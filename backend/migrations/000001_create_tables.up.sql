@@ -59,9 +59,9 @@ CREATE TABLE IF NOT EXISTS genres (
 );
 
 CREATE TABLE IF NOT EXISTS track_genre (
-    id UUID PRIMARY KEY,
     track_id UUID REFERENCES tracks ON DELETE CASCADE,
-    genre_id UUID REFERENCES genres ON DELETE CASCADE
+    genre_id UUID REFERENCES genres ON DELETE CASCADE,
+    PRIMARY KEY (track_id, genre_id)
 );
 
 CREATE TABLE IF NOT EXISTS favorite (

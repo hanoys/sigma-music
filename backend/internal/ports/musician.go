@@ -14,7 +14,7 @@ var (
 )
 
 type IMusicianRepository interface {
-	Create(ctx context.Context, user domain.Musician) (domain.Musician, error)
+	Create(ctx context.Context, musician domain.Musician) (domain.Musician, error)
 	GetByName(ctx context.Context, name string) (domain.Musician, error)
 	GetByEmail(ctx context.Context, email string) (domain.Musician, error)
 }
@@ -28,5 +28,5 @@ type MusicianServiceCreateRequest struct {
 }
 
 type IMusicianService interface {
-	Register(ctx context.Context, user UserServiceCreateRequest) (domain.Musician, error)
+	Register(ctx context.Context, musician UserServiceCreateRequest) (domain.Musician, error)
 }

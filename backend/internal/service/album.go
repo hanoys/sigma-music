@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"github.com/google/uuid"
+	"github.com/guregu/null/v5"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
 )
@@ -16,11 +17,12 @@ func NewAlbumService(repo ports.IAlbumRepository) *AlbumService {
 }
 
 func (as *AlbumService) Create(ctx context.Context, albumInfo ports.CreateAlbumServiceReq) (domain.Album, error) {
-	createAlbum := ports.CreateAlbumRepositoryReq{
+	createAlbum := domain.Album{
 		ID:          uuid.New(),
 		Name:        albumInfo.Name,
 		Description: albumInfo.Description,
 		Published:   false,
+		ReleaseDate: null.Time{},
 	}
 
 	album, err := as.repository.Create(ctx, createAlbum)
