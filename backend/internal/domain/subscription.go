@@ -1,11 +1,14 @@
 package domain
 
-import "time"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 type Subscription struct {
-	ID             int
-	UserID         int
-	OrderID        int
+	ID             uuid.UUID
+	UserID         uuid.UUID
+	OrderID        uuid.UUID
 	StartDate      time.Time
 	ExpirationDate time.Time
 }

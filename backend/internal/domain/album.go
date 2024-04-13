@@ -1,11 +1,14 @@
 package domain
 
-import "time"
+import (
+	"github.com/google/uuid"
+	"github.com/guregu/null/v5"
+)
 
 type Album struct {
-	ID          int
-	MusicianID  int
+	ID          uuid.UUID
 	Name        string
 	Description string
-	ReleaseDate time.Time
+	Published   bool
+	ReleaseDate null.Time
 }

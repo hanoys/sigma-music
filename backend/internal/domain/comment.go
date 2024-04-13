@@ -1,9 +1,11 @@
 package domain
 
+import "github.com/google/uuid"
+
 type Comment struct {
-	ID      int
-	UserID  int
-	TrackID int
+	ID      uuid.UUID
+	UserID  uuid.UUID
+	TrackID uuid.UUID
 	Stars   int
 	Text    string
 }

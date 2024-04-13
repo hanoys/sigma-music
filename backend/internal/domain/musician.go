@@ -1,7 +1,9 @@
 package domain
 
+import "github.com/google/uuid"
+
 type Musician struct {
-	ID          int
+	ID          uuid.UUID
 	Name        string
 	Email       string
 	Password    string
