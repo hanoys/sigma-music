@@ -2,9 +2,13 @@ package repository
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"github.com/google/uuid"
 	"github.com/hanoys/sigma-music/internal/adapters/repository/entity"
 	"github.com/hanoys/sigma-music/internal/domain"
+	"github.com/hanoys/sigma-music/internal/ports"
+	"github.com/hanoys/sigma-music/internal/utill"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -26,7 +30,10 @@ func (gr *PostgresGenreRepository) GetAll(ctx context.Context) ([]domain.Genre, 
 	var genres []entity.PgGenre
 	err := gr.db.SelectContext(ctx, &genres, genreGetAllQuery)
 	if err != nil {
-		return nil, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utill.WrapError(ports.ErrGenreNotFound, err)
+		}
+		return nil, utill.WrapError(ports.ErrInternalGenreRepo, err)
 	}
 
 	domainGenres := make([]domain.Genre, len(genres))
@@ -41,7 +48,10 @@ func (gr *PostgresGenreRepository) GetByID(ctx context.Context, id uuid.UUID) (d
 	var foundGenre entity.PgGenre
 	err := gr.db.GetContext(ctx, &foundGenre, genreGetByIDQuery, id)
 	if err != nil {
-		return domain.Genre{}, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.Genre{}, utill.WrapError(ports.ErrGenreIDNotFound, err)
+		}
+		return domain.Genre{}, utill.WrapError(ports.ErrInternalGenreRepo, err)
 	}
 
 	return foundGenre.ToDomain(), nil
@@ -55,7 +65,7 @@ func (gr *PostgresGenreRepository) AddForTrack(ctx context.Context, trackID uuid
 
 	err := tx.Commit()
 	if err != nil {
-		return err
+		return utill.WrapError(ports.ErrInternalGenreRepo, err)
 	}
 
 	return nil

@@ -16,19 +16,9 @@ func NewCommentService(repo ports.ICommentRepository) *CommentService {
 }
 
 func (cs *CommentService) Post(ctx context.Context, comment domain.Comment) (domain.Comment, error) {
-	comment, err := cs.repository.Create(ctx, comment)
-	if err != nil {
-		return domain.Comment{}, ports.ErrPostComment
-	}
-
-	return comment, nil
+	return cs.repository.Create(ctx, comment)
 }
 
 func (cs *CommentService) GetCommentsOnTrack(ctx context.Context, trackID uuid.UUID) ([]domain.Comment, error) {
-	comments, err := cs.repository.GetByTrackID(ctx, trackID)
-	if err != nil {
-		return nil, ports.ErrGetComments
-	}
-
-	return comments, nil
+	return cs.repository.GetByTrackID(ctx, trackID)
 }

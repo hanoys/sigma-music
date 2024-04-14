@@ -6,6 +6,6 @@ type Comment struct {
 	ID      uuid.UUID
 	UserID  uuid.UUID
 	TrackID uuid.UUID
-	Stars   int
-	Text    string
+	Stars   int    // > 0 && < 5
+	Text    string // len
 }

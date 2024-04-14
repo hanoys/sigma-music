@@ -17,17 +17,17 @@ func NewUserService(repo ports.IUserRepository) *UserService {
 
 func (us *UserService) Register(ctx context.Context, user ports.UserServiceCreateRequest) (domain.User, error) {
 	_, err := us.repository.GetByName(ctx, user.Name)
-	if err != nil {
+	if err == nil {
 		return domain.User{}, ports.ErrUserWithSuchNameAlreadyExists
 	}
 
 	_, err = us.repository.GetByEmail(ctx, user.Email)
-	if err != nil {
+	if err == nil {
 		return domain.User{}, ports.ErrUserWithSuchEmailAlreadyExists
 	}
 
 	_, err = us.repository.GetByPhone(ctx, user.Phone)
-	if err != nil {
+	if err == nil {
 		return domain.User{}, ports.ErrUserWithSuchPhoneAlreadyExists
 	}
 
@@ -40,10 +40,5 @@ func (us *UserService) Register(ctx context.Context, user ports.UserServiceCreat
 		Country:  user.Country,
 	}
 
-	newUser, err := us.repository.Create(ctx, createUser)
-	if err != nil {
-		return domain.User{}, ports.ErrUserRegister
-	}
-
-	return newUser, nil
+	return us.repository.Create(ctx, createUser)
 }

@@ -8,8 +8,11 @@ import (
 )
 
 var (
-	ErrPostComment = errors.New("can't post comment: internal error")
-	ErrGetComments = errors.New("can't get comments: internal error")
+	ErrCommentDuplicate         = errors.New("")
+	ErrCommentIDNotFound        = errors.New("comment with such id not found")
+	ErrCommentByUserIDNotFound  = errors.New("comment with such user id not found")
+	ErrCommentByTrackIDNotFound = errors.New("comment with such track id not found")
+	ErrInternalCommentRepo      = errors.New("comment repository internal error")
 )
 
 type ICommentRepository interface {

@@ -8,19 +8,18 @@ import (
 )
 
 type PgOrder struct {
-	ID         uuid.UUID    `db:"id"`
-	UserID     uuid.UUID    `db:"user_id"`
-	CreateTime time.Time    `db:"create_time"`
-	Price      *money.Money `db:"price"`
+	ID         uuid.UUID `db:"id"`
+	UserID     uuid.UUID `db:"user_id"`
+	CreateTime time.Time `db:"create_time"`
+	Price      float64   `db:"price"`
 }
 
-// TODO: data type for price
 func (o *PgOrder) ToDomain() domain.Order {
 	return domain.Order{
 		ID:         o.ID,
 		UserID:     o.UserID,
 		CreateTime: o.CreateTime,
-		Price:      o.Price,
+		Price:      money.NewFromFloat(o.Price, money.RUB),
 	}
 }
 
@@ -29,6 +28,6 @@ func NewPgOrder(order domain.Order) PgOrder {
 		ID:         order.ID,
 		UserID:     order.UserID,
 		CreateTime: order.CreateTime,
-		Price:      order.Price,
+		Price:      order.Price.AsMajorUnits(),
 	}
 }

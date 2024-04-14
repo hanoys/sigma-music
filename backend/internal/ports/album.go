@@ -8,8 +8,11 @@ import (
 )
 
 var (
-	ErrCreateAlbum = errors.New("can't create the album: internal error")
-	ErrPublish     = errors.New("can't publish the album: internal error")
+	ErrAlbumDuplicate            = errors.New("")
+	ErrAlbumIDNotFound           = errors.New("album with such id not found")
+	ErrAlbumByMusicianIDNotFound = errors.New("album with such musician id not found")
+	ErrAlbumPublish              = errors.New("can't publish album with such id")
+	ErrInternalAlbumRepo         = errors.New("album repository internal error")
 )
 
 type IAlbumRepository interface {

@@ -2,9 +2,15 @@ package repository
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"github.com/google/uuid"
 	"github.com/hanoys/sigma-music/internal/adapters/repository/entity"
 	"github.com/hanoys/sigma-music/internal/domain"
+	"github.com/hanoys/sigma-music/internal/ports"
+	"github.com/hanoys/sigma-music/internal/utill"
+	"github.com/jackc/pgerrcode"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -26,13 +32,22 @@ func (tr *PostgresTrackRepository) Create(ctx context.Context, track domain.Trac
 	queryString := entity.InsertQueryString(pgTrack, "tracks")
 	_, err := tr.db.NamedExecContext(ctx, queryString, pgTrack)
 	if err != nil {
-		return domain.Track{}, err
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == pgerrcode.UniqueViolation {
+				return domain.Track{}, utill.WrapError(ports.ErrTrackDuplicate, err)
+			}
+		}
+		return domain.Track{}, utill.WrapError(ports.ErrInternalTrackRepo, err)
 	}
 
 	var createdTrack entity.PgTrack
 	err = tr.db.GetContext(ctx, &createdTrack, trackGetByIDQuery, pgTrack.ID)
 	if err != nil {
-		return domain.Track{}, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.Track{}, utill.WrapError(ports.ErrTrackIDNotFound, err)
+		}
+		return domain.Track{}, utill.WrapError(ports.ErrInternalTrackRepo, err)
 	}
 
 	return createdTrack.ToDomain(), nil
@@ -42,12 +57,15 @@ func (tr *PostgresTrackRepository) Delete(ctx context.Context, trackID uuid.UUID
 	var deletedTrack entity.PgTrack
 	err := tr.db.GetContext(ctx, &deletedTrack, trackGetByIDQuery, trackID)
 	if err != nil {
-		return domain.Track{}, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.Track{}, utill.WrapError(ports.ErrTrackIDNotFound, err)
+		}
+		return domain.Track{}, utill.WrapError(ports.ErrInternalTrackRepo, err)
 	}
 
 	_, err = tr.db.ExecContext(ctx, trackDeleteQuery, trackID)
 	if err != nil {
-		return domain.Track{}, err
+		return domain.Track{}, utill.WrapError(ports.ErrTrackDelete, err)
 	}
 
 	return deletedTrack.ToDomain(), nil

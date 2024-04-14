@@ -2,9 +2,15 @@ package repository
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"github.com/google/uuid"
 	"github.com/hanoys/sigma-music/internal/adapters/repository/entity"
 	"github.com/hanoys/sigma-music/internal/domain"
+	"github.com/hanoys/sigma-music/internal/ports"
+	"github.com/hanoys/sigma-music/internal/utill"
+	"github.com/jackc/pgerrcode"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -27,13 +33,19 @@ func (cr *PostgresCommentRepository) Create(ctx context.Context, comment domain.
 	queryString := entity.InsertQueryString(pgComment, "comments")
 	_, err := cr.db.NamedExecContext(ctx, queryString, pgComment)
 	if err != nil {
-		return domain.Comment{}, err
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == pgerrcode.UniqueViolation {
+				return domain.Comment{}, utill.WrapError(ports.ErrCommentDuplicate, err)
+			}
+		}
+		return domain.Comment{}, utill.WrapError(ports.ErrInternalCommentRepo, err)
 	}
 
 	var createdTrack entity.PgComment
 	err = cr.db.GetContext(ctx, &createdTrack, commentGetByIDQuery, pgComment.ID)
 	if err != nil {
-		return domain.Comment{}, err
+		return domain.Comment{}, utill.WrapError(ports.ErrCommentIDNotFound, err)
 	}
 
 	return createdTrack.ToDomain(), nil
@@ -43,7 +55,10 @@ func (cr *PostgresCommentRepository) GetByUserID(ctx context.Context, userID uui
 	var comments []entity.PgComment
 	err := cr.db.SelectContext(ctx, &comments, commentGetByUserIDQuery, userID)
 	if err != nil {
-		return nil, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utill.WrapError(ports.ErrCommentByUserIDNotFound, err)
+		}
+		return nil, utill.WrapError(ports.ErrInternalCommentRepo, err)
 	}
 
 	domainComments := make([]domain.Comment, len(comments))
@@ -58,7 +73,10 @@ func (cr *PostgresCommentRepository) GetByTrackID(ctx context.Context, trackID u
 	var comments []entity.PgComment
 	err := cr.db.SelectContext(ctx, &comments, commentGetByTrackIDQuery, trackID)
 	if err != nil {
-		return nil, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utill.WrapError(ports.ErrCommentByTrackIDNotFound, err)
+		}
+		return nil, utill.WrapError(ports.ErrInternalCommentRepo, err)
 	}
 
 	domainComments := make([]domain.Comment, len(comments))

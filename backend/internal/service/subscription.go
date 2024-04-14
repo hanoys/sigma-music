@@ -25,10 +25,5 @@ func (ss *SubscriptionService) Create(ctx context.Context, subReq ports.CreateSu
 		ExpirationDate: time.Now().Add(time.Hour * 30),
 	}
 
-	sub, err := ss.repository.Create(ctx, newSubscription)
-	if err != nil {
-		return domain.Subscription{}, ports.ErrSubscriptionCreate
-	}
-
-	return sub, nil
+	return ss.repository.Create(ctx, newSubscription)
 }

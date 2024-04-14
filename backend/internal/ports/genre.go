@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	ErrGenreGetAll      = errors.New("genre: can't get all genres")
-	ErrGenreGetByID     = errors.New("genre: can't get by id")
-	ErrGenreSetForTrack = errors.New("genre: can't get by id")
+	ErrGenreIDNotFound   = errors.New("genre with such id not found")
+	ErrGenreNotFound     = errors.New("can't find any genre")
+	ErrInternalGenreRepo = errors.New("internal track repository error")
 )
 
 type IGenreRepository interface {

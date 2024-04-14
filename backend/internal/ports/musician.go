@@ -7,10 +7,16 @@ import (
 )
 
 var (
+	ErrMusicianDuplicate     = errors.New("")
+	ErrMusicianIDNotFound    = errors.New("user with such id not found")
+	ErrMusicianNameNotFound  = errors.New("user with such name doesn't exists")
+	ErrMusicianEmailNotFound = errors.New("user with such email doesn't exists")
+	ErrInternalMusicianRepo  = errors.New("user repository internal error")
+)
+
+var (
 	ErrMusicianWithSuchNameAlreadyExists  = errors.New("user with such name already exists")
 	ErrMusicianWithSuchEmailAlreadyExists = errors.New("user with such email already exists")
-	ErrMusicianWithSuchPhoneAlreadyExists = errors.New("user with such phone already exists")
-	ErrMusicianRegister                   = errors.New("can't register user: internal error")
 )
 
 type IMusicianRepository interface {

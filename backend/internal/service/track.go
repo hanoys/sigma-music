@@ -32,7 +32,7 @@ func (ts *TrackService) Create(ctx context.Context, trackInfo ports.CreateTrackR
 	})
 
 	if err != nil {
-		return domain.Track{}, ports.ErrTrackCreate
+		return domain.Track{}, err
 	}
 
 	err = ts.GenreService.AddForTrack(ctx, trackID, trackInfo.GenresID)
@@ -47,7 +47,7 @@ func (ts *TrackService) Create(ctx context.Context, trackInfo ports.CreateTrackR
 	})
 
 	if err != nil {
-		return domain.Track{}, ports.ErrTrackPut
+		return domain.Track{}, err
 	}
 
 	return track, nil
@@ -56,13 +56,13 @@ func (ts *TrackService) Create(ctx context.Context, trackInfo ports.CreateTrackR
 func (ts *TrackService) Delete(ctx context.Context, trackID uuid.UUID) error {
 	trackInfo, err := ts.repository.Delete(ctx, trackID)
 	if err != nil {
-		return ports.ErrTrackDelete
+		return err
 	}
 
 	err = ts.trackStorage.DeleteTrack(ctx, trackID)
 	if err != nil {
 		_, _ = ts.repository.Create(ctx, trackInfo)
-		return ports.ErrTrackDelete
+		return err
 	}
 
 	return nil

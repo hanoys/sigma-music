@@ -24,10 +24,5 @@ func (os *OrderService) Create(ctx context.Context, orderReq ports.CreateOrderRe
 		Price:      orderReq.Price,
 	}
 
-	order, err := os.repository.Create(ctx, newOrder)
-	if err != nil {
-		return domain.Order{}, ports.ErrOrderCreate
-	}
-
-	return order, nil
+	return os.repository.Create(ctx, newOrder)
 }

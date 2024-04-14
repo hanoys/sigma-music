@@ -25,19 +25,9 @@ func (as *AlbumService) Create(ctx context.Context, albumInfo ports.CreateAlbumS
 		ReleaseDate: null.Time{},
 	}
 
-	album, err := as.repository.Create(ctx, createAlbum)
-	if err != nil {
-		return domain.Album{}, ports.ErrCreateAlbum
-	}
-
-	return album, nil
+	return as.repository.Create(ctx, createAlbum)
 }
 
 func (as *AlbumService) Publish(ctx context.Context, albumID uuid.UUID) error {
-	err := as.repository.Publish(ctx, albumID)
-	if err != nil {
-		return ports.ErrPublish
-	}
-
-	return nil
+	return as.repository.Publish(ctx, albumID)
 }

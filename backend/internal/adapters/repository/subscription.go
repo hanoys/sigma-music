@@ -2,8 +2,14 @@ package repository
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"github.com/hanoys/sigma-music/internal/adapters/repository/entity"
 	"github.com/hanoys/sigma-music/internal/domain"
+	"github.com/hanoys/sigma-music/internal/ports"
+	"github.com/hanoys/sigma-music/internal/utill"
+	"github.com/jackc/pgerrcode"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -24,13 +30,22 @@ func (sr *PostgresSubscriptionRepository) Create(ctx context.Context, sub domain
 	queryString := entity.InsertQueryString(pgSubscription, "subscriptions")
 	_, err := sr.db.NamedExecContext(ctx, queryString, pgSubscription)
 	if err != nil {
-		return domain.Subscription{}, err
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == pgerrcode.UniqueViolation {
+				return domain.Subscription{}, utill.WrapError(ports.ErrSubDuplicate, err)
+			}
+		}
+		return domain.Subscription{}, utill.WrapError(ports.ErrInternalSubRepo, err)
 	}
 
 	var createdSubscription entity.PgSubscription
 	err = sr.db.GetContext(ctx, &createdSubscription, subscriptionGetByID, pgSubscription.ID)
 	if err != nil {
-		return domain.Subscription{}, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.Subscription{}, utill.WrapError(ports.ErrSubIDNotFound, err)
+		}
+		return domain.Subscription{}, utill.WrapError(ports.ErrInternalSubRepo, err)
 	}
 
 	return createdSubscription.ToDomain(), nil

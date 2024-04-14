@@ -4,5 +4,5 @@ import "github.com/google/uuid"
 
 type Genre struct {
 	ID   uuid.UUID
-	Name string
+	Name string // len
 }

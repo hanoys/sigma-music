@@ -9,9 +9,10 @@ import (
 )
 
 var (
-	ErrTrackCreate = errors.New("can't create track: internal error")
-	ErrTrackPut    = errors.New("can't put track: internal error")
-	ErrTrackDelete = errors.New("can't delete track: internal error")
+	ErrTrackDuplicate    = errors.New("")
+	ErrTrackIDNotFound   = errors.New("track with such id not found")
+	ErrTrackDelete       = errors.New("can't delete track with such id")
+	ErrInternalTrackRepo = errors.New("internal track repository error")
 )
 
 type ITrackRepository interface {

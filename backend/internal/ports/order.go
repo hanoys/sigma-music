@@ -9,7 +9,9 @@ import (
 )
 
 var (
-	ErrOrderCreate = errors.New("can't create order: internal error")
+	ErrOrderDuplicate    = errors.New("")
+	ErrOrderIDNotFound   = errors.New("order with such id not found")
+	ErrInternalOrderRepo = errors.New("internal order repository error")
 )
 
 type IOrderRepository interface {

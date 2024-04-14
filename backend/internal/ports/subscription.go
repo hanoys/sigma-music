@@ -8,7 +8,9 @@ import (
 )
 
 var (
-	ErrSubscriptionCreate = errors.New("can't create subscription: internal error")
+	ErrSubDuplicate    = errors.New("")
+	ErrSubIDNotFound   = errors.New("subscription with such id not found")
+	ErrInternalSubRepo = errors.New("internal subscription repository error")
 )
 
 type ISubscriptionRepository interface {
