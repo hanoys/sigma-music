@@ -30,9 +30,6 @@ func (gr *PostgresGenreRepository) GetAll(ctx context.Context) ([]domain.Genre, 
 	var genres []entity.PgGenre
 	err := gr.db.SelectContext(ctx, &genres, genreGetAllQuery)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, utill.WrapError(ports.ErrGenreNotFound, err)
-		}
 		return nil, utill.WrapError(ports.ErrInternalGenreRepo, err)
 	}
 
