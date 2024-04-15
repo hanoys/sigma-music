@@ -17,12 +17,12 @@ func NewMusicianService(repo ports.IMusicianRepository) *MusicianService {
 
 func (ms *MusicianService) Register(ctx context.Context, musician ports.MusicianServiceCreateRequest) (domain.Musician, error) {
 	_, err := ms.repository.GetByName(ctx, musician.Name)
-	if err != nil {
+	if err == nil {
 		return domain.Musician{}, ports.ErrMusicianWithSuchNameAlreadyExists
 	}
 
 	_, err = ms.repository.GetByEmail(ctx, musician.Email)
-	if err != nil {
+	if err == nil {
 		return domain.Musician{}, ports.ErrMusicianWithSuchEmailAlreadyExists
 	}
 
