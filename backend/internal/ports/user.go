@@ -19,7 +19,6 @@ var (
 	ErrUserWithSuchNameAlreadyExists  = errors.New("user with such name already exists")
 	ErrUserWithSuchEmailAlreadyExists = errors.New("user with such email already exists")
 	ErrUserWithSuchPhoneAlreadyExists = errors.New("user with such phone already exists")
-	ErrUserRegister                   = errors.New("can't register user: internal error")
 )
 
 type IUserRepository interface {
