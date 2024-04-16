@@ -14,8 +14,14 @@ type StatService struct {
 	musicianService ports.IMusicianService
 }
 
-func NewStatService(repo ports.IStatRepository) *StatService {
-	return &StatService{repository: repo}
+func NewStatService(repo ports.IStatRepository, genreService ports.IGenreService,
+	musService ports.IMusicianService) *StatService {
+
+	return &StatService{
+		repository:      repo,
+		genreService:    genreService,
+		musicianService: musService,
+	}
 }
 
 func (ss *StatService) Add(ctx context.Context, userID uuid.UUID, trackID uuid.UUID) error {
