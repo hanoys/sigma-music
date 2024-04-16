@@ -37,3 +37,15 @@ func (ms *MusicianService) Register(ctx context.Context, musician ports.Musician
 
 	return ms.repository.Create(ctx, createMusician)
 }
+
+func (ms *MusicianService) GetByID(ctx context.Context, musicianID uuid.UUID) (domain.Musician, error) {
+	return ms.repository.GetByID(ctx, musicianID)
+}
+
+func (ms *MusicianService) GetByName(ctx context.Context, name string) (domain.Musician, error) {
+	return ms.repository.GetByName(ctx, name)
+}
+
+func (ms *MusicianService) GetByEmail(ctx context.Context, email string) (domain.Musician, error) {
+	return ms.repository.GetByEmail(ctx, email)
+}

@@ -26,7 +26,6 @@ CREATE TABLE IF NOT EXISTS musicians (
     id UUID PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
-    phone VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     country VARCHAR(255) NOT NULL,
     description VARCHAR(1024) NOT NULL
@@ -77,3 +76,9 @@ CREATE TABLE IF NOT EXISTS comments (
     stars INTEGER CHECK (stars > 0 AND stars <= 5),
     comment_text VARCHAR(1024)
 );
+
+CREATE TABLE IF NOT EXISTS users_history (
+    id SERIAL PRIMARY KEY,
+    user_id UUID REFERENCES users ON DELETE CASCADE,
+    track_id UUID REFERENCES tracks ON DELETE CASCADE
+)

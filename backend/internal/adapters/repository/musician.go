@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"github.com/google/uuid"
 	"github.com/hanoys/sigma-music/internal/adapters/repository/entity"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
@@ -49,6 +50,19 @@ func (mr *PostgresMusicianRepository) Create(ctx context.Context, musician domai
 	}
 
 	return createdUser.ToDomain(), nil
+}
+
+func (mr *PostgresMusicianRepository) GetByID(ctx context.Context, musicianID uuid.UUID) (domain.Musician, error) {
+	var foundMusician entity.PgMusician
+	err := mr.db.GetContext(ctx, &foundMusician, musicianGetByUniqueQuery, "id", musicianID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.Musician{}, utill.WrapError(ports.ErrMusicianIDNotFound, err)
+		}
+		return domain.Musician{}, utill.WrapError(ports.ErrInternalMusicianRepo, err)
+	}
+
+	return foundMusician.ToDomain(), nil
 }
 
 func (mr *PostgresMusicianRepository) GetByName(ctx context.Context, name string) (domain.Musician, error) {
