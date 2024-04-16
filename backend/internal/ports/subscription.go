@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	ErrSubDuplicate    = errors.New("")
+	ErrSubDuplicate    = errors.New("subscription duplicate error")
 	ErrSubIDNotFound   = errors.New("subscription with such id not found")
 	ErrInternalSubRepo = errors.New("internal subscription repository error")
 )

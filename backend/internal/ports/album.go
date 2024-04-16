@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	ErrAlbumDuplicate            = errors.New("")
+	ErrAlbumDuplicate            = errors.New("album duplicate error")
 	ErrAlbumIDNotFound           = errors.New("album with such id not found")
 	ErrAlbumByMusicianIDNotFound = errors.New("album with such musician id not found")
 	ErrAlbumPublish              = errors.New("can't publish album with such id")

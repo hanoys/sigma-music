@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	ErrMusicianDuplicate     = errors.New("")
+	ErrMusicianDuplicate     = errors.New("musician duplicate error")
 	ErrMusicianIDNotFound    = errors.New("musician with such id not found")
 	ErrMusicianNameNotFound  = errors.New("musician with such name doesn't exists")
 	ErrMusicianEmailNotFound = errors.New("musician with such email doesn't exists")

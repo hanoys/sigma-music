@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	ErrTrackDuplicate    = errors.New("")
+	ErrTrackDuplicate    = errors.New("track duplicate error")
 	ErrTrackIDNotFound   = errors.New("track with such id not found")
 	ErrTrackDelete       = errors.New("can't delete track with such id")
 	ErrInternalTrackRepo = errors.New("internal track repository error")

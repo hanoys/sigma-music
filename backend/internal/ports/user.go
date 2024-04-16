@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	ErrUserDuplicate     = errors.New("")
+	ErrUserDuplicate     = errors.New("user duplicate error")
 	ErrUserIDNotFound    = errors.New("user with such id not found")
 	ErrUserNameNotFound  = errors.New("user with such name doesn't exists")
 	ErrUserEmailNotFound = errors.New("user with such email doesn't exists")

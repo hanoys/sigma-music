@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	ErrOrderDuplicate    = errors.New("")
+	ErrOrderDuplicate    = errors.New("order duplicate error")
 	ErrOrderIDNotFound   = errors.New("order with such id not found")
 	ErrInternalOrderRepo = errors.New("internal order repository error")
 )

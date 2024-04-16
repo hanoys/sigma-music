@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	ErrCommentDuplicate         = errors.New("")
+	ErrCommentDuplicate         = errors.New("comment duplicate error")
 	ErrCommentIDNotFound        = errors.New("comment with such id not found")
 	ErrCommentByUserIDNotFound  = errors.New("comment with such user id not found")
 	ErrCommentByTrackIDNotFound = errors.New("comment with such track id not found")
