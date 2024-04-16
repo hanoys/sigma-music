@@ -27,8 +27,8 @@ type GenreStat struct {
 }
 
 type ListenReport struct {
-	UserID                  uuid.UUID
-	MostListenedMusiciansID []MusicianStat
-	ListenedGenres          []GenreStat
-	ListenCount             int64
+	UserID                uuid.UUID
+	MostListenedMusicians []MusicianStat
+	ListenedGenres        []GenreStat
+	ListenCount           int64
 }

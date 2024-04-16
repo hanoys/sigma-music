@@ -31,14 +31,14 @@ func (ss *StatService) Add(ctx context.Context, userID uuid.UUID, trackID uuid.U
 func (ss *StatService) fillMostListenedMusicians(ctx context.Context, listenReport *domain.ListenReport,
 	listenedMusicians []domain.UserMusiciansStat) error {
 
-	listenReport.MostListenedMusiciansID = make([]domain.MusicianStat, len(listenedMusicians))
+	listenReport.MostListenedMusicians = make([]domain.MusicianStat, len(listenedMusicians))
 	for i, userMusicianStat := range listenedMusicians {
 		musician, err := ss.musicianService.GetByID(ctx, userMusicianStat.MusicianID)
 		if err != nil {
 			return err
 		}
 
-		listenReport.MostListenedMusiciansID[i] = domain.MusicianStat{
+		listenReport.MostListenedMusicians[i] = domain.MusicianStat{
 			MusicianID:   userMusicianStat.MusicianID,
 			MusicianName: musician.Name,
 			ListenCount:  userMusicianStat.ListenCount,
