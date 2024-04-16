@@ -7,8 +7,8 @@ import (
 
 type Album struct {
 	ID          uuid.UUID
-	Name        string // len
-	Description string // len
+	Name        string
+	Description string
 	Published   bool
 	ReleaseDate null.Time
 }

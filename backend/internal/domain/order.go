@@ -10,5 +10,5 @@ type Order struct {
 	ID         uuid.UUID
 	UserID     uuid.UUID
 	CreateTime time.Time
-	Price      *money.Money // > 0
+	Price      *money.Money
 }
