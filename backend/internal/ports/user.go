@@ -15,18 +15,18 @@ var (
 	ErrInternalUserRepo  = errors.New("user repository internal error")
 )
 
-var (
-	ErrUserWithSuchNameAlreadyExists  = errors.New("user with such name already exists")
-	ErrUserWithSuchEmailAlreadyExists = errors.New("user with such email already exists")
-	ErrUserWithSuchPhoneAlreadyExists = errors.New("user with such phone already exists")
-)
-
 type IUserRepository interface {
 	Create(ctx context.Context, user domain.User) (domain.User, error)
 	GetByName(ctx context.Context, name string) (domain.User, error)
 	GetByEmail(ctx context.Context, email string) (domain.User, error)
 	GetByPhone(ctx context.Context, phone string) (domain.User, error)
 }
+
+var (
+	ErrUserWithSuchNameAlreadyExists  = errors.New("user with such name already exists")
+	ErrUserWithSuchEmailAlreadyExists = errors.New("user with such email already exists")
+	ErrUserWithSuchPhoneAlreadyExists = errors.New("user with such phone already exists")
+)
 
 type UserServiceCreateRequest struct {
 	Name     string

@@ -65,14 +65,15 @@ func TestMusicianServiceRegister(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Logf("Test: %s", test.name)
-		musicianRepository := mocks.NewMusicianRepository(t)
-		musicianService := service.NewMusicianService(musicianRepository)
-		test.repositoryMock(musicianRepository)
+		t.Run(test.name, func(t *testing.T) {
+			musicianRepository := mocks.NewMusicianRepository(t)
+			musicianService := service.NewMusicianService(musicianRepository)
+			test.repositoryMock(musicianRepository)
 
-		_, err := musicianService.Register(context.Background(), test.req)
-		if !errors.Is(err, test.expected) {
-			t.Errorf("got %v, want %v", err, test.expected)
-		}
+			_, err := musicianService.Register(context.Background(), test.req)
+			if !errors.Is(err, test.expected) {
+				t.Errorf("got %v, want %v", err, test.expected)
+			}
+		})
 	}
 }

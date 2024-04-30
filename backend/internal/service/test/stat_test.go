@@ -226,32 +226,32 @@ func TestStatServiceFromReport(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Logf("Test: %s", test.name)
+		t.Run(test.name, func(t *testing.T) {
+			musicianRepo := mocks.NewMusicianRepository(t)
+			musicianService := service.NewMusicianService(musicianRepo)
+			test.musicianRepoMock(musicianRepo)
 
-		musicianRepo := mocks.NewMusicianRepository(t)
-		musicianService := service.NewMusicianService(musicianRepo)
-		test.musicianRepoMock(musicianRepo)
+			genreRepo := mocks.NewGenreRepository(t)
+			genreService := service.NewGenreService(genreRepo)
+			test.genreRepoMock(genreRepo)
 
-		genreRepo := mocks.NewGenreRepository(t)
-		genreService := service.NewGenreService(genreRepo)
-		test.genreRepoMock(genreRepo)
+			statRepo := mocks.NewStatRepository(t)
+			statService := service.NewStatService(statRepo, genreService, musicianService)
+			test.statRepoMock(statRepo)
 
-		statRepo := mocks.NewStatRepository(t)
-		statService := service.NewStatService(statRepo, genreService, musicianService)
-		test.statRepoMock(statRepo)
+			res, err := statService.FormReport(context.Background(), userID)
+			if !errors.Is(err, test.expected.err) {
+				t.Errorf("got: %v, expected: %v", err, test.expected.err)
+			}
 
-		res, err := statService.FormReport(context.Background(), userID)
-		if !errors.Is(err, test.expected.err) {
-			t.Errorf("got: %v, expected: %v", err, test.expected.err)
-		}
-
-		if err != nil {
-			for i, percentage := range test.expected.genresPercentages {
-				if res.ListenedGenres[i].ListenPercentage != percentage {
-					t.Errorf("got: %v, expected: %v", res.ListenedGenres[i].ListenPercentage, percentage)
+			if err != nil {
+				for i, percentage := range test.expected.genresPercentages {
+					if res.ListenedGenres[i].ListenPercentage != percentage {
+						t.Errorf("got: %v, expected: %v", res.ListenedGenres[i].ListenPercentage, percentage)
+					}
 				}
 			}
-		}
+		})
 	}
 }
 
@@ -281,24 +281,23 @@ func TestStatServiceAdd(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Logf("Test: %s", test.name)
+		t.Run(test.name, func(t *testing.T) {
+			musicianRepo := mocks.NewMusicianRepository(t)
+			musicianService := service.NewMusicianService(musicianRepo)
+			test.musicianRepoMock(musicianRepo)
 
-		musicianRepo := mocks.NewMusicianRepository(t)
-		musicianService := service.NewMusicianService(musicianRepo)
-		test.musicianRepoMock(musicianRepo)
+			genreRepo := mocks.NewGenreRepository(t)
+			genreService := service.NewGenreService(genreRepo)
+			test.genreRepoMock(genreRepo)
 
-		genreRepo := mocks.NewGenreRepository(t)
-		genreService := service.NewGenreService(genreRepo)
-		test.genreRepoMock(genreRepo)
+			statRepo := mocks.NewStatRepository(t)
+			statService := service.NewStatService(statRepo, genreService, musicianService)
+			test.statRepoMock(statRepo)
 
-		statRepo := mocks.NewStatRepository(t)
-		statService := service.NewStatService(statRepo, genreService, musicianService)
-		test.statRepoMock(statRepo)
-
-		err := statService.Add(context.Background(), userID, trackID)
-		if !errors.Is(err, test.expected) {
-			t.Errorf("got: %v, expected: %v", err, test.expected)
-		}
-
+			err := statService.Add(context.Background(), userID, trackID)
+			if !errors.Is(err, test.expected) {
+				t.Errorf("got: %v, expected: %v", err, test.expected)
+			}
+		})
 	}
 }

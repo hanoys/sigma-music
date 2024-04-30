@@ -39,15 +39,16 @@ func TestGenreServiceGetAll(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Logf("Test: %s", test.name)
-		genreRepository := mocks.NewGenreRepository(t)
-		genreService := service.NewGenreService(genreRepository)
-		test.repositoryMock(genreRepository)
+		t.Run(test.name, func(t *testing.T) {
+			genreRepository := mocks.NewGenreRepository(t)
+			genreService := service.NewGenreService(genreRepository)
+			test.repositoryMock(genreRepository)
 
-		_, err := genreService.GetAll(context.Background())
-		if !errors.Is(err, test.expected) {
-			t.Errorf("got %v, want %v", err, test.expected)
-		}
+			_, err := genreService.GetAll(context.Background())
+			if !errors.Is(err, test.expected) {
+				t.Errorf("got %v, want %v", err, test.expected)
+			}
+		})
 	}
 }
 
@@ -79,15 +80,16 @@ func TestGenreServiceGetByID(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Logf("Test: %s", test.name)
-		genreRepository := mocks.NewGenreRepository(t)
-		genreService := service.NewGenreService(genreRepository)
-		test.repositoryMock(genreRepository)
+		t.Run(test.name, func(t *testing.T) {
+			genreRepository := mocks.NewGenreRepository(t)
+			genreService := service.NewGenreService(genreRepository)
+			test.repositoryMock(genreRepository)
 
-		_, err := genreService.GetByID(context.Background(), uuid.New())
-		if !errors.Is(err, test.expected) {
-			t.Errorf("got: %v, expected: %v", err, test.expected)
-		}
+			_, err := genreService.GetByID(context.Background(), uuid.New())
+			if !errors.Is(err, test.expected) {
+				t.Errorf("got: %v, expected: %v", err, test.expected)
+			}
+		})
 	}
 }
 
@@ -113,14 +115,15 @@ func TestGenreServiceAddForTrack(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Logf("Test: %s", test.name)
-		genreRepository := mocks.NewGenreRepository(t)
-		genreService := service.NewGenreService(genreRepository)
-		test.repositoryMock(genreRepository)
+		t.Run(test.name, func(t *testing.T) {
+			genreRepository := mocks.NewGenreRepository(t)
+			genreService := service.NewGenreService(genreRepository)
+			test.repositoryMock(genreRepository)
 
-		err := genreService.AddForTrack(context.Background(), test.trackID, test.genresID)
-		if !errors.Is(err, test.expected) {
-			t.Errorf("got: %v, expected: %v", err, test.expected)
-		}
+			err := genreService.AddForTrack(context.Background(), test.trackID, test.genresID)
+			if !errors.Is(err, test.expected) {
+				t.Errorf("got: %v, expected: %v", err, test.expected)
+			}
+		})
 	}
 }

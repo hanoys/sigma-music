@@ -47,15 +47,16 @@ func TestAlbumServiceCreate(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Logf("Test: %s", test.name)
-		albumRepository := mocks.NewAlbumRepository(t)
-		albumService := service.NewAlbumService(albumRepository)
-		test.repositoryMock(albumRepository)
+		t.Run(test.name, func(t *testing.T) {
+			albumRepository := mocks.NewAlbumRepository(t)
+			albumService := service.NewAlbumService(albumRepository)
+			test.repositoryMock(albumRepository)
 
-		_, err := albumService.Create(context.Background(), test.req)
-		if !errors.Is(err, test.expected) {
-			t.Errorf("got %v, want %v", err, test.expected)
-		}
+			_, err := albumService.Create(context.Background(), test.req)
+			if !errors.Is(err, test.expected) {
+				t.Errorf("got %v, want %v", err, test.expected)
+			}
+		})
 	}
 }
 
@@ -89,14 +90,15 @@ func TestAlbumServicePublish(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Logf("Test: %s", test.name)
-		albumRepository := mocks.NewAlbumRepository(t)
-		albumService := service.NewAlbumService(albumRepository)
-		test.repositoryMock(albumRepository)
+		t.Run(test.name, func(t *testing.T) {
+			albumRepository := mocks.NewAlbumRepository(t)
+			albumService := service.NewAlbumService(albumRepository)
+			test.repositoryMock(albumRepository)
 
-		err := albumService.Publish(context.Background(), test.id)
-		if !errors.Is(err, test.expected) {
-			t.Errorf("got %v, want %v", err, test.expected)
-		}
+			err := albumService.Publish(context.Background(), test.id)
+			if !errors.Is(err, test.expected) {
+				t.Errorf("got %v, want %v", err, test.expected)
+			}
+		})
 	}
 }

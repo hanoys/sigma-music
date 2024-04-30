@@ -81,14 +81,15 @@ func TestUserServiceRegister(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Logf("Test: %s", test.name)
-		userRepository := mocks.NewUserRepository(t)
-		userService := service.NewUserService(userRepository)
-		test.repositoryMock(userRepository)
+		t.Run(test.name, func(t *testing.T) {
+			userRepository := mocks.NewUserRepository(t)
+			userService := service.NewUserService(userRepository)
+			test.repositoryMock(userRepository)
 
-		_, err := userService.Register(context.Background(), test.req)
-		if !errors.Is(err, test.expected) {
-			t.Errorf("got %v, want %v", err, test.expected)
-		}
+			_, err := userService.Register(context.Background(), test.req)
+			if !errors.Is(err, test.expected) {
+				t.Errorf("got %v, want %v", err, test.expected)
+			}
+		})
 	}
 }

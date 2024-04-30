@@ -49,15 +49,16 @@ func TestCommentServicePost(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Logf("Test: %s", test.name)
-		commentRepository := mocks.NewCommentRepository(t)
-		commentService := service.NewCommentService(commentRepository)
-		test.repositoryMock(commentRepository)
+		t.Run(test.name, func(t *testing.T) {
+			commentRepository := mocks.NewCommentRepository(t)
+			commentService := service.NewCommentService(commentRepository)
+			test.repositoryMock(commentRepository)
 
-		_, err := commentService.Post(context.Background(), test.req)
-		if !errors.Is(err, test.expected) {
-			t.Errorf("got %v, want %v", err, test.expected)
-		}
+			_, err := commentService.Post(context.Background(), test.req)
+			if !errors.Is(err, test.expected) {
+				t.Errorf("got %v, want %v", err, test.expected)
+			}
+		})
 	}
 }
 
@@ -91,14 +92,15 @@ func TestCommentServiceGetCommentsOnTrack(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Logf("Test: %s", test.name)
-		commentRepository := mocks.NewCommentRepository(t)
-		commentService := service.NewCommentService(commentRepository)
-		test.repositoryMock(commentRepository)
+		t.Run(test.name, func(t *testing.T) {
+			commentRepository := mocks.NewCommentRepository(t)
+			commentService := service.NewCommentService(commentRepository)
+			test.repositoryMock(commentRepository)
 
-		_, err := commentService.GetCommentsOnTrack(context.Background(), test.id)
-		if !errors.Is(err, test.expected) {
-			t.Errorf("got %v, want %v", err, test.expected)
-		}
+			_, err := commentService.GetCommentsOnTrack(context.Background(), test.id)
+			if !errors.Is(err, test.expected) {
+				t.Errorf("got %v, want %v", err, test.expected)
+			}
+		})
 	}
 }
