@@ -2,5 +2,5 @@ package ports
 
 type IHashPasswordProvider interface {
 	EncodePassword(string) string
-	DecodePassword(string) string
+	ComparePasswordWithHash(password string, hash string) bool
 }

@@ -9,10 +9,11 @@ import (
 
 type UserService struct {
 	repository ports.IUserRepository
+	hash       ports.IHashPasswordProvider
 }
 
-func NewUserService(repo ports.IUserRepository) *UserService {
-	return &UserService{repository: repo}
+func NewUserService(repo ports.IUserRepository, hash ports.IHashPasswordProvider) *UserService {
+	return &UserService{repository: repo, hash: hash}
 }
 
 func (us *UserService) Register(ctx context.Context, user ports.UserServiceCreateRequest) (domain.User, error) {
@@ -36,7 +37,7 @@ func (us *UserService) Register(ctx context.Context, user ports.UserServiceCreat
 		Name:     user.Name,
 		Email:    user.Email,
 		Phone:    user.Phone,
-		Password: user.Password,
+		Password: us.hash.EncodePassword(user.Password),
 		Country:  user.Country,
 	}
 

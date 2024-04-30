@@ -12,13 +12,16 @@ type AuthorizationService struct {
 	userRepository     ports.IUserRepository
 	musicianRepository ports.IMusicianRepository
 	tokenProvider      ports.ITokenProvider
+	hash               ports.IHashPasswordProvider
 }
 
-func NewAuthorizationService(userRepo ports.IUserRepository, musicianRepo ports.IMusicianRepository, tokenProvider ports.ITokenProvider) *AuthorizationService {
+func NewAuthorizationService(userRepo ports.IUserRepository, musicianRepo ports.IMusicianRepository,
+	tokenProvider ports.ITokenProvider, hash ports.IHashPasswordProvider) *AuthorizationService {
 	return &AuthorizationService{
 		userRepository:     userRepo,
 		musicianRepository: musicianRepo,
 		tokenProvider:      tokenProvider,
+		hash:               hash,
 	}
 }
 
@@ -31,7 +34,7 @@ func (a *AuthorizationService) authUser(ctx context.Context, name string, passwo
 		return domain.User{}, ports.ErrInternalAuthRepo
 	}
 
-	if user.Password != password {
+	if a.hash.ComparePasswordWithHash(user.Password, password) {
 		return domain.User{}, ports.ErrIncorrectPassword
 	}
 
@@ -47,7 +50,7 @@ func (a *AuthorizationService) authMusician(ctx context.Context, name string, pa
 		return domain.Musician{}, ports.ErrInternalAuthRepo
 	}
 
-	if musician.Password != password {
+	if a.hash.ComparePasswordWithHash(musician.Password, password) {
 		return domain.Musician{}, ports.ErrIncorrectPassword
 	}
 

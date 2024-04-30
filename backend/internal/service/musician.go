@@ -9,10 +9,11 @@ import (
 
 type MusicianService struct {
 	repository ports.IMusicianRepository
+	hash       ports.IHashPasswordProvider
 }
 
-func NewMusicianService(repo ports.IMusicianRepository) *MusicianService {
-	return &MusicianService{repository: repo}
+func NewMusicianService(repo ports.IMusicianRepository, hash ports.IHashPasswordProvider) *MusicianService {
+	return &MusicianService{repository: repo, hash: hash}
 }
 
 func (ms *MusicianService) Register(ctx context.Context, musician ports.MusicianServiceCreateRequest) (domain.Musician, error) {
@@ -30,7 +31,7 @@ func (ms *MusicianService) Register(ctx context.Context, musician ports.Musician
 		ID:          uuid.New(),
 		Name:        musician.Name,
 		Email:       musician.Email,
-		Password:    musician.Password,
+		Password:    ms.hash.EncodePassword(musician.Password),
 		Country:     musician.Country,
 		Description: musician.Description,
 	}
