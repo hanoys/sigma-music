@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
+	"errors"
 	"github.com/google/uuid"
-	"github.com/hanoys/sigma-music/internal/auth"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
 )
@@ -11,10 +11,10 @@ import (
 type AuthorizationService struct {
 	userRepository     ports.IUserRepository
 	musicianRepository ports.IMusicianRepository
-	tokenProvider      *auth.Provider
+	tokenProvider      ports.ITokenProvider
 }
 
-func NewAuthorizationService(userRepo ports.IUserRepository, musicianRepo ports.IMusicianRepository, tokenProvider *auth.Provider) *AuthorizationService {
+func NewAuthorizationService(userRepo ports.IUserRepository, musicianRepo ports.IMusicianRepository, tokenProvider ports.ITokenProvider) *AuthorizationService {
 	return &AuthorizationService{
 		userRepository:     userRepo,
 		musicianRepository: musicianRepo,
@@ -24,8 +24,11 @@ func NewAuthorizationService(userRepo ports.IUserRepository, musicianRepo ports.
 
 func (a *AuthorizationService) authUser(ctx context.Context, name string, password string) (domain.User, error) {
 	user, err := a.userRepository.GetByName(ctx, name)
-	if err != nil {
+
+	if errors.Is(err, ports.ErrUserNameNotFound) {
 		return domain.User{}, ports.ErrIncorrectName
+	} else if err != nil {
+		return domain.User{}, ports.ErrInternalAuthRepo
 	}
 
 	if user.Password != password {
@@ -37,8 +40,11 @@ func (a *AuthorizationService) authUser(ctx context.Context, name string, passwo
 
 func (a *AuthorizationService) authMusician(ctx context.Context, name string, password string) (domain.Musician, error) {
 	musician, err := a.musicianRepository.GetByName(ctx, name)
-	if err != nil {
+
+	if errors.Is(err, ports.ErrMusicianNameNotFound) {
 		return domain.Musician{}, ports.ErrIncorrectName
+	} else if err != nil {
+		return domain.Musician{}, ports.ErrInternalAuthRepo
 	}
 
 	if musician.Password != password {
@@ -48,39 +54,39 @@ func (a *AuthorizationService) authMusician(ctx context.Context, name string, pa
 	return musician, nil
 }
 
-func (a *AuthorizationService) LogIn(ctx context.Context, cred ports.LogInCredentials) (*auth.TokenPair, error) {
+func (a *AuthorizationService) LogIn(ctx context.Context, cred ports.LogInCredentials) (domain.TokenPair, error) {
 	var id uuid.UUID
 
 	switch cred.Role {
 	case domain.UserRole:
 		user, err := a.authUser(ctx, cred.Name, cred.Password)
 		if err != nil {
-			return nil, err
+			return domain.TokenPair{}, err
 		}
 
 		id = user.ID
 	case domain.MusicianRole:
 		musician, err := a.authMusician(ctx, cred.Name, cred.Password)
 		if err != nil {
-			return nil, err
+			return domain.TokenPair{}, err
 		}
 
 		id = musician.ID
 	default:
-		return nil, ports.ErrUnexpectedRole
+		return domain.TokenPair{}, ports.ErrUnexpectedRole
 	}
 
-	tokenPayload, err := a.tokenProvider.NewPayload(id, cred.Role)
+	payload := domain.Payload{
+		UserID: id,
+		Role:   cred.Role,
+	}
+
+	tokens, err := a.tokenProvider.NewSession(ctx, payload)
 	if err != nil {
-		return nil, err
+		return domain.TokenPair{}, err
 	}
 
-	session, err := a.tokenProvider.NewSession(ctx, tokenPayload)
-	if err != nil {
-		return nil, err
-	}
-
-	return session.Tokens, nil
+	return tokens, nil
 }
 
 func (a *AuthorizationService) LogOut(ctx context.Context, tokenString string) error {
@@ -92,19 +98,19 @@ func (a *AuthorizationService) LogOut(ctx context.Context, tokenString string) e
 	return nil
 }
 
-func (a *AuthorizationService) RefreshToken(ctx context.Context, refreshTokenString string) (*auth.TokenPair, error) {
-	session, err := a.tokenProvider.RefreshSession(ctx, refreshTokenString)
+func (a *AuthorizationService) RefreshToken(ctx context.Context, refreshTokenString string) (domain.TokenPair, error) {
+	payload, err := a.tokenProvider.RefreshSession(ctx, refreshTokenString)
 	if err != nil {
-		return nil, err
+		return domain.TokenPair{}, err
 	}
 
-	return session.Tokens, nil
+	return payload, nil
 }
 
-func (a *AuthorizationService) VerifyToken(ctx context.Context, tokenString string) (*auth.Payload, error) {
+func (a *AuthorizationService) VerifyToken(ctx context.Context, tokenString string) (domain.Payload, error) {
 	payload, err := a.tokenProvider.VerifyToken(ctx, tokenString)
 	if err != nil {
-		return nil, err
+		return domain.Payload{}, err
 	}
 
 	return payload, err

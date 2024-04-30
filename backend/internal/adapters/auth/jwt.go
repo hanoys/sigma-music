@@ -2,22 +2,17 @@ package auth
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
+	"github.com/hanoys/sigma-music/internal/adapters/auth/ports"
+	"github.com/hanoys/sigma-music/internal/domain"
+	serviceports "github.com/hanoys/sigma-music/internal/ports"
+	"github.com/hanoys/sigma-music/internal/utill"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
-	"github.com/redis/go-redis/v9"
-)
-
-var (
-	tokenExpiredErr = errors.New("token expired")
-	invalidTokenErr = errors.New("invalid token")
 )
 
 type TokenSession struct {
-	SessionID      uuid.UUID
 	Tokens         *TokenPair
 	ExpirationTime time.Time
 }
@@ -28,13 +23,12 @@ type TokenPair struct {
 }
 
 type Payload struct {
-	SessionID uuid.UUID
-	UserID    uuid.UUID
-	Role      int
+	UserID uuid.UUID
+	Role   int
 }
 
 type JWTClaims struct {
-	Payload
+	domain.Payload
 	jwt.RegisteredClaims
 }
 
@@ -51,18 +45,18 @@ func NewProviderConfig(accessTime int64, refreshTime int64, secret string) *Prov
 }
 
 type Provider struct {
-	redisClient *redis.Client
-	cfg         *ProviderConfig
+	tokenStorage ports.ITokenStorage
+	cfg          *ProviderConfig
 }
 
-func NewProvider(redisClient *redis.Client, cfg *ProviderConfig) *Provider {
-	return &Provider{redisClient: redisClient,
+func NewProvider(tokenStorage ports.ITokenStorage, cfg *ProviderConfig) *Provider {
+	return &Provider{tokenStorage: tokenStorage,
 		cfg: cfg}
 }
 
-func (p *Provider) newTokenWithExpiration(ctx context.Context, payload *Payload, exp time.Time) (string, error) {
+func (p *Provider) newTokenWithExpiration(ctx context.Context, payload domain.Payload, exp time.Time) (string, error) {
 	claims := &JWTClaims{
-		Payload: *payload,
+		Payload: payload,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(exp),
 		},
@@ -71,110 +65,91 @@ func (p *Provider) newTokenWithExpiration(ctx context.Context, payload *Payload,
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(p.cfg.SecretKey))
 	if err != nil {
-		return "", err
+		return "", serviceports.ErrTokenProviderSignToken
 	}
 
 	return tokenString, nil
 }
 
 func (p *Provider) NewPayload(userID uuid.UUID, role int) (*Payload, error) {
-	sessionID, err := uuid.NewRandom()
-	if err != nil {
-		return nil, err
-	}
-
 	return &Payload{
-		SessionID: sessionID,
-		UserID:    userID,
-		Role:      role,
+		UserID: userID,
+		Role:   role,
 	}, nil
 }
 
-func (p *Provider) NewSession(ctx context.Context, payload *Payload) (*TokenSession, error) {
+func (p *Provider) NewSession(ctx context.Context, payload domain.Payload) (domain.TokenPair, error) {
 	accessExpTime := time.Now().Add(time.Minute * time.Duration(p.cfg.AccessTokenExpTime))
 	refreshExpTime := time.Now().Add(time.Minute * time.Duration(p.cfg.RefreshTokenExpTime))
 
 	accessTokenString, err := p.newTokenWithExpiration(ctx, payload, accessExpTime)
 	if err != nil {
-		return nil, err
+		return domain.TokenPair{}, err
 	}
 
 	refreshTokenString, err := p.newTokenWithExpiration(ctx, payload, refreshExpTime)
 	if err != nil {
-		return nil, err
+		return domain.TokenPair{}, err
 	}
 
-	session := &TokenSession{
-		SessionID: payload.SessionID,
-		Tokens: &TokenPair{
-			AccessToken:  accessTokenString,
-			RefreshToken: refreshTokenString},
-		ExpirationTime: refreshExpTime,
+	tokenPair := domain.TokenPair{
+		AccessToken:  accessTokenString,
+		RefreshToken: refreshTokenString,
 	}
 
-	tokensJSON, err := json.Marshal(session.Tokens)
+	err = p.tokenStorage.Set(ctx, tokenPair.RefreshToken,
+		payload, refreshExpTime.Sub(time.Now()))
 	if err != nil {
-		return nil, err
+		return domain.TokenPair{}, utill.WrapError(serviceports.ErrInternalTokenProvider, err)
 	}
 
-	_, err = p.redisClient.Set(ctx, session.SessionID.String(),
-		string(tokensJSON), session.ExpirationTime.Sub(time.Now())).Result()
-	if err != nil {
-		return nil, err
-	}
-
-	return session, nil
+	return tokenPair, nil
 }
 
-func (p *Provider) RefreshSession(ctx context.Context, refreshTokenString string) (*TokenSession, error) {
+func (p *Provider) RefreshSession(ctx context.Context, refreshTokenString string) (domain.TokenPair, error) {
 	refreshClaims, err := p.parseToken(refreshTokenString)
 	if err != nil {
-		return nil, err
+		return domain.TokenPair{}, err
 	}
 
-	p.redisClient.Del(ctx, refreshClaims.Payload.SessionID.String()).Result()
-
-	payload, err := p.NewPayload(refreshClaims.UserID, refreshClaims.Role)
+	err = p.tokenStorage.Del(ctx, refreshTokenString)
 	if err != nil {
-		return nil, err
+		return domain.TokenPair{}, utill.WrapError(serviceports.ErrInternalTokenProvider, err)
 	}
+
+	payload := domain.Payload{
+		UserID: refreshClaims.UserID,
+		Role:   refreshClaims.Role,
+	}
+
 	return p.NewSession(ctx, payload)
 }
 
-func (p *Provider) CloseSession(ctx context.Context, tokenString string) error {
-	claims, err := p.parseToken(tokenString)
+func (p *Provider) CloseSession(ctx context.Context, refreshTokenString string) error {
+	_, err := p.parseToken(refreshTokenString)
 	if err != nil {
 		return err
 	}
 
-	ok, err := p.redisClient.Del(ctx, claims.Payload.SessionID.String()).Result()
+	err = p.tokenStorage.Del(ctx, refreshTokenString)
 	if err != nil {
-		return err
-	}
-
-	if ok != 1 {
-		return errors.New("tokent wasn't deleted")
+		return utill.WrapError(serviceports.ErrInternalTokenProvider, err)
 	}
 
 	return nil
 }
 
-func (p *Provider) VerifyToken(ctx context.Context, tokenString string) (*Payload, error) {
+func (p *Provider) VerifyToken(ctx context.Context, tokenString string) (domain.Payload, error) {
 	claims, err := p.parseToken(tokenString)
 	if err != nil {
-		return nil, err
+		return domain.Payload{}, err
 	}
 
 	if claims.ExpiresAt.Unix() < time.Now().Local().Unix() {
-		return nil, tokenExpiredErr
+		return domain.Payload{}, serviceports.ErrTokenProviderExpiredToken
 	}
 
-	_, err = p.redisClient.Get(ctx, claims.Payload.SessionID.String()).Result()
-	if err != nil {
-		return nil, err
-	}
-
-	return &claims.Payload, nil
+	return claims.Payload, nil
 }
 
 func (p *Provider) parseToken(tokenString string) (*JWTClaims, error) {
@@ -185,11 +160,11 @@ func (p *Provider) parseToken(tokenString string) (*JWTClaims, error) {
 		})
 
 	if err != nil {
-		return nil, err
+		return nil, serviceports.ErrTokenProviderParsingToken
 	}
 
 	if !token.Valid {
-		return nil, invalidTokenErr
+		return nil, serviceports.ErrTokenProviderInvalidToken
 	}
 
 	claims := token.Claims.(*JWTClaims)
