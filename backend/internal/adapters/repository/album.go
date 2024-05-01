@@ -54,9 +54,6 @@ func (ar *PostgresAlbumRepository) GetByMusicianID(ctx context.Context, musician
 	var albums []entity.PgAlbum
 	err := ar.db.SelectContext(ctx, &albums, albumGetByMusicianIDQuery, musicianID)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, utill.WrapError(ports.ErrAlbumByMusicianIDNotFound, err)
-		}
 		return nil, utill.WrapError(ports.ErrInternalAlbumRepo, err)
 	}
 

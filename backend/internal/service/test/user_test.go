@@ -3,6 +3,7 @@ package test
 import (
 	"context"
 	"errors"
+	"github.com/hanoys/sigma-music/internal/adapters/hash"
 	"github.com/hanoys/sigma-music/internal/adapters/repository/mocks"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
@@ -83,7 +84,7 @@ func TestUserServiceRegister(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			userRepository := mocks.NewUserRepository(t)
-			userService := service.NewUserService(userRepository)
+			userService := service.NewUserService(userRepository, hash.NewHashPasswordProvider())
 			test.repositoryMock(userRepository)
 
 			_, err := userService.Register(context.Background(), test.req)

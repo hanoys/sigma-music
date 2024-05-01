@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	genreGetByIDQuery     = "SELECT * FROM genres WHERE id = $2"
+	genreGetByIDQuery     = "SELECT * FROM genres WHERE id = $1"
 	genreGetAllQuery      = "SELECT * FROM genres"
 	genreAddForTrackQuery = "INSERT INTO track_genre (track_id, genre_id) VALUES ($1, $2)"
 )

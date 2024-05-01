@@ -3,6 +3,7 @@ package test
 import (
 	"context"
 	"errors"
+	"github.com/hanoys/sigma-music/internal/adapters/hash"
 	"github.com/hanoys/sigma-music/internal/adapters/repository/mocks"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
@@ -67,7 +68,7 @@ func TestMusicianServiceRegister(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			musicianRepository := mocks.NewMusicianRepository(t)
-			musicianService := service.NewMusicianService(musicianRepository)
+			musicianService := service.NewMusicianService(musicianRepository, hash.NewHashPasswordProvider())
 			test.repositoryMock(musicianRepository)
 
 			_, err := musicianService.Register(context.Background(), test.req)

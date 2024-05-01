@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/google/uuid"
+	"github.com/hanoys/sigma-music/internal/adapters/hash"
 	"github.com/hanoys/sigma-music/internal/adapters/repository/mocks"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
@@ -228,7 +229,7 @@ func TestStatServiceFromReport(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			musicianRepo := mocks.NewMusicianRepository(t)
-			musicianService := service.NewMusicianService(musicianRepo)
+			musicianService := service.NewMusicianService(musicianRepo, hash.NewHashPasswordProvider())
 			test.musicianRepoMock(musicianRepo)
 
 			genreRepo := mocks.NewGenreRepository(t)
@@ -283,7 +284,7 @@ func TestStatServiceAdd(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			musicianRepo := mocks.NewMusicianRepository(t)
-			musicianService := service.NewMusicianService(musicianRepo)
+			musicianService := service.NewMusicianService(musicianRepo, hash.NewHashPasswordProvider())
 			test.musicianRepoMock(musicianRepo)
 
 			genreRepo := mocks.NewGenreRepository(t)

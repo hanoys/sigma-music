@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"github.com/google/uuid"
 	"github.com/hanoys/sigma-music/internal/adapters/repository/entity"
@@ -55,9 +54,6 @@ func (cr *PostgresCommentRepository) GetByUserID(ctx context.Context, userID uui
 	var comments []entity.PgComment
 	err := cr.db.SelectContext(ctx, &comments, commentGetByUserIDQuery, userID)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, utill.WrapError(ports.ErrCommentByUserIDNotFound, err)
-		}
 		return nil, utill.WrapError(ports.ErrInternalCommentRepo, err)
 	}
 
@@ -73,9 +69,6 @@ func (cr *PostgresCommentRepository) GetByTrackID(ctx context.Context, trackID u
 	var comments []entity.PgComment
 	err := cr.db.SelectContext(ctx, &comments, commentGetByTrackIDQuery, trackID)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, utill.WrapError(ports.ErrCommentByTrackIDNotFound, err)
-		}
 		return nil, utill.WrapError(ports.ErrInternalCommentRepo, err)
 	}
 

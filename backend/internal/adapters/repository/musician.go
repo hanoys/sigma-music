@@ -15,7 +15,9 @@ import (
 )
 
 const (
-	musicianGetByUniqueQuery = "SELECT * FROM musicians WHERE $1 = $2"
+	musicianGetByIDQuery    = "SELECT * FROM musicians WHERE id = $1"
+	musicianGetByNameQuery  = "SELECT * FROM musicians WHERE name = $1"
+	musicianGetByEmailQuery = "SELECT * FROM musicians WHERE email = $1"
 )
 
 type PostgresMusicianRepository struct {
@@ -41,7 +43,7 @@ func (mr *PostgresMusicianRepository) Create(ctx context.Context, musician domai
 	}
 
 	var createdUser entity.PgMusician
-	err = mr.db.GetContext(ctx, &createdUser, musicianGetByUniqueQuery, "id", pgMusician.ID)
+	err = mr.db.GetContext(ctx, &createdUser, musicianGetByIDQuery, pgMusician.ID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.Musician{}, utill.WrapError(ports.ErrMusicianIDNotFound, err)
@@ -54,7 +56,7 @@ func (mr *PostgresMusicianRepository) Create(ctx context.Context, musician domai
 
 func (mr *PostgresMusicianRepository) GetByID(ctx context.Context, musicianID uuid.UUID) (domain.Musician, error) {
 	var foundMusician entity.PgMusician
-	err := mr.db.GetContext(ctx, &foundMusician, musicianGetByUniqueQuery, "id", musicianID)
+	err := mr.db.GetContext(ctx, &foundMusician, musicianGetByIDQuery, musicianID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.Musician{}, utill.WrapError(ports.ErrMusicianIDNotFound, err)
@@ -67,7 +69,7 @@ func (mr *PostgresMusicianRepository) GetByID(ctx context.Context, musicianID uu
 
 func (mr *PostgresMusicianRepository) GetByName(ctx context.Context, name string) (domain.Musician, error) {
 	var foundMusician entity.PgMusician
-	err := mr.db.GetContext(ctx, &foundMusician, musicianGetByUniqueQuery, "name", name)
+	err := mr.db.GetContext(ctx, &foundMusician, musicianGetByNameQuery, name)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.Musician{}, utill.WrapError(ports.ErrMusicianNameNotFound, err)
@@ -80,7 +82,7 @@ func (mr *PostgresMusicianRepository) GetByName(ctx context.Context, name string
 
 func (mr *PostgresMusicianRepository) GetByEmail(ctx context.Context, email string) (domain.Musician, error) {
 	var foundMusician entity.PgMusician
-	err := mr.db.GetContext(ctx, &foundMusician, musicianGetByUniqueQuery, "email", email)
+	err := mr.db.GetContext(ctx, &foundMusician, musicianGetByEmailQuery, email)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.Musician{}, utill.WrapError(ports.ErrMusicianEmailNotFound, err)

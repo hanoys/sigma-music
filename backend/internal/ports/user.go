@@ -3,6 +3,7 @@ package ports
 import (
 	"context"
 	"errors"
+	"github.com/google/uuid"
 	"github.com/hanoys/sigma-music/internal/domain"
 )
 
@@ -17,6 +18,7 @@ var (
 
 type IUserRepository interface {
 	Create(ctx context.Context, user domain.User) (domain.User, error)
+	GetByID(ctx context.Context, musicianID uuid.UUID) (domain.User, error)
 	GetByName(ctx context.Context, name string) (domain.User, error)
 	GetByEmail(ctx context.Context, email string) (domain.User, error)
 	GetByPhone(ctx context.Context, phone string) (domain.User, error)
