@@ -22,7 +22,6 @@ type ITrackRepository interface {
 
 type PutTrackReq struct {
 	TrackID   string
-	TrackSize int64
 	TrackBLOB io.Reader
 }
 

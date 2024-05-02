@@ -5,7 +5,7 @@ import (
 	"github.com/hanoys/sigma-music/internal/adapters/auth/ports"
 	"github.com/hanoys/sigma-music/internal/domain"
 	serviceports "github.com/hanoys/sigma-music/internal/ports"
-	"github.com/hanoys/sigma-music/internal/utill"
+	"github.com/hanoys/sigma-music/internal/util"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -100,7 +100,7 @@ func (p *Provider) NewSession(ctx context.Context, payload domain.Payload) (doma
 	err = p.tokenStorage.Set(ctx, tokenPair.RefreshToken,
 		payload, refreshExpTime.Sub(time.Now()))
 	if err != nil {
-		return domain.TokenPair{}, utill.WrapError(serviceports.ErrInternalTokenProvider, err)
+		return domain.TokenPair{}, util.WrapError(serviceports.ErrInternalTokenProvider, err)
 	}
 
 	return tokenPair, nil
@@ -114,7 +114,7 @@ func (p *Provider) RefreshSession(ctx context.Context, refreshTokenString string
 
 	err = p.tokenStorage.Del(ctx, refreshTokenString)
 	if err != nil {
-		return domain.TokenPair{}, utill.WrapError(serviceports.ErrInternalTokenProvider, err)
+		return domain.TokenPair{}, util.WrapError(serviceports.ErrInternalTokenProvider, err)
 	}
 
 	payload := domain.Payload{
@@ -133,7 +133,7 @@ func (p *Provider) CloseSession(ctx context.Context, refreshTokenString string) 
 
 	err = p.tokenStorage.Del(ctx, refreshTokenString)
 	if err != nil {
-		return utill.WrapError(serviceports.ErrInternalTokenProvider, err)
+		return util.WrapError(serviceports.ErrInternalTokenProvider, err)
 	}
 
 	return nil

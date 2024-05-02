@@ -8,7 +8,7 @@ import (
 	"github.com/hanoys/sigma-music/internal/adapters/repository/entity"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
-	"github.com/hanoys/sigma-music/internal/utill"
+	"github.com/hanoys/sigma-music/internal/util"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
@@ -38,19 +38,19 @@ func (ur *PostgresUserRepository) Create(ctx context.Context, user domain.User) 
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			if pgErr.Code == pgerrcode.UniqueViolation {
-				return domain.User{}, utill.WrapError(ports.ErrUserDuplicate, err)
+				return domain.User{}, util.WrapError(ports.ErrUserDuplicate, err)
 			}
 		}
-		return domain.User{}, utill.WrapError(ports.ErrInternalUserRepo, err)
+		return domain.User{}, util.WrapError(ports.ErrInternalUserRepo, err)
 	}
 
 	var createdUser entity.PgUser
 	err = ur.db.GetContext(ctx, &createdUser, userGetByIDQuery, pgUser.ID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return domain.User{}, utill.WrapError(ports.ErrUserIDNotFound, err)
+			return domain.User{}, util.WrapError(ports.ErrUserIDNotFound, err)
 		}
-		return domain.User{}, utill.WrapError(ports.ErrInternalUserRepo, err)
+		return domain.User{}, util.WrapError(ports.ErrInternalUserRepo, err)
 	}
 
 	return createdUser.ToDomain(), nil
@@ -61,9 +61,9 @@ func (ur *PostgresUserRepository) GetByID(ctx context.Context, userID uuid.UUID)
 	err := ur.db.GetContext(ctx, &foundMusician, userGetByIDQuery, userID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return domain.User{}, utill.WrapError(ports.ErrUserIDNotFound, err)
+			return domain.User{}, util.WrapError(ports.ErrUserIDNotFound, err)
 		}
-		return domain.User{}, utill.WrapError(ports.ErrInternalUserRepo, err)
+		return domain.User{}, util.WrapError(ports.ErrInternalUserRepo, err)
 	}
 
 	return foundMusician.ToDomain(), nil
@@ -74,9 +74,9 @@ func (ur *PostgresUserRepository) GetByName(ctx context.Context, name string) (d
 	err := ur.db.GetContext(ctx, &foundUser, userGetByNameQuery, name)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return domain.User{}, utill.WrapError(ports.ErrUserNameNotFound, err)
+			return domain.User{}, util.WrapError(ports.ErrUserNameNotFound, err)
 		}
-		return domain.User{}, utill.WrapError(ports.ErrInternalUserRepo, err)
+		return domain.User{}, util.WrapError(ports.ErrInternalUserRepo, err)
 	}
 
 	return foundUser.ToDomain(), nil
@@ -87,9 +87,9 @@ func (ur *PostgresUserRepository) GetByEmail(ctx context.Context, email string) 
 	err := ur.db.GetContext(ctx, &foundUser, userGetByEmailQuery, email)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return domain.User{}, utill.WrapError(ports.ErrUserEmailNotFound, err)
+			return domain.User{}, util.WrapError(ports.ErrUserEmailNotFound, err)
 		}
-		return domain.User{}, utill.WrapError(ports.ErrInternalUserRepo, err)
+		return domain.User{}, util.WrapError(ports.ErrInternalUserRepo, err)
 	}
 
 	return foundUser.ToDomain(), nil
@@ -100,9 +100,9 @@ func (ur *PostgresUserRepository) GetByPhone(ctx context.Context, phone string) 
 	err := ur.db.GetContext(ctx, &foundUser, userGetByPhoneQuery, phone)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return domain.User{}, utill.WrapError(ports.ErrUserPhoneNotFound, err)
+			return domain.User{}, util.WrapError(ports.ErrUserPhoneNotFound, err)
 		}
-		return domain.User{}, utill.WrapError(ports.ErrInternalUserRepo, err)
+		return domain.User{}, util.WrapError(ports.ErrInternalUserRepo, err)
 	}
 
 	return foundUser.ToDomain(), nil

@@ -7,7 +7,7 @@ import (
 	"github.com/hanoys/sigma-music/internal/adapters/repository/entity"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
-	"github.com/hanoys/sigma-music/internal/utill"
+	"github.com/hanoys/sigma-music/internal/util"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
@@ -35,16 +35,16 @@ func (cr *PostgresCommentRepository) Create(ctx context.Context, comment domain.
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			if pgErr.Code == pgerrcode.UniqueViolation {
-				return domain.Comment{}, utill.WrapError(ports.ErrCommentDuplicate, err)
+				return domain.Comment{}, util.WrapError(ports.ErrCommentDuplicate, err)
 			}
 		}
-		return domain.Comment{}, utill.WrapError(ports.ErrInternalCommentRepo, err)
+		return domain.Comment{}, util.WrapError(ports.ErrInternalCommentRepo, err)
 	}
 
 	var createdTrack entity.PgComment
 	err = cr.db.GetContext(ctx, &createdTrack, commentGetByIDQuery, pgComment.ID)
 	if err != nil {
-		return domain.Comment{}, utill.WrapError(ports.ErrCommentIDNotFound, err)
+		return domain.Comment{}, util.WrapError(ports.ErrCommentIDNotFound, err)
 	}
 
 	return createdTrack.ToDomain(), nil
@@ -54,7 +54,7 @@ func (cr *PostgresCommentRepository) GetByUserID(ctx context.Context, userID uui
 	var comments []entity.PgComment
 	err := cr.db.SelectContext(ctx, &comments, commentGetByUserIDQuery, userID)
 	if err != nil {
-		return nil, utill.WrapError(ports.ErrInternalCommentRepo, err)
+		return nil, util.WrapError(ports.ErrInternalCommentRepo, err)
 	}
 
 	domainComments := make([]domain.Comment, len(comments))
@@ -69,7 +69,7 @@ func (cr *PostgresCommentRepository) GetByTrackID(ctx context.Context, trackID u
 	var comments []entity.PgComment
 	err := cr.db.SelectContext(ctx, &comments, commentGetByTrackIDQuery, trackID)
 	if err != nil {
-		return nil, utill.WrapError(ports.ErrInternalCommentRepo, err)
+		return nil, util.WrapError(ports.ErrInternalCommentRepo, err)
 	}
 
 	domainComments := make([]domain.Comment, len(comments))

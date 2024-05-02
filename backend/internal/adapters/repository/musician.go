@@ -8,7 +8,7 @@ import (
 	"github.com/hanoys/sigma-music/internal/adapters/repository/entity"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
-	"github.com/hanoys/sigma-music/internal/utill"
+	"github.com/hanoys/sigma-music/internal/util"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
@@ -36,19 +36,19 @@ func (mr *PostgresMusicianRepository) Create(ctx context.Context, musician domai
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			if pgErr.Code == pgerrcode.UniqueViolation {
-				return domain.Musician{}, utill.WrapError(ports.ErrMusicianDuplicate, err)
+				return domain.Musician{}, util.WrapError(ports.ErrMusicianDuplicate, err)
 			}
 		}
-		return domain.Musician{}, utill.WrapError(ports.ErrInternalMusicianRepo, err)
+		return domain.Musician{}, util.WrapError(ports.ErrInternalMusicianRepo, err)
 	}
 
 	var createdUser entity.PgMusician
 	err = mr.db.GetContext(ctx, &createdUser, musicianGetByIDQuery, pgMusician.ID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return domain.Musician{}, utill.WrapError(ports.ErrMusicianIDNotFound, err)
+			return domain.Musician{}, util.WrapError(ports.ErrMusicianIDNotFound, err)
 		}
-		return domain.Musician{}, utill.WrapError(ports.ErrInternalMusicianRepo, err)
+		return domain.Musician{}, util.WrapError(ports.ErrInternalMusicianRepo, err)
 	}
 
 	return createdUser.ToDomain(), nil
@@ -59,9 +59,9 @@ func (mr *PostgresMusicianRepository) GetByID(ctx context.Context, musicianID uu
 	err := mr.db.GetContext(ctx, &foundMusician, musicianGetByIDQuery, musicianID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return domain.Musician{}, utill.WrapError(ports.ErrMusicianIDNotFound, err)
+			return domain.Musician{}, util.WrapError(ports.ErrMusicianIDNotFound, err)
 		}
-		return domain.Musician{}, utill.WrapError(ports.ErrInternalMusicianRepo, err)
+		return domain.Musician{}, util.WrapError(ports.ErrInternalMusicianRepo, err)
 	}
 
 	return foundMusician.ToDomain(), nil
@@ -72,9 +72,9 @@ func (mr *PostgresMusicianRepository) GetByName(ctx context.Context, name string
 	err := mr.db.GetContext(ctx, &foundMusician, musicianGetByNameQuery, name)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return domain.Musician{}, utill.WrapError(ports.ErrMusicianNameNotFound, err)
+			return domain.Musician{}, util.WrapError(ports.ErrMusicianNameNotFound, err)
 		}
-		return domain.Musician{}, utill.WrapError(ports.ErrInternalMusicianRepo, err)
+		return domain.Musician{}, util.WrapError(ports.ErrInternalMusicianRepo, err)
 	}
 
 	return foundMusician.ToDomain(), nil
@@ -85,9 +85,9 @@ func (mr *PostgresMusicianRepository) GetByEmail(ctx context.Context, email stri
 	err := mr.db.GetContext(ctx, &foundMusician, musicianGetByEmailQuery, email)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return domain.Musician{}, utill.WrapError(ports.ErrMusicianEmailNotFound, err)
+			return domain.Musician{}, util.WrapError(ports.ErrMusicianEmailNotFound, err)
 		}
-		return domain.Musician{}, utill.WrapError(ports.ErrInternalMusicianRepo, err)
+		return domain.Musician{}, util.WrapError(ports.ErrInternalMusicianRepo, err)
 	}
 
 	return foundMusician.ToDomain(), nil

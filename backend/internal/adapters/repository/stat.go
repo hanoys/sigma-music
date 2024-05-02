@@ -6,7 +6,7 @@ import (
 	"github.com/hanoys/sigma-music/internal/adapters/repository/entity"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
-	"github.com/hanoys/sigma-music/internal/utill"
+	"github.com/hanoys/sigma-music/internal/util"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -41,7 +41,7 @@ func NewPostgresStatRepository(db *sqlx.DB) *PostgresStatRepository {
 func (sr *PostgresStatRepository) Add(ctx context.Context, userID uuid.UUID, trackID uuid.UUID) error {
 	_, err := sr.db.ExecContext(ctx, statAddQuery, userID, trackID)
 	if err != nil {
-		return utill.WrapError(ports.ErrInternalStatRepo, err)
+		return util.WrapError(ports.ErrInternalStatRepo, err)
 	}
 
 	return nil
@@ -51,7 +51,7 @@ func (sr *PostgresStatRepository) GetMostListenedMusicians(ctx context.Context, 
 	var musiciansStat []entity.PgUserMusiciansStat
 	err := sr.db.SelectContext(ctx, &musiciansStat, statGetMostListenedQuery, userID, maxCnt)
 	if err != nil {
-		return nil, utill.WrapError(ports.ErrInternalStatRepo, err)
+		return nil, util.WrapError(ports.ErrInternalStatRepo, err)
 	}
 
 	domainMusiciansStat := make([]domain.UserMusiciansStat, len(musiciansStat))
@@ -66,7 +66,7 @@ func (sr *PostgresStatRepository) GetListenedGenres(ctx context.Context, userID 
 	var genresStat []entity.PgUserGenresStat
 	err := sr.db.SelectContext(ctx, &genresStat, statGetListenedGenresQuery, userID)
 	if err != nil {
-		return nil, utill.WrapError(ports.ErrInternalStatRepo, err)
+		return nil, util.WrapError(ports.ErrInternalStatRepo, err)
 	}
 
 	domainGenresStat := make([]domain.UserGenresStat, len(genresStat))

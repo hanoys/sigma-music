@@ -7,7 +7,7 @@ import (
 	"github.com/hanoys/sigma-music/internal/adapters/repository/entity"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
-	"github.com/hanoys/sigma-music/internal/utill"
+	"github.com/hanoys/sigma-music/internal/util"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
@@ -33,19 +33,19 @@ func (or *PostgresOrderRepository) Create(ctx context.Context, order domain.Orde
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			if pgErr.Code == pgerrcode.UniqueViolation {
-				return domain.Order{}, utill.WrapError(ports.ErrOrderDuplicate, err)
+				return domain.Order{}, util.WrapError(ports.ErrOrderDuplicate, err)
 			}
 		}
-		return domain.Order{}, utill.WrapError(ports.ErrInternalOrderRepo, err)
+		return domain.Order{}, util.WrapError(ports.ErrInternalOrderRepo, err)
 	}
 
 	var createdOrder entity.PgOrder
 	err = or.db.GetContext(ctx, &createdOrder, orderGetByID, pgOrder.ID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return domain.Order{}, utill.WrapError(ports.ErrOrderIDNotFound, err)
+			return domain.Order{}, util.WrapError(ports.ErrOrderIDNotFound, err)
 		}
-		return domain.Order{}, utill.WrapError(ports.ErrInternalOrderRepo, err)
+		return domain.Order{}, util.WrapError(ports.ErrInternalOrderRepo, err)
 	}
 
 	return createdOrder.ToDomain(), nil
