@@ -15,6 +15,7 @@ import (
 )
 
 const (
+	userGetAllQuery     = "SELECT * FROM users"
 	userGetByIDQuery    = "SELECT * FROM users WHERE id = $1"
 	userGetByNameQuery  = "SELECT * FROM users WHERE name = $1"
 	userGetByEmailQuery = "SELECT * FROM users WHERE email = $1"
@@ -56,9 +57,24 @@ func (ur *PostgresUserRepository) Create(ctx context.Context, user domain.User) 
 	return createdUser.ToDomain(), nil
 }
 
+func (ur *PostgresUserRepository) GetAll(ctx context.Context) ([]domain.User, error) {
+	var users []entity.PgUser
+	err := ur.db.SelectContext(ctx, &users, userGetAllQuery)
+	if err != nil {
+		return nil, util.WrapError(ports.ErrInternalUserRepo, err)
+	}
+
+	domainUsers := make([]domain.User, len(users))
+	for i, user := range users {
+		domainUsers[i] = user.ToDomain()
+	}
+
+	return domainUsers, nil
+}
+
 func (ur *PostgresUserRepository) GetByID(ctx context.Context, userID uuid.UUID) (domain.User, error) {
-	var foundMusician entity.PgUser
-	err := ur.db.GetContext(ctx, &foundMusician, userGetByIDQuery, userID)
+	var foundUser entity.PgUser
+	err := ur.db.GetContext(ctx, &foundUser, userGetByIDQuery, userID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.User{}, util.WrapError(ports.ErrUserIDNotFound, err)
@@ -66,7 +82,7 @@ func (ur *PostgresUserRepository) GetByID(ctx context.Context, userID uuid.UUID)
 		return domain.User{}, util.WrapError(ports.ErrInternalUserRepo, err)
 	}
 
-	return foundMusician.ToDomain(), nil
+	return foundUser.ToDomain(), nil
 }
 
 func (ur *PostgresUserRepository) GetByName(ctx context.Context, name string) (domain.User, error) {

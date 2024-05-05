@@ -30,4 +30,5 @@ type PostCommentServiceReq struct {
 type ICommentService interface {
 	Post(ctx context.Context, comment PostCommentServiceReq) (domain.Comment, error)
 	GetCommentsOnTrack(ctx context.Context, trackID uuid.UUID) ([]domain.Comment, error)
+	GetUserComments(ctx context.Context, userID uuid.UUID) ([]domain.Comment, error)
 }

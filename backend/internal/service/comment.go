@@ -29,3 +29,7 @@ func (cs *CommentService) Post(ctx context.Context, comment ports.PostCommentSer
 func (cs *CommentService) GetCommentsOnTrack(ctx context.Context, trackID uuid.UUID) ([]domain.Comment, error) {
 	return cs.repository.GetByTrackID(ctx, trackID)
 }
+
+func (cs *CommentService) GetUserComments(ctx context.Context, userID uuid.UUID) ([]domain.Comment, error) {
+	return cs.repository.GetByUserID(ctx, userID)
+}

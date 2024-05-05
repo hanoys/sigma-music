@@ -15,6 +15,7 @@ import (
 )
 
 const (
+	musicianGetAllQuery     = "SELECT * FROM musicians"
 	musicianGetByIDQuery    = "SELECT * FROM musicians WHERE id = $1"
 	musicianGetByNameQuery  = "SELECT * FROM musicians WHERE name = $1"
 	musicianGetByEmailQuery = "SELECT * FROM musicians WHERE email = $1"
@@ -42,8 +43,8 @@ func (mr *PostgresMusicianRepository) Create(ctx context.Context, musician domai
 		return domain.Musician{}, util.WrapError(ports.ErrInternalMusicianRepo, err)
 	}
 
-	var createdUser entity.PgMusician
-	err = mr.db.GetContext(ctx, &createdUser, musicianGetByIDQuery, pgMusician.ID)
+	var createdMusician entity.PgMusician
+	err = mr.db.GetContext(ctx, &createdMusician, musicianGetByIDQuery, pgMusician.ID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.Musician{}, util.WrapError(ports.ErrMusicianIDNotFound, err)
@@ -51,7 +52,22 @@ func (mr *PostgresMusicianRepository) Create(ctx context.Context, musician domai
 		return domain.Musician{}, util.WrapError(ports.ErrInternalMusicianRepo, err)
 	}
 
-	return createdUser.ToDomain(), nil
+	return createdMusician.ToDomain(), nil
+}
+
+func (mr *PostgresMusicianRepository) GetAll(ctx context.Context) ([]domain.Musician, error) {
+	var musicians []entity.PgMusician
+	err := mr.db.SelectContext(ctx, &musicians, musicianGetAllQuery)
+	if err != nil {
+		return nil, util.WrapError(ports.ErrInternalMusicianRepo, err)
+	}
+
+	domainMusicians := make([]domain.Musician, len(musicians))
+	for i, musician := range musicians {
+		domainMusicians[i] = musician.ToDomain()
+	}
+
+	return domainMusicians, nil
 }
 
 func (mr *PostgresMusicianRepository) GetByID(ctx context.Context, musicianID uuid.UUID) (domain.Musician, error) {

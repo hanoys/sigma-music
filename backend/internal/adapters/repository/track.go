@@ -15,6 +15,7 @@ import (
 )
 
 const (
+	trackGetAllQuery  = "SELECT * FROM tracks"
 	trackDeleteQuery  = "DELETE FROM tracks WHERE id = $1"
 	trackGetByIDQuery = "SELECT * FROM tracks WHERE id = $1"
 )
@@ -51,6 +52,34 @@ func (tr *PostgresTrackRepository) Create(ctx context.Context, track domain.Trac
 	}
 
 	return createdTrack.ToDomain(), nil
+}
+
+func (tr *PostgresTrackRepository) GetAll(ctx context.Context) ([]domain.Track, error) {
+	var tracks []entity.PgTrack
+	err := tr.db.SelectContext(ctx, &tracks, trackGetAllQuery)
+	if err != nil {
+		return nil, util.WrapError(ports.ErrInternalTrackRepo, err)
+	}
+
+	domainTracks := make([]domain.Track, len(tracks))
+	for i, track := range tracks {
+		domainTracks[i] = track.ToDomain()
+	}
+
+	return domainTracks, nil
+}
+
+func (tr *PostgresTrackRepository) GetByID(ctx context.Context, trackID uuid.UUID) (domain.Track, error) {
+	var foundTrack entity.PgTrack
+	err := tr.db.GetContext(ctx, &foundTrack, trackGetByIDQuery, trackID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.Track{}, util.WrapError(ports.ErrTrackIDNotFound, err)
+		}
+		return domain.Track{}, util.WrapError(ports.ErrInternalTrackRepo, err)
+	}
+
+	return foundTrack.ToDomain(), nil
 }
 
 func (tr *PostgresTrackRepository) Delete(ctx context.Context, trackID uuid.UUID) (domain.Track, error) {

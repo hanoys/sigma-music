@@ -46,3 +46,23 @@ func (us *UserService) Register(ctx context.Context, user ports.UserServiceCreat
 
 	return us.repository.Create(ctx, createUser)
 }
+
+func (us *UserService) GetAll(ctx context.Context) ([]domain.User, error) {
+	return us.repository.GetAll(ctx)
+}
+
+func (us *UserService) GetById(ctx context.Context, userID uuid.UUID) (domain.User, error) {
+	return us.repository.GetByID(ctx, userID)
+}
+
+func (us *UserService) GetByName(ctx context.Context, name string) (domain.User, error) {
+	return us.repository.GetByName(ctx, name)
+}
+
+func (us *UserService) GetByEmail(ctx context.Context, email string) (domain.User, error) {
+	return us.repository.GetByEmail(ctx, email)
+}
+
+func (us *UserService) GetByPhone(ctx context.Context, phone string) (domain.User, error) {
+	return us.repository.GetByPhone(ctx, phone)
+}

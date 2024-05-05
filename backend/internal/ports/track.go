@@ -17,6 +17,8 @@ var (
 
 type ITrackRepository interface {
 	Create(ctx context.Context, track domain.Track) (domain.Track, error)
+	GetAll(ctx context.Context) ([]domain.Track, error)
+	GetByID(ctx context.Context, trackID uuid.UUID) (domain.Track, error)
 	Delete(ctx context.Context, trackID uuid.UUID) (domain.Track, error)
 }
 
@@ -34,11 +36,12 @@ type CreateTrackReq struct {
 	AlbumID   uuid.UUID
 	Name      string
 	TrackBLOB io.Reader
-	TrackSize int64
 	GenresID  []uuid.UUID
 }
 
 type ITrackService interface {
 	Create(ctx context.Context, trackInfo CreateTrackReq) (domain.Track, error)
+	GetAll(ctx context.Context) ([]domain.Track, error)
+	GetByID(ctx context.Context, trackID uuid.UUID) (domain.Track, error)
 	Delete(ctx context.Context, trackID uuid.UUID) (domain.Track, error)
 }

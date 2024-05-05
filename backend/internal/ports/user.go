@@ -18,7 +18,8 @@ var (
 
 type IUserRepository interface {
 	Create(ctx context.Context, user domain.User) (domain.User, error)
-	GetByID(ctx context.Context, musicianID uuid.UUID) (domain.User, error)
+	GetAll(ctx context.Context) ([]domain.User, error)
+	GetByID(ctx context.Context, userID uuid.UUID) (domain.User, error)
 	GetByName(ctx context.Context, name string) (domain.User, error)
 	GetByEmail(ctx context.Context, email string) (domain.User, error)
 	GetByPhone(ctx context.Context, phone string) (domain.User, error)
@@ -40,4 +41,9 @@ type UserServiceCreateRequest struct {
 
 type IUserService interface {
 	Register(ctx context.Context, user UserServiceCreateRequest) (domain.User, error)
+	GetAll(ctx context.Context) ([]domain.User, error)
+	GetById(ctx context.Context, userID uuid.UUID) (domain.User, error)
+	GetByName(ctx context.Context, name string) (domain.User, error)
+	GetByEmail(ctx context.Context, email string) (domain.User, error)
+	GetByPhone(ctx context.Context, phone string) (domain.User, error)
 }

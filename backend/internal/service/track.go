@@ -10,14 +10,14 @@ import (
 type TrackService struct {
 	repository   ports.ITrackRepository
 	trackStorage ports.ITrackObjectStorage
-	GenreService ports.IGenreService
+	genreService ports.IGenreService
 }
 
 func NewTrackService(repo ports.ITrackRepository, storage ports.ITrackObjectStorage, genreService ports.IGenreService) *TrackService {
 	return &TrackService{
 		repository:   repo,
 		trackStorage: storage,
-		GenreService: genreService,
+		genreService: genreService,
 	}
 }
 
@@ -35,14 +35,13 @@ func (ts *TrackService) Create(ctx context.Context, trackInfo ports.CreateTrackR
 		return domain.Track{}, err
 	}
 
-	err = ts.GenreService.AddForTrack(ctx, trackID, trackInfo.GenresID)
+	err = ts.genreService.AddForTrack(ctx, trackID, trackInfo.GenresID)
 	if err != nil {
 		return domain.Track{}, err
 	}
 
 	err = ts.trackStorage.PutTrack(ctx, ports.PutTrackReq{
 		TrackID:   trackID.String(),
-		TrackSize: trackInfo.TrackSize,
 		TrackBLOB: trackInfo.TrackBLOB,
 	})
 
@@ -53,17 +52,24 @@ func (ts *TrackService) Create(ctx context.Context, trackInfo ports.CreateTrackR
 	return track, nil
 }
 
-func (ts *TrackService) Delete(ctx context.Context, trackID uuid.UUID) error {
+func (ts *TrackService) GetAll(ctx context.Context) ([]domain.Track, error) {
+	return ts.repository.GetAll(ctx)
+}
+
+func (ts *TrackService) GetByID(ctx context.Context, trackID uuid.UUID) (domain.Track, error) {
+	return ts.repository.GetByID(ctx, trackID)
+}
+
+func (ts *TrackService) Delete(ctx context.Context, trackID uuid.UUID) (domain.Track, error) {
 	trackInfo, err := ts.repository.Delete(ctx, trackID)
 	if err != nil {
-		return err
+		return domain.Track{}, err
 	}
 
 	err = ts.trackStorage.DeleteTrack(ctx, trackID)
 	if err != nil {
-		_, _ = ts.repository.Create(ctx, trackInfo)
-		return err
+		return domain.Track{}, err
 	}
 
-	return nil
+	return trackInfo, nil
 }

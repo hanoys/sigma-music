@@ -42,6 +42,10 @@ func (ms *MusicianService) Register(ctx context.Context, musician ports.Musician
 	return ms.repository.Create(ctx, createMusician)
 }
 
+func (ms *MusicianService) GetAll(ctx context.Context) ([]domain.Musician, error) {
+	return ms.repository.GetAll(ctx)
+}
+
 func (ms *MusicianService) GetByID(ctx context.Context, musicianID uuid.UUID) (domain.Musician, error) {
 	return ms.repository.GetByID(ctx, musicianID)
 }

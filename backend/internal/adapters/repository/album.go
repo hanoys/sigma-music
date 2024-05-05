@@ -15,6 +15,7 @@ import (
 )
 
 const (
+	albumGetAllQuery          = "SELECT * FROM albums"
 	albumGetByMusicianIDQuery = "SELECT (a.id, a.name, a.description, a.published, a.release_date) FROM album_musician JOIN public.albums a on a.id = album_musician.album_id WHERE musician_id = $1"
 	albumGetByIDQuery         = "SELECT * FROM albums WHERE id = $1"
 )
@@ -48,6 +49,21 @@ func (ar *PostgresAlbumRepository) Create(ctx context.Context, album domain.Albu
 	}
 
 	return createdUser.ToDomain(), nil
+}
+
+func (ar *PostgresAlbumRepository) GetAll(ctx context.Context) ([]domain.Album, error) {
+	var albums []entity.PgAlbum
+	err := ar.db.SelectContext(ctx, &albums, albumGetAllQuery)
+	if err != nil {
+		return nil, util.WrapError(ports.ErrInternalAlbumRepo, err)
+	}
+
+	domainAlbums := make([]domain.Album, len(albums))
+	for i, track := range albums {
+		domainAlbums[i] = track.ToDomain()
+	}
+
+	return domainAlbums, nil
 }
 
 func (ar *PostgresAlbumRepository) GetByMusicianID(ctx context.Context, musicianID uuid.UUID) ([]domain.Album, error) {

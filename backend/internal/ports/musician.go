@@ -17,6 +17,7 @@ var (
 
 type IMusicianRepository interface {
 	Create(ctx context.Context, musician domain.Musician) (domain.Musician, error)
+	GetAll(ctx context.Context) ([]domain.Musician, error)
 	GetByID(ctx context.Context, musicianID uuid.UUID) (domain.Musician, error)
 	GetByName(ctx context.Context, name string) (domain.Musician, error)
 	GetByEmail(ctx context.Context, email string) (domain.Musician, error)
@@ -37,6 +38,7 @@ type MusicianServiceCreateRequest struct {
 
 type IMusicianService interface {
 	Register(ctx context.Context, musician MusicianServiceCreateRequest) (domain.Musician, error)
+	GetAll(ctx context.Context) ([]domain.Musician, error)
 	GetByID(ctx context.Context, musicianID uuid.UUID) (domain.Musician, error)
 	GetByName(ctx context.Context, name string) (domain.Musician, error)
 	GetByEmail(ctx context.Context, email string) (domain.Musician, error)
