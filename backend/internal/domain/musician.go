@@ -7,6 +7,7 @@ type Musician struct {
 	Name        string
 	Email       string
 	Password    string
+	Salt        string
 	Country     string
 	Description string
 }

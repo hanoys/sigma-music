@@ -1,6 +1,11 @@
 package ports
 
+type SaltedPassword struct {
+	HashPassword string
+	Salt         string
+}
+
 type IHashPasswordProvider interface {
-	EncodePassword(string) string
-	ComparePasswordWithHash(password string, hash string) bool
+	EncodePassword(password string) SaltedPassword
+	ComparePasswordWithHash(password string, saltedPassword SaltedPassword) bool
 }

@@ -27,11 +27,14 @@ func (ms *MusicianService) Register(ctx context.Context, musician ports.Musician
 		return domain.Musician{}, ports.ErrMusicianWithSuchEmailAlreadyExists
 	}
 
+	saltedPassword := ms.hash.EncodePassword(musician.Password)
+
 	createMusician := domain.Musician{
 		ID:          uuid.New(),
 		Name:        musician.Name,
 		Email:       musician.Email,
-		Password:    ms.hash.EncodePassword(musician.Password),
+		Password:    saltedPassword.HashPassword,
+		Salt:        saltedPassword.Salt,
 		Country:     musician.Country,
 		Description: musician.Description,
 	}

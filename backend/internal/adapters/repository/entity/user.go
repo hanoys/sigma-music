@@ -11,6 +11,7 @@ type PgUser struct {
 	Email    string    `db:"email"`
 	Phone    string    `db:"phone"`
 	Password string    `db:"password"`
+	Salt     string    `db:"salt"`
 	Country  string    `db:"country"`
 }
 
@@ -21,6 +22,7 @@ func (u *PgUser) ToDomain() domain.User {
 		Email:    u.Email,
 		Phone:    u.Phone,
 		Password: u.Password,
+		Salt:     u.Salt,
 		Country:  u.Country,
 	}
 }
@@ -32,6 +34,7 @@ func NewPgUser(user domain.User) PgUser {
 		Email:    user.Email,
 		Phone:    user.Phone,
 		Password: user.Password,
+		Salt:     user.Salt,
 		Country:  user.Country,
 	}
 }

@@ -32,12 +32,15 @@ func (us *UserService) Register(ctx context.Context, user ports.UserServiceCreat
 		return domain.User{}, ports.ErrUserWithSuchPhoneAlreadyExists
 	}
 
+	saltedPassword := us.hash.EncodePassword(user.Password)
+
 	createUser := domain.User{
 		ID:       uuid.New(),
 		Name:     user.Name,
 		Email:    user.Email,
 		Phone:    user.Phone,
-		Password: us.hash.EncodePassword(user.Password),
+		Password: saltedPassword.HashPassword,
+		Salt:     saltedPassword.Salt,
 		Country:  user.Country,
 	}
 

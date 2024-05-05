@@ -10,6 +10,7 @@ type PgMusician struct {
 	Name        string    `db:"name"`
 	Email       string    `db:"email"`
 	Password    string    `db:"password"`
+	Salt        string    `db:"salt"`
 	Country     string    `db:"country"`
 	Description string    `db:"description"`
 }
@@ -20,6 +21,7 @@ func (m *PgMusician) ToDomain() domain.Musician {
 		Name:        m.Name,
 		Email:       m.Email,
 		Password:    m.Password,
+		Salt:        m.Salt,
 		Country:     m.Country,
 		Description: m.Description,
 	}
@@ -31,6 +33,7 @@ func NewPgMusician(musician domain.Musician) PgMusician {
 		Name:        musician.Name,
 		Email:       musician.Email,
 		Password:    musician.Password,
+		Salt:        musician.Salt,
 		Country:     musician.Country,
 		Description: musician.Description,
 	}
