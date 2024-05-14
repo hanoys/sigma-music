@@ -44,6 +44,36 @@ func (_m *AlbumRepository) Create(ctx context.Context, album domain.Album) (doma
 	return r0, r1
 }
 
+// GetAll provides a mock function with given fields: ctx
+func (_m *AlbumRepository) GetAll(ctx context.Context) ([]domain.Album, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAll")
+	}
+
+	var r0 []domain.Album
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) ([]domain.Album, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) []domain.Album); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.Album)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetByID provides a mock function with given fields: ctx, id
 func (_m *AlbumRepository) GetByID(ctx context.Context, id uuid.UUID) (domain.Album, error) {
 	ret := _m.Called(ctx, id)

@@ -3,7 +3,7 @@ package hash
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"github.com/hanoys/sigma-music/internal/ports"
+	"github.com/hanoys/sigma-music/internal/domain"
 	"time"
 )
 
@@ -19,15 +19,15 @@ func (h *HashPasswordProvider) genSalt() string {
 	return hex.EncodeToString(salt[:])
 }
 
-func (h *HashPasswordProvider) EncodePassword(password string) ports.SaltedPassword {
+func (h *HashPasswordProvider) EncodePassword(password string) domain.SaltedPassword {
 	salt := h.genSalt()
 	hash := sha256.Sum256([]byte(password + salt))
-	return ports.SaltedPassword{
+	return domain.SaltedPassword{
 		HashPassword: hex.EncodeToString(hash[:]),
 		Salt:         salt,
 	}
 }
-func (h *HashPasswordProvider) ComparePasswordWithHash(password string, saltedPassword ports.SaltedPassword) bool {
+func (h *HashPasswordProvider) ComparePasswordWithHash(password string, saltedPassword domain.SaltedPassword) bool {
 	passwordHash := sha256.Sum256([]byte(password + saltedPassword.Salt))
 	return hex.EncodeToString(passwordHash[:]) == password
 }

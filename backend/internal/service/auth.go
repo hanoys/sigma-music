@@ -34,7 +34,12 @@ func (a *AuthorizationService) authUser(ctx context.Context, name string, passwo
 		return domain.User{}, ports.ErrInternalAuthRepo
 	}
 
-	if a.hash.ComparePasswordWithHash(user.Password, password) {
+	saltedPassword := domain.SaltedPassword{
+		HashPassword: user.Password,
+		Salt:         user.Salt,
+	}
+
+	if !a.hash.ComparePasswordWithHash(password, saltedPassword) {
 		return domain.User{}, ports.ErrIncorrectPassword
 	}
 
@@ -50,7 +55,12 @@ func (a *AuthorizationService) authMusician(ctx context.Context, name string, pa
 		return domain.Musician{}, ports.ErrInternalAuthRepo
 	}
 
-	if a.hash.ComparePasswordWithHash(musician.Password, password) {
+	saltedPassword := domain.SaltedPassword{
+		HashPassword: musician.Password,
+		Salt:         musician.Salt,
+	}
+
+	if !a.hash.ComparePasswordWithHash(password, saltedPassword) {
 		return domain.Musician{}, ports.ErrIncorrectPassword
 	}
 

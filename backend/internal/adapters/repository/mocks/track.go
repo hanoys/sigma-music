@@ -72,6 +72,64 @@ func (_m *TrackRepository) Delete(ctx context.Context, trackID uuid.UUID) (domai
 	return r0, r1
 }
 
+// GetAll provides a mock function with given fields: ctx
+func (_m *TrackRepository) GetAll(ctx context.Context) ([]domain.Track, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAll")
+	}
+
+	var r0 []domain.Track
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) ([]domain.Track, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) []domain.Track); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.Track)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetByID provides a mock function with given fields: ctx, trackID
+func (_m *TrackRepository) GetByID(ctx context.Context, trackID uuid.UUID) (domain.Track, error) {
+	ret := _m.Called(ctx, trackID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetByID")
+	}
+
+	var r0 domain.Track
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (domain.Track, error)); ok {
+		return rf(ctx, trackID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) domain.Track); ok {
+		r0 = rf(ctx, trackID)
+	} else {
+		r0 = ret.Get(0).(domain.Track)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = rf(ctx, trackID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // NewTrackRepository creates a new instance of TrackRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewTrackRepository(t interface {

@@ -9,23 +9,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/google/uuid"
 )
-
-type TokenSession struct {
-	Tokens         *TokenPair
-	ExpirationTime time.Time
-}
-
-type TokenPair struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
-}
-
-type Payload struct {
-	UserID uuid.UUID
-	Role   int
-}
 
 type JWTClaims struct {
 	domain.Payload
@@ -69,13 +53,6 @@ func (p *Provider) newTokenWithExpiration(ctx context.Context, payload domain.Pa
 	}
 
 	return tokenString, nil
-}
-
-func (p *Provider) NewPayload(userID uuid.UUID, role int) (*Payload, error) {
-	return &Payload{
-		UserID: userID,
-		Role:   role,
-	}, nil
 }
 
 func (p *Provider) NewSession(ctx context.Context, payload domain.Payload) (domain.TokenPair, error) {

@@ -44,6 +44,36 @@ func (_m *MusicianRepository) Create(ctx context.Context, musician domain.Musici
 	return r0, r1
 }
 
+// GetAll provides a mock function with given fields: ctx
+func (_m *MusicianRepository) GetAll(ctx context.Context) ([]domain.Musician, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAll")
+	}
+
+	var r0 []domain.Musician
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) ([]domain.Musician, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) []domain.Musician); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.Musician)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetByEmail provides a mock function with given fields: ctx, email
 func (_m *MusicianRepository) GetByEmail(ctx context.Context, email string) (domain.Musician, error) {
 	ret := _m.Called(ctx, email)

@@ -15,3 +15,9 @@ mocks:
         --filename user.go --structname UserRepository
 	mockery --dir internal/ports --name IStatRepository --output internal/adapters/repository/mocks \
 		--filename stat.go --structname StatRepository
+	mockery --dir internal/ports --name ITrackRepository --output internal/adapters/repository/mocks \
+    		--filename track.go --structname TrackRepository
+	mockery --dir internal/ports --name ITokenProvider --output internal/adapters/auth/mocks \
+        		--filename auth.go --structname TokenProvider
+	mockery --dir internal/ports --name IHashPasswordProvider --output internal/adapters/hash/mocks \
+            		--filename hash.go --structname HashPasswordProvider
