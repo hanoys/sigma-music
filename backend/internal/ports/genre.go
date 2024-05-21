@@ -17,10 +17,12 @@ type IGenreRepository interface {
 	GetAll(ctx context.Context) ([]domain.Genre, error)
 	GetByID(ctx context.Context, id uuid.UUID) (domain.Genre, error)
 	AddForTrack(ctx context.Context, trackID uuid.UUID, genresID []uuid.UUID) error
+	GetByTrackID(ctx context.Context, trackID uuid.UUID) ([]domain.Genre, error)
 }
 
 type IGenreService interface {
 	GetAll(ctx context.Context) ([]domain.Genre, error)
 	GetByID(ctx context.Context, id uuid.UUID) (domain.Genre, error)
 	AddForTrack(ctx context.Context, trackID uuid.UUID, genresID []uuid.UUID) error
+	GetByTrackID(ctx context.Context, trackID uuid.UUID) ([]domain.Genre, error)
 }

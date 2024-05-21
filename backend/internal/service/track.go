@@ -24,11 +24,20 @@ func NewTrackService(repo ports.ITrackRepository, storage ports.ITrackObjectStor
 func (ts *TrackService) Create(ctx context.Context, trackInfo ports.CreateTrackReq) (domain.Track, error) {
 	trackID := uuid.New()
 
+	url, err := ts.trackStorage.PutTrack(ctx, ports.PutTrackReq{
+		TrackID:   trackID.String(),
+		TrackBLOB: trackInfo.TrackBLOB,
+	})
+
+	if err != nil {
+		return domain.Track{}, err
+	}
+
 	track, err := ts.repository.Create(ctx, domain.Track{
 		ID:      trackID,
 		AlbumID: trackInfo.AlbumID,
 		Name:    trackInfo.Name,
-		URL:     trackID.String(),
+		URL:     url.String(),
 	})
 
 	if err != nil {
@@ -36,15 +45,6 @@ func (ts *TrackService) Create(ctx context.Context, trackInfo ports.CreateTrackR
 	}
 
 	err = ts.genreService.AddForTrack(ctx, trackID, trackInfo.GenresID)
-	if err != nil {
-		return domain.Track{}, err
-	}
-
-	err = ts.trackStorage.PutTrack(ctx, ports.PutTrackReq{
-		TrackID:   trackID.String(),
-		TrackBLOB: trackInfo.TrackBLOB,
-	})
-
 	if err != nil {
 		return domain.Track{}, err
 	}
@@ -72,4 +72,20 @@ func (ts *TrackService) Delete(ctx context.Context, trackID uuid.UUID) (domain.T
 	}
 
 	return trackInfo, nil
+}
+
+func (ts *TrackService) GetUserFavorites(ctx context.Context, userID uuid.UUID) ([]domain.Track, error) {
+	return ts.repository.GetUserFavorites(ctx, userID)
+}
+
+func (ts *TrackService) AddToUserFavorites(ctx context.Context, trackID uuid.UUID, userID uuid.UUID) error {
+	return ts.repository.AddToUserFavorites(ctx, trackID, userID)
+}
+
+func (ts *TrackService) GetByAlbumID(ctx context.Context, albumID uuid.UUID) ([]domain.Track, error) {
+	return ts.repository.GetByAlbumID(ctx, albumID)
+}
+
+func (ts *TrackService) GetByMusicianID(ctx context.Context, musicianID uuid.UUID) ([]domain.Track, error) {
+	return ts.repository.GetByMusicianID(ctx, musicianID)
 }

@@ -1,8 +1,0 @@
-TRUNCATE TABLE genres;
-TRUNCATE TABLE users;
-TRUNCATE TABLE musicians;
-TRUNCATE TABLE albums;
-TRUNCATE TABLE album_musician;
-TRUNCATE TABLE tracks;
-TRUNCATE TABLE track_genre;
-TRUNCATE TABLE users_history;

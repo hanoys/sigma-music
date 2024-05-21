@@ -29,5 +29,5 @@ func (h *HashPasswordProvider) EncodePassword(password string) domain.SaltedPass
 }
 func (h *HashPasswordProvider) ComparePasswordWithHash(password string, saltedPassword domain.SaltedPassword) bool {
 	passwordHash := sha256.Sum256([]byte(password + saltedPassword.Salt))
-	return hex.EncodeToString(passwordHash[:]) == password
+	return hex.EncodeToString(passwordHash[:]) == saltedPassword.HashPassword
 }

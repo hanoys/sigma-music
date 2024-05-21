@@ -26,3 +26,6 @@ func (gs *GenreService) GetByID(ctx context.Context, id uuid.UUID) (domain.Genre
 func (gs *GenreService) AddForTrack(ctx context.Context, trackID uuid.UUID, genreID []uuid.UUID) error {
 	return gs.repository.AddForTrack(ctx, trackID, genreID)
 }
+func (gs *GenreService) GetByTrackID(ctx context.Context, trackID uuid.UUID) ([]domain.Genre, error) {
+	return gs.repository.GetByTrackID(ctx, trackID)
+}

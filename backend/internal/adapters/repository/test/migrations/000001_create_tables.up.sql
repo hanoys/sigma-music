@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) NOT NULL UNIQUE,
     phone VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
+    salt VARCHAR(255) NOT NULL,
     country VARCHAR(255) NOT NULL
 );
 
@@ -27,6 +28,7 @@ CREATE TABLE IF NOT EXISTS musicians (
     name VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
+    salt VARCHAR(255) NOT NULL,
     country VARCHAR(255) NOT NULL,
     description VARCHAR(1024) NOT NULL
 );

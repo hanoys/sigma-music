@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"io"
+	"net/url"
 )
 
 var (
@@ -20,6 +21,10 @@ type ITrackRepository interface {
 	GetAll(ctx context.Context) ([]domain.Track, error)
 	GetByID(ctx context.Context, trackID uuid.UUID) (domain.Track, error)
 	Delete(ctx context.Context, trackID uuid.UUID) (domain.Track, error)
+	GetUserFavorites(ctx context.Context, userID uuid.UUID) ([]domain.Track, error)
+	AddToUserFavorites(ctx context.Context, trackID uuid.UUID, userID uuid.UUID) error
+	GetByAlbumID(ctx context.Context, albumID uuid.UUID) ([]domain.Track, error)
+	GetByMusicianID(ctx context.Context, musicianID uuid.UUID) ([]domain.Track, error)
 }
 
 type PutTrackReq struct {
@@ -28,7 +33,7 @@ type PutTrackReq struct {
 }
 
 type ITrackObjectStorage interface {
-	PutTrack(ctx context.Context, req PutTrackReq) error
+	PutTrack(ctx context.Context, req PutTrackReq) (url.URL, error)
 	DeleteTrack(ctx context.Context, trackID uuid.UUID) error
 }
 
@@ -44,4 +49,8 @@ type ITrackService interface {
 	GetAll(ctx context.Context) ([]domain.Track, error)
 	GetByID(ctx context.Context, trackID uuid.UUID) (domain.Track, error)
 	Delete(ctx context.Context, trackID uuid.UUID) (domain.Track, error)
+	GetUserFavorites(ctx context.Context, userID uuid.UUID) ([]domain.Track, error)
+	AddToUserFavorites(ctx context.Context, trackID uuid.UUID, userID uuid.UUID) error
+	GetByAlbumID(ctx context.Context, albumID uuid.UUID) ([]domain.Track, error)
+	GetByMusicianID(ctx context.Context, musicianID uuid.UUID) ([]domain.Track, error)
 }

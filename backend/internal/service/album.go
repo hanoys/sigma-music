@@ -25,7 +25,7 @@ func (as *AlbumService) Create(ctx context.Context, albumInfo ports.CreateAlbumS
 		ReleaseDate: null.Time{},
 	}
 
-	return as.repository.Create(ctx, createAlbum)
+	return as.repository.Create(ctx, createAlbum, albumInfo.MusicianID)
 }
 
 func (as *AlbumService) GetAll(ctx context.Context) ([]domain.Album, error) {

@@ -16,6 +16,7 @@ const (
 	genreGetByIDQuery     = "SELECT * FROM genres WHERE id = $1"
 	genreGetAllQuery      = "SELECT * FROM genres"
 	genreAddForTrackQuery = "INSERT INTO track_genre (track_id, genre_id) VALUES ($1, $2)"
+	genreGetByTrack       = "SELECT g.id, g.name FROM genres g JOIN public.track_genre tg on g.id = tg.genre_id WHERE tg.track_id = $1"
 )
 
 type PostgresGenreRepository struct {
@@ -66,4 +67,19 @@ func (gr *PostgresGenreRepository) AddForTrack(ctx context.Context, trackID uuid
 	}
 
 	return nil
+}
+
+func (gr *PostgresGenreRepository) GetByTrackID(ctx context.Context, trackID uuid.UUID) ([]domain.Genre, error) {
+	var genres []entity.PgGenre
+	err := gr.db.SelectContext(ctx, &genres, genreGetByTrack, trackID)
+	if err != nil {
+		return nil, util.WrapError(ports.ErrInternalGenreRepo, err)
+	}
+
+	domainGenres := make([]domain.Genre, len(genres))
+	for i, genre := range genres {
+		domainGenres[i] = genre.ToDomain()
+	}
+
+	return domainGenres, nil
 }

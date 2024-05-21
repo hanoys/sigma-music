@@ -24,7 +24,6 @@ type ITokenProvider interface {
 type LogInCredentials struct {
 	Name     string
 	Password string
-	Role     int
 }
 
 var (

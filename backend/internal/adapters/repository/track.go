@@ -15,9 +15,12 @@ import (
 )
 
 const (
-	trackGetAllQuery  = "SELECT * FROM tracks"
-	trackDeleteQuery  = "DELETE FROM tracks WHERE id = $1"
-	trackGetByIDQuery = "SELECT * FROM tracks WHERE id = $1"
+	trackGetAllQuery      = "SELECT * FROM tracks"
+	trackDeleteQuery      = "DELETE FROM tracks WHERE id = $1"
+	trackGetByIDQuery     = "SELECT * FROM tracks WHERE id = $1"
+	trackGetUserFavorites = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN favorite f on t.id = f.track_id WHERE f.user_id = $1"
+	trackGetByAlbumID     = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN albums a ON t.album_id = a.id WHERE a.published = TRUE AND a.id = $1"
+	trackGetByMusicianID  = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN albums a ON t.album_id = a.id JOIN album_musician am on a.id = am.album_id JOIN musicians m on am.musician_id = m.id WHERE published = TRUE and m.id = $1"
 )
 
 type PostgresTrackRepository struct {
@@ -98,4 +101,64 @@ func (tr *PostgresTrackRepository) Delete(ctx context.Context, trackID uuid.UUID
 	}
 
 	return deletedTrack.ToDomain(), nil
+}
+
+func (tr *PostgresTrackRepository) GetUserFavorites(ctx context.Context, userID uuid.UUID) ([]domain.Track, error) {
+	var tracks []entity.PgTrack
+	err := tr.db.SelectContext(ctx, &tracks, trackGetUserFavorites, userID)
+	if err != nil {
+		return nil, util.WrapError(ports.ErrInternalTrackRepo, err)
+	}
+
+	domainTracks := make([]domain.Track, len(tracks))
+	for i, track := range tracks {
+		domainTracks[i] = track.ToDomain()
+	}
+
+	return domainTracks, nil
+}
+
+func (tr *PostgresTrackRepository) AddToUserFavorites(ctx context.Context, trackID uuid.UUID, userID uuid.UUID) error {
+	_, err := tr.db.ExecContext(ctx, "INSERT INTO favorite(user_id, track_id) VALUES ($1, $2)", userID, trackID)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == pgerrcode.UniqueViolation {
+				return util.WrapError(ports.ErrTrackDuplicate, err)
+			}
+		}
+		return util.WrapError(ports.ErrInternalTrackRepo, err)
+	}
+
+	return nil
+}
+
+func (tr *PostgresTrackRepository) GetByAlbumID(ctx context.Context, albumID uuid.UUID) ([]domain.Track, error) {
+	var tracks []entity.PgTrack
+	err := tr.db.SelectContext(ctx, &tracks, trackGetByAlbumID, albumID)
+	if err != nil {
+		return nil, util.WrapError(ports.ErrInternalTrackRepo, err)
+	}
+
+	domainTracks := make([]domain.Track, len(tracks))
+	for i, track := range tracks {
+		domainTracks[i] = track.ToDomain()
+	}
+
+	return domainTracks, nil
+}
+
+func (tr *PostgresTrackRepository) GetByMusicianID(ctx context.Context, musicianID uuid.UUID) ([]domain.Track, error) {
+	var tracks []entity.PgTrack
+	err := tr.db.SelectContext(ctx, &tracks, trackGetByMusicianID, musicianID)
+	if err != nil {
+		return nil, util.WrapError(ports.ErrInternalTrackRepo, err)
+	}
+
+	domainTracks := make([]domain.Track, len(tracks))
+	for i, track := range tracks {
+		domainTracks[i] = track.ToDomain()
+	}
+
+	return domainTracks, nil
 }

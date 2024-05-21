@@ -107,3 +107,66 @@ func TestAuthServiceLogIn(t *testing.T) {
 		})
 	}
 }
+
+var tokenString = "testTokenString"
+
+func TestAuthServiceVerifyToken(t *testing.T) {
+	tests := []struct {
+		name              string
+		userRepoMock      func(repository *mocks.UserRepository)
+		musicianRepoMock  func(repository *mocks.MusicianRepository)
+		tokenProviderMock func(provider *mocks2.TokenProvider)
+		hashProviderMock  func(provider *mocks3.HashPasswordProvider)
+		expected          error
+	}{
+		{
+			name: "success verification",
+			userRepoMock: func(repository *mocks.UserRepository) {
+			},
+			musicianRepoMock: func(repository *mocks.MusicianRepository) {
+			},
+			tokenProviderMock: func(provider *mocks2.TokenProvider) {
+				provider.
+					On("VerifyToken", context.Background(), tokenString).
+					Return(domain.Payload{}, nil)
+			},
+			hashProviderMock: func(provider *mocks3.HashPasswordProvider) {
+			},
+			expected: nil,
+		},
+		{
+			name: "fail verification",
+			userRepoMock: func(repository *mocks.UserRepository) {
+			},
+			musicianRepoMock: func(repository *mocks.MusicianRepository) {
+			},
+			tokenProviderMock: func(provider *mocks2.TokenProvider) {
+				provider.
+					On("VerifyToken", context.Background(), tokenString).
+					Return(domain.Payload{}, ports.ErrTokenProviderInvalidToken)
+			},
+			hashProviderMock: func(provider *mocks3.HashPasswordProvider) {
+			},
+			expected: ports.ErrTokenProviderInvalidToken,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			userRepository := mocks.NewUserRepository(t)
+			musicianRepository := mocks.NewMusicianRepository(t)
+			tokenProvider := mocks2.NewTokenProvider(t)
+			hashProvider := mocks3.NewHashPasswordProvider(t)
+			authService := service.NewAuthorizationService(userRepository, musicianRepository, tokenProvider, hashProvider)
+			test.userRepoMock(userRepository)
+			test.musicianRepoMock(musicianRepository)
+			test.tokenProviderMock(tokenProvider)
+			test.hashProviderMock(hashProvider)
+
+			_, err := authService.VerifyToken(context.Background(), tokenString)
+			if !errors.Is(err, test.expected) {
+				t.Errorf("got %v, want %v", err, test.expected)
+			}
+		})
+	}
+}

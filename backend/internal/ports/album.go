@@ -15,7 +15,7 @@ var (
 )
 
 type IAlbumRepository interface {
-	Create(ctx context.Context, album domain.Album) (domain.Album, error)
+	Create(ctx context.Context, album domain.Album, musicianID uuid.UUID) (domain.Album, error)
 	GetAll(ctx context.Context) ([]domain.Album, error)
 	GetByMusicianID(ctx context.Context, musicianID uuid.UUID) ([]domain.Album, error)
 	GetByID(ctx context.Context, id uuid.UUID) (domain.Album, error)
@@ -23,6 +23,7 @@ type IAlbumRepository interface {
 }
 
 type CreateAlbumServiceReq struct {
+	MusicianID  uuid.UUID
 	Name        string
 	Description string
 }

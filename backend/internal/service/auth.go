@@ -69,29 +69,25 @@ func (a *AuthorizationService) authMusician(ctx context.Context, name string, pa
 
 func (a *AuthorizationService) LogIn(ctx context.Context, cred ports.LogInCredentials) (domain.TokenPair, error) {
 	var id uuid.UUID
+	var role int
 
-	switch cred.Role {
-	case domain.UserRole:
-		user, err := a.authUser(ctx, cred.Name, cred.Password)
-		if err != nil {
-			return domain.TokenPair{}, err
-		}
-
+	user, err := a.authUser(ctx, cred.Name, cred.Password)
+	if err == nil {
 		id = user.ID
-	case domain.MusicianRole:
+		role = domain.UserRole
+	} else {
 		musician, err := a.authMusician(ctx, cred.Name, cred.Password)
-		if err != nil {
+		if err == nil {
+			id = musician.ID
+			role = domain.MusicianRole
+		} else {
 			return domain.TokenPair{}, err
 		}
-
-		id = musician.ID
-	default:
-		return domain.TokenPair{}, ports.ErrUnexpectedRole
 	}
 
 	payload := domain.Payload{
 		UserID: id,
-		Role:   cred.Role,
+		Role:   role,
 	}
 
 	tokens, err := a.tokenProvider.NewSession(ctx, payload)

@@ -14,6 +14,10 @@ type TokenStorage struct {
 	redisClient *redis.Client
 }
 
+func NewTokenStorage(redisClient *redis.Client) *TokenStorage {
+	return &TokenStorage{redisClient: redisClient}
+}
+
 func (ts *TokenStorage) Set(ctx context.Context, key string, payload domain.Payload, expiration time.Duration) error {
 	payloadJSON, err := json.Marshal(payload)
 	if err != nil {

@@ -22,12 +22,6 @@ type ProviderConfig struct {
 	SecretKey           string
 }
 
-func NewProviderConfig(accessTime int64, refreshTime int64, secret string) *ProviderConfig {
-	return &ProviderConfig{AccessTokenExpTime: accessTime,
-		RefreshTokenExpTime: refreshTime,
-		SecretKey:           secret}
-}
-
 type Provider struct {
 	tokenStorage ports.ITokenStorage
 	cfg          *ProviderConfig
