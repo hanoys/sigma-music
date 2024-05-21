@@ -36,6 +36,10 @@ func (as *AlbumService) GetByMusicianID(ctx context.Context, musicianID uuid.UUI
 	return as.repository.GetByMusicianID(ctx, musicianID)
 }
 
+func (as *AlbumService) GetOwn(ctx context.Context, musicianID uuid.UUID) ([]domain.Album, error) {
+	return as.repository.GetOwn(ctx, musicianID)
+}
+
 func (as *AlbumService) GetByID(ctx context.Context, id uuid.UUID) (domain.Album, error) {
 	return as.repository.GetByID(ctx, id)
 }

@@ -57,3 +57,11 @@ func (ms *MusicianService) GetByName(ctx context.Context, name string) (domain.M
 func (ms *MusicianService) GetByEmail(ctx context.Context, email string) (domain.Musician, error) {
 	return ms.repository.GetByEmail(ctx, email)
 }
+
+func (ms *MusicianService) GetByAlbumID(ctx context.Context, albumID uuid.UUID) (domain.Musician, error) {
+	return ms.repository.GetByAlbumID(ctx, albumID)
+}
+
+func (ms *MusicianService) GetByTrackID(ctx context.Context, trackID uuid.UUID) (domain.Musician, error) {
+	return ms.repository.GetByTrackID(ctx, trackID)
+}

@@ -18,6 +18,7 @@ type IAlbumRepository interface {
 	Create(ctx context.Context, album domain.Album, musicianID uuid.UUID) (domain.Album, error)
 	GetAll(ctx context.Context) ([]domain.Album, error)
 	GetByMusicianID(ctx context.Context, musicianID uuid.UUID) ([]domain.Album, error)
+	GetOwn(ctx context.Context, musicianID uuid.UUID) ([]domain.Album, error)
 	GetByID(ctx context.Context, id uuid.UUID) (domain.Album, error)
 	Publish(ctx context.Context, id uuid.UUID) error
 }
@@ -32,6 +33,7 @@ type IAlbumService interface {
 	Create(ctx context.Context, albumInfo CreateAlbumServiceReq) (domain.Album, error)
 	GetAll(ctx context.Context) ([]domain.Album, error)
 	GetByMusicianID(ctx context.Context, musicianID uuid.UUID) ([]domain.Album, error)
+	GetOwn(ctx context.Context, musicianID uuid.UUID) ([]domain.Album, error)
 	GetByID(ctx context.Context, id uuid.UUID) (domain.Album, error)
 	Publish(ctx context.Context, albumID uuid.UUID) error
 }

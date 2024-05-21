@@ -21,6 +21,8 @@ type IMusicianRepository interface {
 	GetByID(ctx context.Context, musicianID uuid.UUID) (domain.Musician, error)
 	GetByName(ctx context.Context, name string) (domain.Musician, error)
 	GetByEmail(ctx context.Context, email string) (domain.Musician, error)
+	GetByAlbumID(ctx context.Context, albumID uuid.UUID) (domain.Musician, error)
+	GetByTrackID(ctx context.Context, trackID uuid.UUID) (domain.Musician, error)
 }
 
 var (
@@ -42,4 +44,6 @@ type IMusicianService interface {
 	GetByID(ctx context.Context, musicianID uuid.UUID) (domain.Musician, error)
 	GetByName(ctx context.Context, name string) (domain.Musician, error)
 	GetByEmail(ctx context.Context, email string) (domain.Musician, error)
+	GetByAlbumID(ctx context.Context, albumID uuid.UUID) (domain.Musician, error)
+	GetByTrackID(ctx context.Context, trackID uuid.UUID) (domain.Musician, error)
 }
