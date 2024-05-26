@@ -102,7 +102,7 @@ func (h *Handler) GetOwn(c *Console) {
 		return
 	}
 
-	albums, err := h.albumService.GetByMusicianID(context.Background(), c.UserID)
+	albums, err := h.albumService.GetOwn(context.Background(), c.UserID)
 
 	if err != nil {
 		fmt.Println(err)

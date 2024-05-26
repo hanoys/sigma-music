@@ -18,3 +18,12 @@
 go.work
 
 .idea/*
+*/.idea/*
+
+.data/*
+*/.data/*
+
+*.DS_Store
+
+*.*.bkp
+*.*.dtmp

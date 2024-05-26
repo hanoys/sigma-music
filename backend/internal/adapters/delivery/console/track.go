@@ -200,3 +200,21 @@ func (h *Handler) GetByMusicianIDTrack(c *Console) {
 		dto.NewTrackDTO(track).Print()
 	}
 }
+
+func (h *Handler) GetOwnTrack(c *Console) {
+	err := h.verifyMusicianAuth(c)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	tracks, err := h.trackService.GetOwn(context.Background(), c.UserID)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	for _, track := range tracks {
+		dto.NewTrackDTO(track).Print()
+	}
+}

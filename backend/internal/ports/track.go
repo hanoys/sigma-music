@@ -25,6 +25,7 @@ type ITrackRepository interface {
 	AddToUserFavorites(ctx context.Context, trackID uuid.UUID, userID uuid.UUID) error
 	GetByAlbumID(ctx context.Context, albumID uuid.UUID) ([]domain.Track, error)
 	GetByMusicianID(ctx context.Context, musicianID uuid.UUID) ([]domain.Track, error)
+	GetOwn(ctx context.Context, musicianID uuid.UUID) ([]domain.Track, error)
 }
 
 type PutTrackReq struct {
@@ -53,4 +54,5 @@ type ITrackService interface {
 	AddToUserFavorites(ctx context.Context, trackID uuid.UUID, userID uuid.UUID) error
 	GetByAlbumID(ctx context.Context, albumID uuid.UUID) ([]domain.Track, error)
 	GetByMusicianID(ctx context.Context, musicianID uuid.UUID) ([]domain.Track, error)
+	GetOwn(ctx context.Context, musicianID uuid.UUID) ([]domain.Track, error)
 }

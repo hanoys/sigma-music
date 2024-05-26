@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/google/uuid"
+	"github.com/guregu/null/v5"
 	"github.com/hanoys/sigma-music/internal/adapters/repository/entity"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
@@ -12,6 +13,7 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
+	"time"
 )
 
 const (
@@ -125,7 +127,7 @@ func (ar *PostgresAlbumRepository) GetByID(ctx context.Context, id uuid.UUID) (d
 
 func (ar *PostgresAlbumRepository) Publish(ctx context.Context, id uuid.UUID) error {
 	var foundAlbum entity.PgAlbum
-	err := ar.db.GetContext(ctx, &foundAlbum, albumGetByIDQuery, id)
+	err := ar.db.GetContext(ctx, &foundAlbum, albumGetByIDInternalQuery, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return util.WrapError(ports.ErrAlbumIDNotFound, err)
@@ -134,6 +136,7 @@ func (ar *PostgresAlbumRepository) Publish(ctx context.Context, id uuid.UUID) er
 	}
 
 	foundAlbum.Published = true
+	foundAlbum.ReleaseDate = null.TimeFrom(time.Now())
 	updateQuery := entity.UpdateQueryString(foundAlbum, "albums")
 	_, err = ar.db.NamedExecContext(ctx, updateQuery, foundAlbum)
 	if err != nil {

@@ -89,3 +89,7 @@ func (ts *TrackService) GetByAlbumID(ctx context.Context, albumID uuid.UUID) ([]
 func (ts *TrackService) GetByMusicianID(ctx context.Context, musicianID uuid.UUID) ([]domain.Track, error) {
 	return ts.repository.GetByMusicianID(ctx, musicianID)
 }
+
+func (ts *TrackService) GetOwn(ctx context.Context, musicianID uuid.UUID) ([]domain.Track, error) {
+	return ts.repository.GetOwn(ctx, musicianID)
+}

@@ -47,6 +47,7 @@ const (
 	addToUserFavoritesTrack
 	getByAlbumIDTrack
 	getByMusicianIDTrack
+	getOwnTracks
 
 	postComment
 	getOnTrackComment
@@ -100,6 +101,7 @@ func (c *Console) InitRoutes() {
 		getUserComments:         c.Handler.GetUserComments,
 		getStatistic:            c.Handler.GetStat,
 		listen:                  c.Handler.Listen,
+		getOwnTracks:            c.Handler.GetOwnTrack,
 	}
 }
 
@@ -151,21 +153,22 @@ func (c *Console) PrintMenu() {
 	fmt.Println("17. Add track to user favorites (U)")
 	fmt.Println("18. Get tracks by album id")
 	fmt.Println("19. Get tracks by musician id")
+	fmt.Println("20. Get own tracks")
 	fmt.Println("-----------------------")
-	fmt.Println("20. Post comment (U)")
-	fmt.Println("21. Get comments on track (U)")
-	fmt.Println("22. Get user comments (U)")
+	fmt.Println("21. Post comment (U)")
+	fmt.Println("22. Get comments on track (U)")
+	fmt.Println("23. Get user comments (U)")
 	fmt.Println("-----------------------")
-	fmt.Println("23. Get all genres (U)")
+	fmt.Println("24. Get all genres (U)")
 	fmt.Println("-----------------------")
-	fmt.Println("24. Create album (M)")
-	fmt.Println("25. Get all albums")
-	fmt.Println("26. Get albums by musician id")
-	fmt.Println("27. Get own albums (M)")
-	fmt.Println("28. Get album by id")
-	fmt.Println("29. Publish album (M)")
+	fmt.Println("25. Create album (M)")
+	fmt.Println("26. Get all albums")
+	fmt.Println("27. Get albums by musician id")
+	fmt.Println("28. Get own albums (M)")
+	fmt.Println("29. Get album by id")
+	fmt.Println("30. Publish album (M)")
 	fmt.Println("-----------------------")
-	fmt.Println("30. Get statistics (U)")
-	fmt.Println("31. Listen Track (U)")
+	fmt.Println("31. Get statistics (U)")
+	fmt.Println("32. Listen Track (U)")
 	fmt.Println("-----------------------")
 }

@@ -15,12 +15,14 @@ import (
 )
 
 const (
-	trackGetAllQuery      = "SELECT * FROM tracks"
-	trackDeleteQuery      = "DELETE FROM tracks WHERE id = $1"
-	trackGetByIDQuery     = "SELECT * FROM tracks WHERE id = $1"
-	trackGetUserFavorites = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN favorite f on t.id = f.track_id WHERE f.user_id = $1"
-	trackGetByAlbumID     = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN albums a ON t.album_id = a.id WHERE a.published = TRUE AND a.id = $1"
-	trackGetByMusicianID  = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN albums a ON t.album_id = a.id JOIN album_musician am on a.id = am.album_id JOIN musicians m on am.musician_id = m.id WHERE published = TRUE and m.id = $1"
+	trackGetAllQuery          = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN albums a ON t.album_id = a.id WHERE a.published = TRUE"
+	trackDeleteQuery          = "DELETE FROM tracks WHERE id = $1"
+	trackGetByIDQuery         = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN albums a ON t.album_id = a.id WHERE t.id = $1 AND a.published = TRUE"
+	trackGetByIDInternalQuery = "SELECT id, album_id, name, url FROM tracks WHERE id = $1"
+	trackGetUserFavorites     = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN favorite f on t.id = f.track_id WHERE f.user_id = $1"
+	trackGetByAlbumID         = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN albums a ON t.album_id = a.id WHERE a.published = TRUE AND a.id = $1"
+	trackGetByMusicianID      = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN albums a ON t.album_id = a.id JOIN album_musician am on a.id = am.album_id JOIN musicians m on am.musician_id = m.id WHERE published = TRUE and m.id = $1"
+	trackGetOwn               = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN albums a ON t.album_id = a.id JOIN album_musician am on a.id = am.album_id JOIN musicians m on am.musician_id = m.id WHERE m.id = $1"
 )
 
 type PostgresTrackRepository struct {
@@ -46,7 +48,7 @@ func (tr *PostgresTrackRepository) Create(ctx context.Context, track domain.Trac
 	}
 
 	var createdTrack entity.PgTrack
-	err = tr.db.GetContext(ctx, &createdTrack, trackGetByIDQuery, pgTrack.ID)
+	err = tr.db.GetContext(ctx, &createdTrack, trackGetByIDInternalQuery, pgTrack.ID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.Track{}, util.WrapError(ports.ErrTrackIDNotFound, err)
@@ -87,7 +89,7 @@ func (tr *PostgresTrackRepository) GetByID(ctx context.Context, trackID uuid.UUI
 
 func (tr *PostgresTrackRepository) Delete(ctx context.Context, trackID uuid.UUID) (domain.Track, error) {
 	var deletedTrack entity.PgTrack
-	err := tr.db.GetContext(ctx, &deletedTrack, trackGetByIDQuery, trackID)
+	err := tr.db.GetContext(ctx, &deletedTrack, trackGetByIDInternalQuery, trackID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.Track{}, util.WrapError(ports.ErrTrackIDNotFound, err)
@@ -151,6 +153,21 @@ func (tr *PostgresTrackRepository) GetByAlbumID(ctx context.Context, albumID uui
 func (tr *PostgresTrackRepository) GetByMusicianID(ctx context.Context, musicianID uuid.UUID) ([]domain.Track, error) {
 	var tracks []entity.PgTrack
 	err := tr.db.SelectContext(ctx, &tracks, trackGetByMusicianID, musicianID)
+	if err != nil {
+		return nil, util.WrapError(ports.ErrInternalTrackRepo, err)
+	}
+
+	domainTracks := make([]domain.Track, len(tracks))
+	for i, track := range tracks {
+		domainTracks[i] = track.ToDomain()
+	}
+
+	return domainTracks, nil
+}
+
+func (tr *PostgresTrackRepository) GetOwn(ctx context.Context, musicianID uuid.UUID) ([]domain.Track, error) {
+	var tracks []entity.PgTrack
+	err := tr.db.SelectContext(ctx, &tracks, trackGetOwn, musicianID)
 	if err != nil {
 		return nil, util.WrapError(ports.ErrInternalTrackRepo, err)
 	}

@@ -8,17 +8,9 @@ CREATE TABLE IF NOT EXISTS users (
     country VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS orders (
-    id UUID PRIMARY KEY,
-    user_id UUID REFERENCES users ON DELETE CASCADE,
-    create_time TIMESTAMP NOT NULL,
-    price NUMERIC(20, 5) NOT NULL CHECK (price > 0)
-);
-
 CREATE TABLE IF NOT EXISTS subscriptions (
     id UUID PRIMARY KEY,
     user_id UUID REFERENCES users ON DELETE CASCADE,
-    order_id UUID REFERENCES orders ON DELETE CASCADE,
     start_date TIMESTAMP NOT NULL,
     expiration_date TIMESTAMP NOT NULL CHECK (expiration_date > start_date)
 );
