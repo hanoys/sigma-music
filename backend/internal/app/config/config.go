@@ -29,6 +29,10 @@ type Config struct {
 		RootUser     string `config:"MINIO_ROOT_USER"`
 		RootPassword string `config:"MINIO_ROOT_PASSWORD"`
 	}
+
+	Logger struct {
+		LogLevel string `config:"LOGGER_LOG_LEVEL"`
+	}
 }
 
 func GetConfig(configPath string) (*Config, error) {
@@ -49,6 +53,11 @@ func GetConfig(configPath string) (*Config, error) {
 	}
 
 	err = config.From(configPath).To(&conf.Minio)
+	if err != nil {
+		return nil, err
+	}
+
+	err = config.From(configPath).To(&conf.Logger)
 	if err != nil {
 		return nil, err
 	}

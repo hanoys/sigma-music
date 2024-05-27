@@ -5,6 +5,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
+	"go.uber.org/zap"
 	"math"
 )
 
@@ -12,20 +13,33 @@ type StatService struct {
 	repository      ports.IStatRepository
 	genreService    ports.IGenreService
 	musicianService ports.IMusicianService
+	logger          *zap.Logger
 }
 
 func NewStatService(repo ports.IStatRepository, genreService ports.IGenreService,
-	musService ports.IMusicianService) *StatService {
+	musService ports.IMusicianService, logger *zap.Logger) *StatService {
 
 	return &StatService{
 		repository:      repo,
 		genreService:    genreService,
 		musicianService: musService,
+		logger:          logger,
 	}
 }
 
 func (ss *StatService) Add(ctx context.Context, userID uuid.UUID, trackID uuid.UUID) error {
-	return ss.repository.Add(ctx, userID, trackID)
+	err := ss.repository.Add(ctx, userID, trackID)
+	if err != nil {
+		ss.logger.Error("Failed to add track to statistics", zap.Error(err),
+			zap.String("User ID", userID.String()), zap.String("Track ID", trackID.String()))
+
+		return err
+	}
+
+	ss.logger.Info("Track successfully added to statistics",
+		zap.String("User ID", userID.String()), zap.String("Track ID", trackID.String()))
+
+	return nil
 }
 
 func (ss *StatService) fillMostListenedMusicians(ctx context.Context, listenReport *domain.ListenReport,
@@ -80,21 +94,25 @@ func (ss *StatService) FormReport(ctx context.Context, userID uuid.UUID) (domain
 
 	listenedMusicians, err := ss.repository.GetMostListenedMusicians(ctx, userID, 3)
 	if err != nil {
+		ss.logger.Error("Error to create report", zap.Error(err))
 		return domain.ListenReport{}, err
 	}
 
 	listenedGenres, err := ss.repository.GetListenedGenres(ctx, userID)
 	if err != nil {
+		ss.logger.Error("Error to create report", zap.Error(err))
 		return domain.ListenReport{}, err
 	}
 
 	err = ss.fillMostListenedMusicians(ctx, &listenReport, listenedMusicians)
 	if err != nil {
+		ss.logger.Error("Error to create report", zap.Error(err))
 		return domain.ListenReport{}, err
 	}
 
 	err = ss.fillListenedGenres(ctx, &listenReport, listenedGenres)
 	if err != nil {
+		ss.logger.Error("Error to create report", zap.Error(err))
 		return domain.ListenReport{}, err
 	}
 
@@ -104,6 +122,8 @@ func (ss *StatService) FormReport(ctx context.Context, userID uuid.UUID) (domain
 	}
 
 	listenReport.ListenCount = listenCountSum
+
+	ss.logger.Info("Report successfully created", zap.String("User ID", userID.String()))
 
 	return listenReport, nil
 }

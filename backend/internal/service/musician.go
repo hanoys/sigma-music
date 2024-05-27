@@ -5,25 +5,34 @@ import (
 	"github.com/google/uuid"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
+	"go.uber.org/zap"
 )
 
 type MusicianService struct {
 	repository ports.IMusicianRepository
 	hash       ports.IHashPasswordProvider
+	logger     *zap.Logger
 }
 
-func NewMusicianService(repo ports.IMusicianRepository, hash ports.IHashPasswordProvider) *MusicianService {
-	return &MusicianService{repository: repo, hash: hash}
+func NewMusicianService(repo ports.IMusicianRepository, hash ports.IHashPasswordProvider,
+	logger *zap.Logger) *MusicianService {
+	return &MusicianService{
+		repository: repo,
+		hash:       hash,
+		logger:     logger,
+	}
 }
 
 func (ms *MusicianService) Register(ctx context.Context, musician ports.MusicianServiceCreateRequest) (domain.Musician, error) {
 	_, err := ms.repository.GetByName(ctx, musician.Name)
 	if err == nil {
+		ms.logger.Error("Failed to register musician", zap.Error(err), zap.String("Musician Name", musician.Name))
 		return domain.Musician{}, ports.ErrMusicianWithSuchNameAlreadyExists
 	}
 
 	_, err = ms.repository.GetByEmail(ctx, musician.Email)
 	if err == nil {
+		ms.logger.Error("Failed to register musician", zap.Error(err), zap.String("Musician Email", musician.Email))
 		return domain.Musician{}, ports.ErrMusicianWithSuchEmailAlreadyExists
 	}
 
@@ -39,29 +48,87 @@ func (ms *MusicianService) Register(ctx context.Context, musician ports.Musician
 		Description: musician.Description,
 	}
 
-	return ms.repository.Create(ctx, createMusician)
+	mus, err := ms.repository.Create(ctx, createMusician)
+	if err != nil {
+		ms.logger.Error("Failed to register musician", zap.Error(err))
+		return domain.Musician{}, err
+	}
+
+	ms.logger.Info("Musician successfully registered", zap.String("Musician ID", createMusician.ID.String()))
+
+	return mus, nil
 }
 
 func (ms *MusicianService) GetAll(ctx context.Context) ([]domain.Musician, error) {
-	return ms.repository.GetAll(ctx)
+	musicians, err := ms.repository.GetAll(ctx)
+	if err != nil {
+		ms.logger.Error("Failed to get all musicians", zap.Error(err))
+		return nil, err
+	}
+
+	return musicians, nil
 }
 
 func (ms *MusicianService) GetByID(ctx context.Context, musicianID uuid.UUID) (domain.Musician, error) {
-	return ms.repository.GetByID(ctx, musicianID)
+	mus, err := ms.repository.GetByID(ctx, musicianID)
+	if err != nil {
+		ms.logger.Error("Failed to get musician by ID", zap.Error(err),
+			zap.String("Musician ID", musicianID.String()))
+	}
+
+	ms.logger.Info("Musician successfully received by id", zap.String("Musician ID", musicianID.String()))
+
+	return mus, nil
 }
 
 func (ms *MusicianService) GetByName(ctx context.Context, name string) (domain.Musician, error) {
-	return ms.repository.GetByName(ctx, name)
+	mus, err := ms.repository.GetByName(ctx, name)
+	if err != nil {
+		ms.logger.Error("Failed to get musician by name", zap.Error(err), zap.String("Musician Name", name))
+		return domain.Musician{}, err
+	}
+
+	ms.logger.Info("Musician successfully received by name", zap.String("Musician Name", name))
+
+	return mus, nil
 }
 
 func (ms *MusicianService) GetByEmail(ctx context.Context, email string) (domain.Musician, error) {
-	return ms.repository.GetByEmail(ctx, email)
+	mus, err := ms.repository.GetByEmail(ctx, email)
+	if err != nil {
+		ms.logger.Error("Failed to get musician by email", zap.Error(err), zap.String("Musician Email", email))
+		return domain.Musician{}, err
+	}
+
+	ms.logger.Info("Musician successfully received by email", zap.String("Musician Email", email))
+
+	return mus, nil
 }
 
 func (ms *MusicianService) GetByAlbumID(ctx context.Context, albumID uuid.UUID) (domain.Musician, error) {
-	return ms.repository.GetByAlbumID(ctx, albumID)
+	mus, err := ms.repository.GetByAlbumID(ctx, albumID)
+	if err != nil {
+		ms.logger.Error("Failed to get musician by album ID", zap.Error(err),
+			zap.String("Album ID", albumID.String()))
+
+		return domain.Musician{}, err
+	}
+
+	ms.logger.Info("Musician successfully received by album ID", zap.String("Album ID", albumID.String()))
+
+	return mus, nil
 }
 
 func (ms *MusicianService) GetByTrackID(ctx context.Context, trackID uuid.UUID) (domain.Musician, error) {
-	return ms.repository.GetByTrackID(ctx, trackID)
+	mus, err := ms.repository.GetByTrackID(ctx, trackID)
+	if err != nil {
+		ms.logger.Error("Failed to get musician by track ID", zap.Error(err),
+			zap.String("Album ID", trackID.String()))
+
+		return domain.Musician{}, err
+	}
+
+	ms.logger.Info("Musician successfully received by track ID", zap.String("Track ID", trackID.String()))
+
+	return mus, nil
 }

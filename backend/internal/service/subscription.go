@@ -5,15 +5,20 @@ import (
 	"github.com/google/uuid"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
+	"go.uber.org/zap"
 	"time"
 )
 
 type SubscriptionService struct {
 	repository ports.ISubscriptionRepository
+	logger     *zap.Logger
 }
 
-func NewSubscriptionService(repo ports.ISubscriptionRepository) *SubscriptionService {
-	return &SubscriptionService{repository: repo}
+func NewSubscriptionService(repo ports.ISubscriptionRepository, logger *zap.Logger) *SubscriptionService {
+	return &SubscriptionService{
+		repository: repo,
+		logger:     logger,
+	}
 }
 
 func (ss *SubscriptionService) Create(ctx context.Context, subReq ports.CreateSubscriptionReq) (domain.Subscription, error) {
@@ -25,5 +30,16 @@ func (ss *SubscriptionService) Create(ctx context.Context, subReq ports.CreateSu
 		ExpirationDate: time.Now().Add(time.Hour * 30),
 	}
 
-	return ss.repository.Create(ctx, newSubscription)
+	sub, err := ss.repository.Create(ctx, newSubscription)
+	if err != nil {
+		ss.logger.Error("Failed to create subscription", zap.Error(err),
+			zap.String("User ID", subReq.UserID.String()))
+
+		return domain.Subscription{}, err
+	}
+
+	ss.logger.Info("Subscription successfully created", zap.String("Subscription ID", newSubscription.ID.String()),
+		zap.String("User ID", newSubscription.UserID.String()))
+
+	return sub, nil
 }

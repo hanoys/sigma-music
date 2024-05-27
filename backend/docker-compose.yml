@@ -60,6 +60,8 @@ services:
       - .env.local
     networks:
       - backend
+    volumes:
+      - ./log:/etc/log
 
 networks:
   backend:

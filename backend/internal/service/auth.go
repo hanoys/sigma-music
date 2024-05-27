@@ -6,6 +6,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
+	"github.com/hanoys/sigma-music/internal/util"
+	"go.uber.org/zap"
 )
 
 type AuthorizationService struct {
@@ -13,15 +15,17 @@ type AuthorizationService struct {
 	musicianRepository ports.IMusicianRepository
 	tokenProvider      ports.ITokenProvider
 	hash               ports.IHashPasswordProvider
+	logger             *zap.Logger
 }
 
 func NewAuthorizationService(userRepo ports.IUserRepository, musicianRepo ports.IMusicianRepository,
-	tokenProvider ports.ITokenProvider, hash ports.IHashPasswordProvider) *AuthorizationService {
+	tokenProvider ports.ITokenProvider, hash ports.IHashPasswordProvider, logger *zap.Logger) *AuthorizationService {
 	return &AuthorizationService{
 		userRepository:     userRepo,
 		musicianRepository: musicianRepo,
 		tokenProvider:      tokenProvider,
 		hash:               hash,
+		logger:             logger,
 	}
 }
 
@@ -31,7 +35,7 @@ func (a *AuthorizationService) authUser(ctx context.Context, name string, passwo
 	if errors.Is(err, ports.ErrUserNameNotFound) {
 		return domain.User{}, ports.ErrIncorrectName
 	} else if err != nil {
-		return domain.User{}, ports.ErrInternalAuthRepo
+		return domain.User{}, util.WrapError(ports.ErrInternalAuthRepo, err)
 	}
 
 	saltedPassword := domain.SaltedPassword{
@@ -52,7 +56,7 @@ func (a *AuthorizationService) authMusician(ctx context.Context, name string, pa
 	if errors.Is(err, ports.ErrMusicianNameNotFound) {
 		return domain.Musician{}, ports.ErrIncorrectName
 	} else if err != nil {
-		return domain.Musician{}, ports.ErrInternalAuthRepo
+		return domain.Musician{}, util.WrapError(ports.ErrInternalAuthRepo, err)
 	}
 
 	saltedPassword := domain.SaltedPassword{
@@ -81,6 +85,7 @@ func (a *AuthorizationService) LogIn(ctx context.Context, cred ports.LogInCreden
 			id = musician.ID
 			role = domain.MusicianRole
 		} else {
+			a.logger.Error("Failed to authorize user", zap.Error(err), zap.String("User Name", cred.Name))
 			return domain.TokenPair{}, err
 		}
 	}
@@ -90,10 +95,22 @@ func (a *AuthorizationService) LogIn(ctx context.Context, cred ports.LogInCreden
 		Role:   role,
 	}
 
+	var stringRole string
+	if payload.Role == domain.UserRole {
+		stringRole = "User"
+	} else {
+		stringRole = "Musician"
+	}
+
 	tokens, err := a.tokenProvider.NewSession(ctx, payload)
 	if err != nil {
+		a.logger.Error("Failed to create new session for user", zap.Error(err),
+			zap.String("User ID", payload.UserID.String()), zap.String("User Role", stringRole))
 		return domain.TokenPair{}, err
 	}
+
+	a.logger.Info("User successfully authorized",
+		zap.String("User ID", payload.UserID.String()), zap.String("User Role", stringRole))
 
 	return tokens, nil
 }
@@ -101,6 +118,21 @@ func (a *AuthorizationService) LogIn(ctx context.Context, cred ports.LogInCreden
 func (a *AuthorizationService) LogOut(ctx context.Context, tokenString string) error {
 	err := a.tokenProvider.CloseSession(ctx, tokenString)
 	if err != nil {
+		payload, errVerify := a.tokenProvider.VerifyToken(ctx, tokenString)
+		if errVerify != nil {
+			a.logger.Error("Failed to close session for user", zap.Error(errVerify))
+		} else {
+			var stringRole string
+			if payload.Role == domain.UserRole {
+				stringRole = "User"
+			} else {
+				stringRole = "Musician"
+			}
+
+			a.logger.Error("Failed to close user session", zap.Error(err),
+				zap.String("User ID", payload.UserID.String()), zap.String("User Role", stringRole))
+		}
+
 		return err
 	}
 
@@ -108,19 +140,32 @@ func (a *AuthorizationService) LogOut(ctx context.Context, tokenString string) e
 }
 
 func (a *AuthorizationService) RefreshToken(ctx context.Context, refreshTokenString string) (domain.TokenPair, error) {
-	payload, err := a.tokenProvider.RefreshSession(ctx, refreshTokenString)
+	tokenPair, err := a.tokenProvider.RefreshSession(ctx, refreshTokenString)
 	if err != nil {
+		a.logger.Error("Failed to refresh token for user", zap.Error(err))
 		return domain.TokenPair{}, err
 	}
 
-	return payload, nil
+	return tokenPair, nil
 }
 
 func (a *AuthorizationService) VerifyToken(ctx context.Context, tokenString string) (domain.Payload, error) {
 	payload, err := a.tokenProvider.VerifyToken(ctx, tokenString)
+	var stringRole string
+	if payload.Role == domain.UserRole {
+		stringRole = "User"
+	} else {
+		stringRole = "Musician"
+	}
+
 	if err != nil {
+		a.logger.Error("Failed to verify token for user", zap.Error(err),
+			zap.String("User ID", payload.UserID.String()), zap.String("User Role", stringRole))
 		return domain.Payload{}, err
 	}
+
+	a.logger.Info("Token successfully verified for user",
+		zap.String("User ID", payload.UserID.String()), zap.String("User Role", stringRole))
 
 	return payload, err
 }

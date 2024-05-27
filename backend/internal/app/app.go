@@ -17,6 +17,10 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"log"
+	"strings"
 	"time"
 )
 
@@ -38,6 +42,10 @@ type MinioConfig struct {
 	BucketName   string
 	RootUser     string
 	RootPassword string
+}
+
+type LoggerConfig struct {
+	LogLevel string
 }
 
 const (
@@ -119,11 +127,52 @@ func NewMinioClient(cfg *MinioConfig) (*minio.Client, error) {
 	return minioClient, nil
 }
 
+func NewLogger(cfg *LoggerConfig) (*zap.Logger, error) {
+	var logLevel zap.AtomicLevel
+	if strings.ToLower(cfg.LogLevel) == "info" {
+		logLevel = zap.NewAtomicLevelAt(zap.InfoLevel)
+	} else if strings.ToLower(cfg.LogLevel) == "error" {
+		logLevel = zap.NewAtomicLevelAt(zap.ErrorLevel)
+	} else if strings.ToLower(cfg.LogLevel) == "fatal" {
+		logLevel = zap.NewAtomicLevelAt(zap.FatalLevel)
+	} else {
+		return nil, fmt.Errorf("unknown log level: %s", cfg.LogLevel)
+	}
+
+	encoderCfg := zap.NewProductionEncoderConfig()
+	encoderCfg.TimeKey = "timestamp"
+	encoderCfg.EncodeTime = zapcore.ISO8601TimeEncoder
+
+	conf := zap.Config{
+		Level:             logLevel,
+		Development:       false,
+		DisableCaller:     true,
+		DisableStacktrace: true,
+		Sampling:          nil,
+		Encoding:          "json",
+		EncoderConfig:     encoderCfg,
+		OutputPaths: []string{
+			"/etc/log/sigma-music.log",
+		},
+		ErrorOutputPaths: []string{
+			"/etc/log/sigma-music.log",
+		},
+	}
+
+	return zap.Must(conf.Build()), nil
+}
+
 func Run() {
 	cfg, err := config.GetConfig(".env.local")
 
 	if err != nil {
-		fmt.Println("config error:", err)
+		log.Println("config error:", err)
+		return
+	}
+
+	logger, err := NewLogger(&LoggerConfig{LogLevel: cfg.Logger.LogLevel})
+	if err != nil {
+		log.Println("logger error:", err)
 		return
 	}
 
@@ -136,7 +185,7 @@ func Run() {
 	})
 
 	if err != nil {
-		fmt.Println("postgres error:", err)
+		logger.Fatal("Error connecting postgres", zap.Error(err))
 		return
 	}
 
@@ -146,7 +195,7 @@ func Run() {
 	})
 
 	if err != nil {
-		fmt.Println("redis error:", err)
+		logger.Fatal("Error connecting redis", zap.Error(err))
 		return
 	}
 
@@ -158,7 +207,7 @@ func Run() {
 	})
 
 	if err != nil {
-		fmt.Println("minio error:", err)
+		logger.Fatal("Error connecting minio", zap.Error(err))
 		return
 	}
 
@@ -167,7 +216,6 @@ func Run() {
 	albumRepo := repository.NewPostgresAlbumRepository(dbConn)
 	commentRepo := repository.NewPostgresCommentRepository(dbConn)
 	genreRepo := repository.NewPostgresGenreRepository(dbConn)
-	orderRepo := repository.NewPostgresOrderRepository(dbConn)
 	statRepo := repository.NewPostgresStatRepository(dbConn)
 	subRepo := repository.NewPostgresSubscriptionRepository(dbConn)
 	trackRepo := repository.NewPostgresTrackRepository(dbConn)
@@ -181,16 +229,15 @@ func Run() {
 	hashProvider := hash.NewHashPasswordProvider()
 	trackStorage := miniostorage.NewTrackStorage(minioClient, cfg.Minio.BucketName)
 
-	authService := service.NewAuthorizationService(userRepo, musicianRepo, tokenProvider, hashProvider)
-	userService := service.NewUserService(userRepo, hashProvider)
-	musicianService := service.NewMusicianService(musicianRepo, hashProvider)
-	albumService := service.NewAlbumService(albumRepo)
-	commentService := service.NewCommentService(commentRepo)
-	genreService := service.NewGenreService(genreRepo)
-	orderService := service.NewOrderService(orderRepo)
-	statService := service.NewStatService(statRepo, genreService, musicianService)
-	subService := service.NewSubscriptionService(subRepo)
-	trackService := service.NewTrackService(trackRepo, trackStorage, genreService)
+	authService := service.NewAuthorizationService(userRepo, musicianRepo, tokenProvider, hashProvider, logger)
+	userService := service.NewUserService(userRepo, hashProvider, logger)
+	musicianService := service.NewMusicianService(musicianRepo, hashProvider, logger)
+	albumService := service.NewAlbumService(albumRepo, logger)
+	commentService := service.NewCommentService(commentRepo, logger)
+	genreService := service.NewGenreService(genreRepo, logger)
+	statService := service.NewStatService(statRepo, genreService, musicianService, logger)
+	subService := service.NewSubscriptionService(subRepo, logger)
+	trackService := service.NewTrackService(trackRepo, trackStorage, genreService, logger)
 
 	cons := console.NewConsole(console.NewHandler(console.HandlerParams{
 		AlbumService:        albumService,
@@ -198,7 +245,6 @@ func Run() {
 		CommentService:      commentService,
 		GenreService:        genreService,
 		MusicianService:     musicianService,
-		OrderService:        orderService,
 		StatService:         statService,
 		SubscriptionService: subService,
 		TrackService:        trackService,
