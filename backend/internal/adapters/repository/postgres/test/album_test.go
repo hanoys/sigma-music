@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/google/uuid"
-	"github.com/hanoys/sigma-music/internal/adapters/repository"
+	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres"
 	"github.com/hanoys/sigma-music/internal/ports"
 	"testing"
 )
@@ -42,7 +42,7 @@ func TestAlbumRepository(t *testing.T) {
 		}
 		defer db.Close()
 
-		repo := repository.NewPostgresAlbumRepository(db)
+		repo := postgres.NewPostgresAlbumRepository(db)
 		albums, err := repo.GetByMusicianID(ctx, uuid.New())
 		if len(albums) != 0 {
 			t.Errorf("unexpected albums count: %v", len(albums))
@@ -63,7 +63,7 @@ func TestAlbumRepository(t *testing.T) {
 		}
 		defer db.Close()
 
-		repo := repository.NewPostgresAlbumRepository(db)
+		repo := postgres.NewPostgresAlbumRepository(db)
 		_, err = repo.GetByID(ctx, uuid.New())
 		if !errors.Is(err, ports.ErrAlbumIDNotFound) {
 			t.Errorf("unexpected error: %v", err)
@@ -84,7 +84,7 @@ func TestAlbumRepository(t *testing.T) {
 		}
 		defer db.Close()
 
-		repo := repository.NewPostgresAlbumRepository(db)
+		repo := postgres.NewPostgresAlbumRepository(db)
 		err = repo.Publish(ctx, uuid.New())
 		if !errors.Is(err, ports.ErrAlbumIDNotFound) {
 			t.Errorf("unexpected error: %v", err)

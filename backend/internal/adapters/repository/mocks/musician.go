@@ -74,6 +74,34 @@ func (_m *MusicianRepository) GetAll(ctx context.Context) ([]domain.Musician, er
 	return r0, r1
 }
 
+// GetByAlbumID provides a mock function with given fields: ctx, albumID
+func (_m *MusicianRepository) GetByAlbumID(ctx context.Context, albumID uuid.UUID) (domain.Musician, error) {
+	ret := _m.Called(ctx, albumID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetByAlbumID")
+	}
+
+	var r0 domain.Musician
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (domain.Musician, error)); ok {
+		return rf(ctx, albumID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) domain.Musician); ok {
+		r0 = rf(ctx, albumID)
+	} else {
+		r0 = ret.Get(0).(domain.Musician)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = rf(ctx, albumID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetByEmail provides a mock function with given fields: ctx, email
 func (_m *MusicianRepository) GetByEmail(ctx context.Context, email string) (domain.Musician, error) {
 	ret := _m.Called(ctx, email)
@@ -151,6 +179,34 @@ func (_m *MusicianRepository) GetByName(ctx context.Context, name string) (domai
 
 	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
 		r1 = rf(ctx, name)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetByTrackID provides a mock function with given fields: ctx, trackID
+func (_m *MusicianRepository) GetByTrackID(ctx context.Context, trackID uuid.UUID) (domain.Musician, error) {
+	ret := _m.Called(ctx, trackID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetByTrackID")
+	}
+
+	var r0 domain.Musician
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (domain.Musician, error)); ok {
+		return rf(ctx, trackID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) domain.Musician); ok {
+		r0 = rf(ctx, trackID)
+	} else {
+		r0 = ret.Get(0).(domain.Musician)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = rf(ctx, trackID)
 	} else {
 		r1 = ret.Error(1)
 	}

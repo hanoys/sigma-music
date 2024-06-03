@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/google/uuid"
-	"github.com/hanoys/sigma-music/internal/adapters/repository"
+	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres"
 	"github.com/hanoys/sigma-music/internal/ports"
 	"testing"
 )
@@ -42,7 +42,7 @@ func TestGenreRepository(t *testing.T) {
 		}
 		defer db.Close()
 
-		repo := repository.NewPostgresGenreRepository(db)
+		repo := postgres.NewPostgresGenreRepository(db)
 		genres, err := repo.GetAll(context.Background())
 		if err != nil {
 			t.Errorf("unexcpected error: %v", err)
@@ -66,7 +66,7 @@ func TestGenreRepository(t *testing.T) {
 			}
 			defer db.Close()
 
-			repo := repository.NewPostgresGenreRepository(db)
+			repo := postgres.NewPostgresGenreRepository(db)
 			_, err = repo.GetByID(context.Background(), uuid.New())
 
 			if !errors.Is(err, ports.ErrGenreIDNotFound) {

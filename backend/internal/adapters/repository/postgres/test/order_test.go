@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/Rhymond/go-money"
 	"github.com/google/uuid"
-	"github.com/hanoys/sigma-music/internal/adapters/repository"
+	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
 	"testing"
@@ -52,7 +52,7 @@ func TestOrderRepository(t *testing.T) {
 		}
 		defer db.Close()
 
-		repo := repository.NewPostgresOrderRepository(db)
+		repo := postgres.NewPostgresOrderRepository(db)
 		_, err = repo.Create(ctx, newOrder)
 		if !errors.Is(err, ports.ErrInternalOrderRepo) {
 			t.Errorf("unexpected error: %v", err)

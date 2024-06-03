@@ -1,11 +1,11 @@
-package repository
+package postgres
 
 import (
 	"context"
 	"database/sql"
 	"errors"
 	"github.com/google/uuid"
-	"github.com/hanoys/sigma-music/internal/adapters/repository/entity"
+	entity2 "github.com/hanoys/sigma-music/internal/adapters/repository/postgres/entity"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
 	"github.com/hanoys/sigma-music/internal/util"
@@ -31,8 +31,8 @@ func NewPostgresUserRepository(db *sqlx.DB) *PostgresUserRepository {
 }
 
 func (ur *PostgresUserRepository) Create(ctx context.Context, user domain.User) (domain.User, error) {
-	pgUser := entity.NewPgUser(user)
-	queryString := entity.InsertQueryString(pgUser, "users")
+	pgUser := entity2.NewPgUser(user)
+	queryString := entity2.InsertQueryString(pgUser, "users")
 
 	_, err := ur.db.NamedExecContext(ctx, queryString, pgUser)
 	if err != nil {
@@ -45,7 +45,7 @@ func (ur *PostgresUserRepository) Create(ctx context.Context, user domain.User) 
 		return domain.User{}, util.WrapError(ports.ErrInternalUserRepo, err)
 	}
 
-	var createdUser entity.PgUser
+	var createdUser entity2.PgUser
 	err = ur.db.GetContext(ctx, &createdUser, userGetByIDQuery, pgUser.ID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -58,7 +58,7 @@ func (ur *PostgresUserRepository) Create(ctx context.Context, user domain.User) 
 }
 
 func (ur *PostgresUserRepository) GetAll(ctx context.Context) ([]domain.User, error) {
-	var users []entity.PgUser
+	var users []entity2.PgUser
 	err := ur.db.SelectContext(ctx, &users, userGetAllQuery)
 	if err != nil {
 		return nil, util.WrapError(ports.ErrInternalUserRepo, err)
@@ -73,7 +73,7 @@ func (ur *PostgresUserRepository) GetAll(ctx context.Context) ([]domain.User, er
 }
 
 func (ur *PostgresUserRepository) GetByID(ctx context.Context, userID uuid.UUID) (domain.User, error) {
-	var foundUser entity.PgUser
+	var foundUser entity2.PgUser
 	err := ur.db.GetContext(ctx, &foundUser, userGetByIDQuery, userID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -86,7 +86,7 @@ func (ur *PostgresUserRepository) GetByID(ctx context.Context, userID uuid.UUID)
 }
 
 func (ur *PostgresUserRepository) GetByName(ctx context.Context, name string) (domain.User, error) {
-	var foundUser entity.PgUser
+	var foundUser entity2.PgUser
 	err := ur.db.GetContext(ctx, &foundUser, userGetByNameQuery, name)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -99,7 +99,7 @@ func (ur *PostgresUserRepository) GetByName(ctx context.Context, name string) (d
 }
 
 func (ur *PostgresUserRepository) GetByEmail(ctx context.Context, email string) (domain.User, error) {
-	var foundUser entity.PgUser
+	var foundUser entity2.PgUser
 	err := ur.db.GetContext(ctx, &foundUser, userGetByEmailQuery, email)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -112,7 +112,7 @@ func (ur *PostgresUserRepository) GetByEmail(ctx context.Context, email string) 
 }
 
 func (ur *PostgresUserRepository) GetByPhone(ctx context.Context, phone string) (domain.User, error) {
-	var foundUser entity.PgUser
+	var foundUser entity2.PgUser
 	err := ur.db.GetContext(ctx, &foundUser, userGetByPhoneQuery, phone)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

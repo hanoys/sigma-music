@@ -1,11 +1,11 @@
-package repository
+package postgres
 
 import (
 	"context"
 	"database/sql"
 	"errors"
 	"github.com/google/uuid"
-	"github.com/hanoys/sigma-music/internal/adapters/repository/entity"
+	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres/entity"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
 	"github.com/hanoys/sigma-music/internal/util"

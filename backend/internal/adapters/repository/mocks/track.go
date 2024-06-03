@@ -16,6 +16,24 @@ type TrackRepository struct {
 	mock.Mock
 }
 
+// AddToUserFavorites provides a mock function with given fields: ctx, trackID, userID
+func (_m *TrackRepository) AddToUserFavorites(ctx context.Context, trackID uuid.UUID, userID uuid.UUID) error {
+	ret := _m.Called(ctx, trackID, userID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AddToUserFavorites")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
+		r0 = rf(ctx, trackID, userID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // Create provides a mock function with given fields: ctx, track
 func (_m *TrackRepository) Create(ctx context.Context, track domain.Track) (domain.Track, error) {
 	ret := _m.Called(ctx, track)
@@ -102,6 +120,36 @@ func (_m *TrackRepository) GetAll(ctx context.Context) ([]domain.Track, error) {
 	return r0, r1
 }
 
+// GetByAlbumID provides a mock function with given fields: ctx, albumID
+func (_m *TrackRepository) GetByAlbumID(ctx context.Context, albumID uuid.UUID) ([]domain.Track, error) {
+	ret := _m.Called(ctx, albumID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetByAlbumID")
+	}
+
+	var r0 []domain.Track
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) ([]domain.Track, error)); ok {
+		return rf(ctx, albumID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) []domain.Track); ok {
+		r0 = rf(ctx, albumID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.Track)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = rf(ctx, albumID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetByID provides a mock function with given fields: ctx, trackID
 func (_m *TrackRepository) GetByID(ctx context.Context, trackID uuid.UUID) (domain.Track, error) {
 	ret := _m.Called(ctx, trackID)
@@ -123,6 +171,96 @@ func (_m *TrackRepository) GetByID(ctx context.Context, trackID uuid.UUID) (doma
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
 		r1 = rf(ctx, trackID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetByMusicianID provides a mock function with given fields: ctx, musicianID
+func (_m *TrackRepository) GetByMusicianID(ctx context.Context, musicianID uuid.UUID) ([]domain.Track, error) {
+	ret := _m.Called(ctx, musicianID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetByMusicianID")
+	}
+
+	var r0 []domain.Track
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) ([]domain.Track, error)); ok {
+		return rf(ctx, musicianID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) []domain.Track); ok {
+		r0 = rf(ctx, musicianID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.Track)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = rf(ctx, musicianID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetOwn provides a mock function with given fields: ctx, musicianID
+func (_m *TrackRepository) GetOwn(ctx context.Context, musicianID uuid.UUID) ([]domain.Track, error) {
+	ret := _m.Called(ctx, musicianID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetOwn")
+	}
+
+	var r0 []domain.Track
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) ([]domain.Track, error)); ok {
+		return rf(ctx, musicianID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) []domain.Track); ok {
+		r0 = rf(ctx, musicianID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.Track)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = rf(ctx, musicianID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetUserFavorites provides a mock function with given fields: ctx, userID
+func (_m *TrackRepository) GetUserFavorites(ctx context.Context, userID uuid.UUID) ([]domain.Track, error) {
+	ret := _m.Called(ctx, userID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetUserFavorites")
+	}
+
+	var r0 []domain.Track
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) ([]domain.Track, error)); ok {
+		return rf(ctx, userID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) []domain.Track); ok {
+		r0 = rf(ctx, userID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.Track)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = rf(ctx, userID)
 	} else {
 		r1 = ret.Error(1)
 	}

@@ -92,6 +92,36 @@ func (_m *GenreRepository) GetByID(ctx context.Context, id uuid.UUID) (domain.Ge
 	return r0, r1
 }
 
+// GetByTrackID provides a mock function with given fields: ctx, trackID
+func (_m *GenreRepository) GetByTrackID(ctx context.Context, trackID uuid.UUID) ([]domain.Genre, error) {
+	ret := _m.Called(ctx, trackID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetByTrackID")
+	}
+
+	var r0 []domain.Genre
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) ([]domain.Genre, error)); ok {
+		return rf(ctx, trackID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) []domain.Genre); ok {
+		r0 = rf(ctx, trackID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.Genre)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = rf(ctx, trackID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // NewGenreRepository creates a new instance of GenreRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewGenreRepository(t interface {

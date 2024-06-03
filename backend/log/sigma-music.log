@@ -1,5 +1,1 @@
-{"level":"error","timestamp":"2024-05-26T18:17:38.490Z","msg":"Failed to authorize user","error":"authentication error: incorrect name","User Name":"Timur"}
-{"level":"error","timestamp":"2024-05-26T18:19:54.852Z","msg":"Failed to authorize user","error":"authentication error: internal repository error","User Name":"Timur"}
-{"level":"error","timestamp":"2024-05-26T18:24:25.341Z","msg":"Failed to authorize user","error":"authentication error: incorrect name","User Name":"timur"}
-{"level":"error","timestamp":"2024-05-26T18:24:49.168Z","msg":"Failed to authorize user","error":"authentication error: internal repository error: musician repository internal error: failed to connect to `host=db user=sigma database=sigmamusic`: hostname resolving error (lookup db on 127.0.0.11:53: no such host)","User Name":"timur"}
-{"level":"fatal","timestamp":"2024-05-26T18:28:21.590Z","msg":"Error connecting redis","error":"dial tcp: lookup redis on 127.0.0.11:53: no such host"}
+{"level":"fatal","timestamp":"2024-06-03T21:29:22.020Z","msg":"Error unknown database name","Database name":"postgrfes"}

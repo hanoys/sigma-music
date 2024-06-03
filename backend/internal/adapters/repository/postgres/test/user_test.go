@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/google/uuid"
-	"github.com/hanoys/sigma-music/internal/adapters/repository"
+	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
 	"github.com/stretchr/testify/require"
@@ -53,7 +53,7 @@ func TestUserRepository(t *testing.T) {
 		}
 		defer db.Close()
 
-		repo := repository.NewPostgresUserRepository(db)
+		repo := postgres.NewPostgresUserRepository(db)
 		createdUser, err := repo.Create(ctx, newUser)
 		if err != nil {
 			t.Errorf("unexcpected error: %v", err)
@@ -76,7 +76,7 @@ func TestUserRepository(t *testing.T) {
 		}
 
 		defer db.Close()
-		repo := repository.NewPostgresUserRepository(db)
+		repo := postgres.NewPostgresUserRepository(db)
 		repo.Create(ctx, newUser)
 		_, err = repo.Create(ctx, newUser)
 
@@ -99,7 +99,7 @@ func TestUserRepository(t *testing.T) {
 		}
 
 		defer db.Close()
-		repo := repository.NewPostgresUserRepository(db)
+		repo := postgres.NewPostgresUserRepository(db)
 		repo.Create(ctx, newUser)
 		foundUser, err := repo.GetByID(ctx, newUser.ID)
 
@@ -124,7 +124,7 @@ func TestUserRepository(t *testing.T) {
 		}
 
 		defer db.Close()
-		repo := repository.NewPostgresUserRepository(db)
+		repo := postgres.NewPostgresUserRepository(db)
 		repo.Create(ctx, newUser)
 		foundUser, err := repo.GetByEmail(ctx, newUser.Email)
 
@@ -149,7 +149,7 @@ func TestUserRepository(t *testing.T) {
 		}
 
 		defer db.Close()
-		repo := repository.NewPostgresUserRepository(db)
+		repo := postgres.NewPostgresUserRepository(db)
 		repo.Create(ctx, newUser)
 		foundUser, err := repo.GetByPhone(ctx, newUser.Phone)
 

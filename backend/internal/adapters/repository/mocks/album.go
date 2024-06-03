@@ -16,9 +16,9 @@ type AlbumRepository struct {
 	mock.Mock
 }
 
-// Create provides a mock function with given fields: ctx, album
-func (_m *AlbumRepository) Create(ctx context.Context, album domain.Album) (domain.Album, error) {
-	ret := _m.Called(ctx, album)
+// Create provides a mock function with given fields: ctx, album, musicianID
+func (_m *AlbumRepository) Create(ctx context.Context, album domain.Album, musicianID uuid.UUID) (domain.Album, error) {
+	ret := _m.Called(ctx, album, musicianID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
@@ -26,17 +26,17 @@ func (_m *AlbumRepository) Create(ctx context.Context, album domain.Album) (doma
 
 	var r0 domain.Album
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, domain.Album) (domain.Album, error)); ok {
-		return rf(ctx, album)
+	if rf, ok := ret.Get(0).(func(context.Context, domain.Album, uuid.UUID) (domain.Album, error)); ok {
+		return rf(ctx, album, musicianID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, domain.Album) domain.Album); ok {
-		r0 = rf(ctx, album)
+	if rf, ok := ret.Get(0).(func(context.Context, domain.Album, uuid.UUID) domain.Album); ok {
+		r0 = rf(ctx, album, musicianID)
 	} else {
 		r0 = ret.Get(0).(domain.Album)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, domain.Album) error); ok {
-		r1 = rf(ctx, album)
+	if rf, ok := ret.Get(1).(func(context.Context, domain.Album, uuid.UUID) error); ok {
+		r1 = rf(ctx, album, musicianID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -108,6 +108,36 @@ func (_m *AlbumRepository) GetByMusicianID(ctx context.Context, musicianID uuid.
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetByMusicianID")
+	}
+
+	var r0 []domain.Album
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) ([]domain.Album, error)); ok {
+		return rf(ctx, musicianID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) []domain.Album); ok {
+		r0 = rf(ctx, musicianID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.Album)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = rf(ctx, musicianID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetOwn provides a mock function with given fields: ctx, musicianID
+func (_m *AlbumRepository) GetOwn(ctx context.Context, musicianID uuid.UUID) ([]domain.Album, error) {
+	ret := _m.Called(ctx, musicianID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetOwn")
 	}
 
 	var r0 []domain.Album

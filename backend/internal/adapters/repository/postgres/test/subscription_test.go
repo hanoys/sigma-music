@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/google/uuid"
-	"github.com/hanoys/sigma-music/internal/adapters/repository"
+	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
 	"testing"
@@ -52,7 +52,7 @@ func TestSubscriptionRepository(t *testing.T) {
 		}
 		defer db.Close()
 
-		repo := repository.NewPostgresSubscriptionRepository(db)
+		repo := postgres.NewPostgresSubscriptionRepository(db)
 		_, err = repo.Create(ctx, newSubscription)
 		if !errors.Is(err, ports.ErrInternalSubRepo) {
 			t.Errorf("unexpected error: %v", err)

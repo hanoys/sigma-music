@@ -4,12 +4,21 @@ import (
 	"context"
 	"errors"
 	"github.com/google/uuid"
-	"github.com/hanoys/sigma-music/internal/adapters/repository"
+	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres"
+	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
 	"testing"
 )
 
-func TestStatRepository(t *testing.T) {
+var newComment = domain.Comment{
+	ID:      uuid.New(),
+	UserID:  uuid.New(),
+	TrackID: uuid.New(),
+	Stars:   0,
+	Text:    "text",
+}
+
+func TestCommentRepository(t *testing.T) {
 	ctx := context.Background()
 	container, err := newPostgresContainer(ctx)
 	if err != nil {
@@ -28,7 +37,7 @@ func TestStatRepository(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	t.Run("add stat", func(t *testing.T) {
+	t.Run("create comment", func(t *testing.T) {
 		t.Cleanup(func() {
 			err = container.Restore(ctx)
 			if err != nil {
@@ -42,14 +51,14 @@ func TestStatRepository(t *testing.T) {
 		}
 		defer db.Close()
 
-		repo := repository.NewPostgresStatRepository(db)
-		err = repo.Add(context.Background(), uuid.New(), uuid.New())
-		if !errors.Is(err, ports.ErrInternalStatRepo) {
+		repo := postgres.NewPostgresCommentRepository(db)
+		_, err = repo.Create(ctx, newComment)
+		if !errors.Is(err, ports.ErrInternalCommentRepo) {
 			t.Errorf("unexpected error: %v", err)
 		}
 	})
 
-	t.Run("musicians stat", func(t *testing.T) {
+	t.Run("get by user id comment", func(t *testing.T) {
 		t.Cleanup(func() {
 			err = container.Restore(ctx)
 			if err != nil {
@@ -63,14 +72,14 @@ func TestStatRepository(t *testing.T) {
 		}
 		defer db.Close()
 
-		repo := repository.NewPostgresStatRepository(db)
-		stat, err := repo.GetMostListenedMusicians(context.Background(), uuid.New(), 10)
-		if len(stat) != 0 {
-			t.Errorf("unexpected len stat len: %v", len(stat))
+		repo := postgres.NewPostgresCommentRepository(db)
+		comments, err := repo.GetByUserID(ctx, uuid.New())
+		if len(comments) != 0 {
+			t.Errorf("unexpected comment count: %v", len(comments))
 		}
 	})
 
-	t.Run("genre stat", func(t *testing.T) {
+	t.Run("get by track id comment", func(t *testing.T) {
 		t.Cleanup(func() {
 			err = container.Restore(ctx)
 			if err != nil {
@@ -84,10 +93,10 @@ func TestStatRepository(t *testing.T) {
 		}
 		defer db.Close()
 
-		repo := repository.NewPostgresStatRepository(db)
-		stat, err := repo.GetListenedGenres(context.Background(), uuid.New())
-		if len(stat) != 0 {
-			t.Errorf("unexpected len stat len: %v", len(stat))
+		repo := postgres.NewPostgresCommentRepository(db)
+		comments, err := repo.GetByUserID(ctx, uuid.New())
+		if len(comments) != 0 {
+			t.Errorf("unexpected comment count: %v", len(comments))
 		}
 	})
 }

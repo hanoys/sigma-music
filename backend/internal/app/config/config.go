@@ -1,22 +1,35 @@
 package config
 
-import "github.com/JeremyLoy/config"
+import (
+	"github.com/JeremyLoy/config"
+	"gopkg.in/yaml.v3"
+	"os"
+)
 
 type Config struct {
 	DB struct {
-		User     string `config:"DB_USER"`
-		Password string `config:"DB_PASSWORD"`
-		Host     string `config:"DB_HOST"`
-		Port     string `config:"DB_PORT"`
-		Name     string `config:"DB_NAME"`
-		URL      string `config:"DB_URL"`
-	}
+		Type    string `yaml:"type"`
+		Mongodb struct {
+			Database string `yaml:"database"`
+			User     string `yaml:"user"`
+			Password string `yaml:"password"`
+			URL      string `yaml:"url"`
+		} `yaml:"mongodb"`
+
+		Postgres struct {
+			User     string `yaml:"user"`
+			Password string `yaml:"password"`
+			Host     string `yaml:"host"`
+			Port     string `yaml:"port"`
+			Name     string `yaml:"name"`
+		} `yaml:"postgres"`
+	} `yaml:"db"`
 
 	JWT struct {
-		AccessTokenExpTime  int64  `config:"JWT_ACCESS_EXPIRATION_TIME"`
-		RefreshTokenExpTime int64  `config:"JWT_REFRESH_EXPIRATION_TIME"`
-		SecretKey           string `config:"JWT_SECRET"`
-	}
+		AccessTokenExpTime  int64  `yaml:"access_expiration_time"`
+		RefreshTokenExpTime int64  `yaml:"refresh_expiration_time"`
+		SecretKey           string `yaml:"secret"`
+	} `yaml:"jwt"`
 
 	Redis struct {
 		Host string `config:"REDIS_HOST"`
@@ -31,18 +44,28 @@ type Config struct {
 	}
 
 	Logger struct {
-		LogLevel string `config:"LOGGER_LOG_LEVEL"`
-	}
+		LogLevel string `yaml:"level"`
+	} `yaml:"log"`
 }
 
 func GetConfig(configPath string) (*Config, error) {
 	var conf Config
-	err := config.From(configPath).To(&conf.DB)
+	//err := config.From(configPath).To(&conf.DB)
+	//if err != nil {
+	//	return nil, err
+	//}
+
+	buf, err := os.ReadFile("./config/config.yml")
 	if err != nil {
 		return nil, err
 	}
 
-	err = config.From(configPath).To(&conf.JWT)
+	err = yaml.Unmarshal(buf, &conf)
+	if err != nil {
+		return nil, err
+	}
+
+	err = yaml.Unmarshal(buf, &conf.DB)
 	if err != nil {
 		return nil, err
 	}
@@ -53,11 +76,6 @@ func GetConfig(configPath string) (*Config, error) {
 	}
 
 	err = config.From(configPath).To(&conf.Minio)
-	if err != nil {
-		return nil, err
-	}
-
-	err = config.From(configPath).To(&conf.Logger)
 	if err != nil {
 		return nil, err
 	}

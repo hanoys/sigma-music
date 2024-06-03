@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"errors"
 	"github.com/google/uuid"
 	"github.com/guregu/null/v5"
-	"github.com/hanoys/sigma-music/internal/adapters/repository/entity"
+	entity2 "github.com/hanoys/sigma-music/internal/adapters/repository/postgres/entity"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
 	"github.com/hanoys/sigma-music/internal/util"
@@ -34,8 +34,8 @@ func NewPostgresAlbumRepository(db *sqlx.DB) *PostgresAlbumRepository {
 }
 
 func (ar *PostgresAlbumRepository) Create(ctx context.Context, album domain.Album, musicianID uuid.UUID) (domain.Album, error) {
-	pgAlbum := entity.NewPgAlbum(album)
-	queryString := entity.InsertQueryString(pgAlbum, "albums")
+	pgAlbum := entity2.NewPgAlbum(album)
+	queryString := entity2.InsertQueryString(pgAlbum, "albums")
 	_, err := ar.db.NamedExecContext(ctx, queryString, pgAlbum)
 	if err != nil {
 		var pgErr *pgconn.PgError
@@ -58,7 +58,7 @@ func (ar *PostgresAlbumRepository) Create(ctx context.Context, album domain.Albu
 		return domain.Album{}, util.WrapError(ports.ErrInternalAlbumRepo, err)
 	}
 
-	var createdUser entity.PgAlbum
+	var createdUser entity2.PgAlbum
 	err = ar.db.GetContext(ctx, &createdUser, albumGetByIDInternalQuery, pgAlbum.ID)
 	if err != nil {
 		return domain.Album{}, util.WrapError(ports.ErrAlbumIDNotFound, err)
@@ -68,7 +68,7 @@ func (ar *PostgresAlbumRepository) Create(ctx context.Context, album domain.Albu
 }
 
 func (ar *PostgresAlbumRepository) GetAll(ctx context.Context) ([]domain.Album, error) {
-	var albums []entity.PgAlbum
+	var albums []entity2.PgAlbum
 	err := ar.db.SelectContext(ctx, &albums, albumGetAllQuery)
 	if err != nil {
 		return nil, util.WrapError(ports.ErrInternalAlbumRepo, err)
@@ -83,7 +83,7 @@ func (ar *PostgresAlbumRepository) GetAll(ctx context.Context) ([]domain.Album, 
 }
 
 func (ar *PostgresAlbumRepository) GetByMusicianID(ctx context.Context, musicianID uuid.UUID) ([]domain.Album, error) {
-	var albums []entity.PgAlbum
+	var albums []entity2.PgAlbum
 	err := ar.db.SelectContext(ctx, &albums, albumGetByMusicianIDQuery, musicianID)
 	if err != nil {
 		return nil, util.WrapError(ports.ErrInternalAlbumRepo, err)
@@ -98,7 +98,7 @@ func (ar *PostgresAlbumRepository) GetByMusicianID(ctx context.Context, musician
 }
 
 func (ar *PostgresAlbumRepository) GetOwn(ctx context.Context, musicianID uuid.UUID) ([]domain.Album, error) {
-	var albums []entity.PgAlbum
+	var albums []entity2.PgAlbum
 	err := ar.db.SelectContext(ctx, &albums, albumGetOwnQuery, musicianID)
 	if err != nil {
 		return nil, util.WrapError(ports.ErrInternalAlbumRepo, err)
@@ -113,7 +113,7 @@ func (ar *PostgresAlbumRepository) GetOwn(ctx context.Context, musicianID uuid.U
 }
 
 func (ar *PostgresAlbumRepository) GetByID(ctx context.Context, id uuid.UUID) (domain.Album, error) {
-	var foundAlbum entity.PgAlbum
+	var foundAlbum entity2.PgAlbum
 	err := ar.db.GetContext(ctx, &foundAlbum, albumGetByIDQuery, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -126,7 +126,7 @@ func (ar *PostgresAlbumRepository) GetByID(ctx context.Context, id uuid.UUID) (d
 }
 
 func (ar *PostgresAlbumRepository) Publish(ctx context.Context, id uuid.UUID) error {
-	var foundAlbum entity.PgAlbum
+	var foundAlbum entity2.PgAlbum
 	err := ar.db.GetContext(ctx, &foundAlbum, albumGetByIDInternalQuery, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -137,7 +137,7 @@ func (ar *PostgresAlbumRepository) Publish(ctx context.Context, id uuid.UUID) er
 
 	foundAlbum.Published = true
 	foundAlbum.ReleaseDate = null.TimeFrom(time.Now())
-	updateQuery := entity.UpdateQueryString(foundAlbum, "albums")
+	updateQuery := entity2.UpdateQueryString(foundAlbum, "albums")
 	_, err = ar.db.NamedExecContext(ctx, updateQuery, foundAlbum)
 	if err != nil {
 		return util.WrapError(ports.ErrAlbumPublish, err)

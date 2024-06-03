@@ -1,10 +1,10 @@
-package repository
+package postgres
 
 import (
 	"context"
 	"database/sql"
 	"errors"
-	"github.com/hanoys/sigma-music/internal/adapters/repository/entity"
+	entity2 "github.com/hanoys/sigma-music/internal/adapters/repository/postgres/entity"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
 	"github.com/hanoys/sigma-music/internal/util"
@@ -26,8 +26,8 @@ func NewPostgresSubscriptionRepository(db *sqlx.DB) *PostgresSubscriptionReposit
 }
 
 func (sr *PostgresSubscriptionRepository) Create(ctx context.Context, sub domain.Subscription) (domain.Subscription, error) {
-	pgSubscription := entity.NewPgSuscription(sub)
-	queryString := entity.InsertQueryString(pgSubscription, "subscriptions")
+	pgSubscription := entity2.NewPgSuscription(sub)
+	queryString := entity2.InsertQueryString(pgSubscription, "subscriptions")
 	_, err := sr.db.NamedExecContext(ctx, queryString, pgSubscription)
 	if err != nil {
 		var pgErr *pgconn.PgError
@@ -39,7 +39,7 @@ func (sr *PostgresSubscriptionRepository) Create(ctx context.Context, sub domain
 		return domain.Subscription{}, util.WrapError(ports.ErrInternalSubRepo, err)
 	}
 
-	var createdSubscription entity.PgSubscription
+	var createdSubscription entity2.PgSubscription
 	err = sr.db.GetContext(ctx, &createdSubscription, subscriptionGetByID, pgSubscription.ID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

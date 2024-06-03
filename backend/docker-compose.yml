@@ -23,6 +23,15 @@ services:
       - .env.local
     networks:
       - backend
+  mongo:
+    image: 'mongo:4.4-bionic'
+    container_name: 'mongodb'
+    environment:
+      - MONGO_INITDB_DATABASE=sigma-music
+    ports:
+      - '27017:27017'
+    networks:
+      - backend
   migrations:
     build:
       context: migrations
@@ -61,7 +70,8 @@ services:
     networks:
       - backend
     volumes:
-      - ./log:/etc/log
+      - ./log:/usr/src/app/log
+      - ./config:/usr/src/app/config
 
 networks:
   backend:

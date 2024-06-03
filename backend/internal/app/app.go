@@ -8,8 +8,10 @@ import (
 	"github.com/hanoys/sigma-music/internal/adapters/delivery/console"
 	"github.com/hanoys/sigma-music/internal/adapters/hash"
 	"github.com/hanoys/sigma-music/internal/adapters/miniostorage"
-	"github.com/hanoys/sigma-music/internal/adapters/repository"
+	"github.com/hanoys/sigma-music/internal/adapters/repository/mongodb"
+	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres"
 	"github.com/hanoys/sigma-music/internal/app/config"
+	"github.com/hanoys/sigma-music/internal/ports"
 	"github.com/hanoys/sigma-music/internal/service"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
@@ -17,6 +19,8 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"log"
@@ -53,6 +57,31 @@ const (
 	maxConnIdleTime = 1 * time.Minute
 	maxConnLifetime = 3 * time.Minute
 )
+
+type MongoConfig struct {
+	Database string
+	User     string
+	Password string
+	Url      string
+}
+
+func NewMongoDB(cfg *MongoConfig) (*mongo.Database, error) {
+	ctx := context.Background()
+	opts := options.Client().ApplyURI(cfg.Url)
+	client, err := mongo.Connect(ctx, opts)
+	if err != nil {
+		fmt.Printf("failed to connect mongodb db")
+		return nil, err
+	}
+
+	err = client.Ping(ctx, nil)
+	if err != nil {
+		fmt.Printf("failed to ping mongodb db")
+		return nil, err
+	}
+
+	return client.Database(cfg.Database), nil
+}
 
 func NewPostgresDB(cfg *PostgresConfig) (*sqlx.DB, error) {
 	connectionString := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s",
@@ -152,14 +181,25 @@ func NewLogger(cfg *LoggerConfig) (*zap.Logger, error) {
 		Encoding:          "json",
 		EncoderConfig:     encoderCfg,
 		OutputPaths: []string{
-			"/etc/log/sigma-music.log",
+			"./log/sigma-music.log",
 		},
 		ErrorOutputPaths: []string{
-			"/etc/log/sigma-music.log",
+			"./log/sigma-music.log",
 		},
 	}
 
 	return zap.Must(conf.Build()), nil
+}
+
+type Repositories struct {
+	User     ports.IUserRepository
+	Musician ports.IMusicianRepository
+	Album    ports.IAlbumRepository
+	Comment  ports.ICommentRepository
+	Genre    ports.IGenreRepository
+	Stat     ports.IStatRepository
+	Sub      ports.ISubscriptionRepository
+	Track    ports.ITrackRepository
 }
 
 func Run() {
@@ -176,16 +216,54 @@ func Run() {
 		return
 	}
 
-	dbConn, err := NewPostgresDB(&PostgresConfig{
-		Host:     cfg.DB.Host,
-		Port:     cfg.DB.Port,
-		Database: cfg.DB.Name,
-		User:     cfg.DB.User,
-		Password: cfg.DB.Password,
-	})
+	repositories := Repositories{}
+	switch cfg.DB.Type {
+	case "postgres":
+		dbConn, err := NewPostgresDB(&PostgresConfig{
+			Host:     cfg.DB.Postgres.Host,
+			Port:     cfg.DB.Postgres.Port,
+			Database: cfg.DB.Postgres.Name,
+			User:     cfg.DB.Postgres.User,
+			Password: cfg.DB.Postgres.Password,
+		})
 
-	if err != nil {
-		logger.Fatal("Error connecting postgres", zap.Error(err))
+		if err != nil {
+			logger.Fatal("Error connecting postgres", zap.Error(err))
+			return
+		}
+
+		repositories.User = postgres.NewPostgresUserRepository(dbConn)
+		repositories.Musician = postgres.NewPostgresMusicianRepository(dbConn)
+		repositories.Album = postgres.NewPostgresAlbumRepository(dbConn)
+		repositories.Comment = postgres.NewPostgresCommentRepository(dbConn)
+		repositories.Genre = postgres.NewPostgresGenreRepository(dbConn)
+		repositories.Stat = postgres.NewPostgresStatRepository(dbConn)
+		repositories.Sub = postgres.NewPostgresSubscriptionRepository(dbConn)
+		repositories.Track = postgres.NewPostgresTrackRepository(dbConn)
+
+	case "mongodb":
+		dbConn, err := NewMongoDB(&MongoConfig{
+			Database: cfg.DB.Mongodb.Database,
+			User:     cfg.DB.Mongodb.User,
+			Password: cfg.DB.Mongodb.Password,
+			Url:      cfg.DB.Mongodb.URL,
+		})
+		if err != nil {
+			logger.Fatal("Error connecting mongodb", zap.Error(err))
+			return
+		}
+
+		repositories.User = mongodb.NewMongoUserRepository(dbConn)
+		repositories.Musician = mongodb.NewMongoMusicianRepository(dbConn)
+		repositories.Album = mongodb.NewMongoAlbumRepository(dbConn)
+		repositories.Comment = mongodb.NewMongoCommentRepository(dbConn)
+		repositories.Genre = mongodb.NewMongoGenreRepository(dbConn)
+		repositories.Stat = mongodb.NewMongoStatRepository(dbConn)
+		repositories.Sub = mongodb.NewMongoSubscriptionRepository(dbConn)
+		repositories.Track = mongodb.NewMongoTrackRepository(dbConn)
+	default:
+		logger.Fatal("Error unknown database name", zap.Error(err),
+			zap.String("Database name", cfg.DB.Type))
 		return
 	}
 
@@ -211,14 +289,14 @@ func Run() {
 		return
 	}
 
-	userRepo := repository.NewPostgresUserRepository(dbConn)
-	musicianRepo := repository.NewPostgresMusicianRepository(dbConn)
-	albumRepo := repository.NewPostgresAlbumRepository(dbConn)
-	commentRepo := repository.NewPostgresCommentRepository(dbConn)
-	genreRepo := repository.NewPostgresGenreRepository(dbConn)
-	statRepo := repository.NewPostgresStatRepository(dbConn)
-	subRepo := repository.NewPostgresSubscriptionRepository(dbConn)
-	trackRepo := repository.NewPostgresTrackRepository(dbConn)
+	userRepo := repositories.User
+	musicianRepo := repositories.Musician
+	albumRepo := repositories.Album
+	commentRepo := repositories.Comment
+	genreRepo := repositories.Genre
+	statRepo := repositories.Stat
+	subRepo := repositories.Sub
+	trackRepo := repositories.Track
 
 	tokenStorage := adapters.NewTokenStorage(redisClient)
 	tokenProvider := auth.NewProvider(tokenStorage, &auth.ProviderConfig{

@@ -1,10 +1,10 @@
-package repository
+package postgres
 
 import (
 	"context"
 	"database/sql"
 	"errors"
-	"github.com/hanoys/sigma-music/internal/adapters/repository/entity"
+	entity2 "github.com/hanoys/sigma-music/internal/adapters/repository/postgres/entity"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
 	"github.com/hanoys/sigma-music/internal/util"
@@ -26,8 +26,8 @@ func NewPostgresOrderRepository(db *sqlx.DB) *PostgresOrderRepository {
 }
 
 func (or *PostgresOrderRepository) Create(ctx context.Context, order domain.Order) (domain.Order, error) {
-	pgOrder := entity.NewPgOrder(order)
-	queryString := entity.InsertQueryString(pgOrder, "orders")
+	pgOrder := entity2.NewPgOrder(order)
+	queryString := entity2.InsertQueryString(pgOrder, "orders")
 	_, err := or.db.NamedExecContext(ctx, queryString, pgOrder)
 	if err != nil {
 		var pgErr *pgconn.PgError
@@ -39,7 +39,7 @@ func (or *PostgresOrderRepository) Create(ctx context.Context, order domain.Orde
 		return domain.Order{}, util.WrapError(ports.ErrInternalOrderRepo, err)
 	}
 
-	var createdOrder entity.PgOrder
+	var createdOrder entity2.PgOrder
 	err = or.db.GetContext(ctx, &createdOrder, orderGetByID, pgOrder.ID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
