@@ -83,8 +83,8 @@ func NewMongoDB(cfg *MongoConfig) (*mongo.Database, error) {
 	return client.Database(cfg.Database), nil
 }
 
-func NewPostgresDB(cfg *PostgresConfig) (*sqlx.DB, error) {
-	connectionString := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s",
+func NewPostgresDB(cfg *PostgresConfig) (*PostgresDBConnections, error) {
+	guestConnectionString := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s",
 		cfg.Host,
 		cfg.Port,
 		cfg.User,
