@@ -50,10 +50,6 @@ type Config struct {
 
 func GetConfig(configPath string) (*Config, error) {
 	var conf Config
-	//err := config.From(configPath).To(&conf.DB)
-	//if err != nil {
-	//	return nil, err
-	//}
 
 	buf, err := os.ReadFile("./config/config.yml")
 	if err != nil {

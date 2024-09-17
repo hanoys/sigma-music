@@ -21,6 +21,7 @@ func (h *Handler) GetAllMusicians(c *Console) {
 
 	for _, user := range users {
 		dto.NewMusicianDTO(user).Print()
+        fmt.Println("-----------------------")
 	}
 }
 

@@ -9,6 +9,7 @@ import (
 	"github.com/hanoys/sigma-music/internal/ports"
 	"github.com/hanoys/sigma-music/internal/service"
 	"github.com/stretchr/testify/mock"
+	"go.uber.org/zap"
 	"testing"
 )
 
@@ -83,8 +84,9 @@ func TestUserServiceRegister(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			logger, _ := zap.NewProduction()
 			userRepository := mocks.NewUserRepository(t)
-			userService := service.NewUserService(userRepository, hash.NewHashPasswordProvider())
+			userService := service.NewUserService(userRepository, hash.NewHashPasswordProvider(), logger)
 			test.repositoryMock(userRepository)
 
 			_, err := userService.Register(context.Background(), test.req)

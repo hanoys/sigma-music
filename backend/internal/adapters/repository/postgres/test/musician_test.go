@@ -50,7 +50,11 @@ func TestMusicianRepository(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer db.Close()
+		defer func() {
+			db.GuestConnection.Close()
+			db.UserConnection.Close()
+			db.MusicianConnection.Close()
+		}()
 
 		repo := postgres.NewPostgresMusicianRepository(db)
 		createdMusician, err := repo.Create(ctx, newMusician)
@@ -74,7 +78,11 @@ func TestMusicianRepository(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		defer db.Close()
+		defer func() {
+			db.GuestConnection.Close()
+			db.UserConnection.Close()
+			db.MusicianConnection.Close()
+		}()
 		repo := postgres.NewPostgresMusicianRepository(db)
 		repo.Create(ctx, newMusician)
 		_, err = repo.Create(ctx, newMusician)
@@ -97,7 +105,11 @@ func TestMusicianRepository(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		defer db.Close()
+		defer func() {
+			db.GuestConnection.Close()
+			db.UserConnection.Close()
+			db.MusicianConnection.Close()
+		}()
 		repo := postgres.NewPostgresMusicianRepository(db)
 		repo.Create(ctx, newMusician)
 		foundMusician, err := repo.GetByID(ctx, newMusician.ID)
@@ -122,7 +134,11 @@ func TestMusicianRepository(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		defer db.Close()
+		defer func() {
+			db.GuestConnection.Close()
+			db.UserConnection.Close()
+			db.MusicianConnection.Close()
+		}()
 		repo := postgres.NewPostgresMusicianRepository(db)
 		repo.Create(ctx, newMusician)
 		foundMusician, err := repo.GetByEmail(ctx, newMusician.Email)

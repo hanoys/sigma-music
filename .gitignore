@@ -28,4 +28,5 @@ go.work
 *.*.bkp
 *.*.dtmp
 
-*/backend/data/*
+backend/data/
+backend/log/

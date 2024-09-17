@@ -68,7 +68,7 @@ func (p *Provider) NewSession(ctx context.Context, payload domain.Payload) (doma
 		RefreshToken: refreshTokenString,
 	}
 
-	err = p.tokenStorage.Set(ctx, tokenPair.RefreshToken,
+	err = p.tokenStorage.Set(ctx, tokenPair.AccessToken,
 		payload, refreshExpTime.Sub(time.Now()))
 	if err != nil {
 		return domain.TokenPair{}, util.WrapError(serviceports.ErrInternalTokenProvider, err)

@@ -12,7 +12,7 @@ var (
 )
 
 type IStatRepository interface {
-	Add(ctx context.Context, userID uuid.UUID, trackID uuid.UUID) error
+	Add(ctx context.Context, recordID uuid.UUID, userID uuid.UUID, trackID uuid.UUID) error
 	GetMostListenedMusicians(ctx context.Context, userID uuid.UUID, maxCnt int) ([]domain.UserMusiciansStat, error)
 	GetListenedGenres(ctx context.Context, userID uuid.UUID) ([]domain.UserGenresStat, error)
 }

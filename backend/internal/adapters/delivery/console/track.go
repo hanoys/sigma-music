@@ -59,6 +59,7 @@ func (h *Handler) GetAllTrack(c *Console) {
 
 	for _, track := range tracks {
 		dto.NewTrackDTO(track).Print()
+        fmt.Println("-----------------------")
 	}
 }
 
@@ -130,6 +131,7 @@ func (h *Handler) GetUserFavoritesTrack(c *Console) {
 
 	for _, track := range tracks {
 		dto.NewTrackDTO(track).Print()
+        fmt.Println("-----------------------")
 	}
 }
 
@@ -174,6 +176,7 @@ func (h *Handler) GetByAlbumIDTrack(c *Console) {
 
 	for _, track := range tracks {
 		dto.NewTrackDTO(track).Print()
+        fmt.Println("-----------------------")
 	}
 }
 
@@ -198,6 +201,7 @@ func (h *Handler) GetByMusicianIDTrack(c *Console) {
 
 	for _, track := range tracks {
 		dto.NewTrackDTO(track).Print()
+        fmt.Println("-----------------------")
 	}
 }
 
@@ -216,5 +220,6 @@ func (h *Handler) GetOwnTrack(c *Console) {
 
 	for _, track := range tracks {
 		dto.NewTrackDTO(track).Print()
+        fmt.Println("-----------------------")
 	}
 }

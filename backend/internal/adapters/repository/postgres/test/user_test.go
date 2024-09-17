@@ -51,7 +51,11 @@ func TestUserRepository(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer db.Close()
+		defer func() {
+			db.GuestConnection.Close()
+			db.UserConnection.Close()
+			db.MusicianConnection.Close()
+		}()
 
 		repo := postgres.NewPostgresUserRepository(db)
 		createdUser, err := repo.Create(ctx, newUser)
@@ -75,7 +79,11 @@ func TestUserRepository(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		defer db.Close()
+		defer func() {
+			db.GuestConnection.Close()
+			db.UserConnection.Close()
+			db.MusicianConnection.Close()
+		}()
 		repo := postgres.NewPostgresUserRepository(db)
 		repo.Create(ctx, newUser)
 		_, err = repo.Create(ctx, newUser)
@@ -98,7 +106,11 @@ func TestUserRepository(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		defer db.Close()
+		defer func() {
+			db.GuestConnection.Close()
+			db.UserConnection.Close()
+			db.MusicianConnection.Close()
+		}()
 		repo := postgres.NewPostgresUserRepository(db)
 		repo.Create(ctx, newUser)
 		foundUser, err := repo.GetByID(ctx, newUser.ID)
@@ -123,7 +135,11 @@ func TestUserRepository(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		defer db.Close()
+		defer func() {
+			db.GuestConnection.Close()
+			db.UserConnection.Close()
+			db.MusicianConnection.Close()
+		}()
 		repo := postgres.NewPostgresUserRepository(db)
 		repo.Create(ctx, newUser)
 		foundUser, err := repo.GetByEmail(ctx, newUser.Email)
@@ -148,7 +164,11 @@ func TestUserRepository(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		defer db.Close()
+		defer func() {
+			db.GuestConnection.Close()
+			db.UserConnection.Close()
+			db.MusicianConnection.Close()
+		}()
 		repo := postgres.NewPostgresUserRepository(db)
 		repo.Create(ctx, newUser)
 		foundUser, err := repo.GetByPhone(ctx, newUser.Phone)

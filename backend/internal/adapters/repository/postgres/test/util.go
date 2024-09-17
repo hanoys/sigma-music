@@ -6,6 +6,7 @@ import (
 	"github.com/golang-migrate/migrate"
 	migratepg "github.com/golang-migrate/migrate/database/postgres"
 	_ "github.com/golang-migrate/migrate/source/file"
+	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 	"github.com/testcontainers/testcontainers-go"
@@ -53,9 +54,13 @@ func newPostgresContainer(ctx context.Context) (*testpg.PostgresContainer, error
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to postgres db: %s", err)
 	}
-	defer db.Close()
+	defer func() {
+		db.GuestConnection.Close()
+		db.UserConnection.Close()
+		db.MusicianConnection.Close()
+	}()
 
-	driver, err := migratepg.WithInstance(db.DB, &migratepg.Config{})
+	driver, err := migratepg.WithInstance(db.GuestConnection.DB, &migratepg.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to get db driver from instance: %s", err)
 	}
@@ -84,10 +89,10 @@ const (
 	maxConnLifetime = 3 * time.Minute
 )
 
-func newPostgresDB(url string) (*sqlx.DB, error) {
+func newPostgresDB(url string) (postgres.PostgresConnections, error) {
 	db, err := sqlx.Connect("pgx", url)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect postgres db: %s", err)
+		return postgres.PostgresConnections{}, fmt.Errorf("failed to connect postgres db: %s", err)
 	}
 
 	db.SetMaxOpenConns(maxConn)
@@ -96,8 +101,12 @@ func newPostgresDB(url string) (*sqlx.DB, error) {
 
 	err = db.Ping()
 	if err != nil {
-		return nil, fmt.Errorf("failed to ping postgres db: %s", err)
+		return postgres.PostgresConnections{}, fmt.Errorf("failed to ping postgres db: %s", err)
 	}
 
-	return db, nil
+	return postgres.PostgresConnections{
+		GuestConnection:    db,
+		UserConnection:     db,
+		MusicianConnection: db,
+	}, nil
 }

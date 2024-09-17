@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+
 	"github.com/google/uuid"
 	entity2 "github.com/hanoys/sigma-music/internal/adapters/repository/postgres/entity"
 	"github.com/hanoys/sigma-music/internal/domain"
@@ -17,7 +18,7 @@ import (
 const (
 	trackGetAllQuery          = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN albums a ON t.album_id = a.id WHERE a.published = TRUE"
 	trackDeleteQuery          = "DELETE FROM tracks WHERE id = $1"
-	trackGetByIDQuery         = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN albums a ON t.album_id = a.id WHERE t.id = $1 AND a.published = TRUE"
+	trackGetByIDQuery         = "SELECT t.id, t.album_id, t.name, t.url t.avg_stars FROM tracks t JOIN albums a ON t.album_id = a.id WHERE t.id = $1 AND a.published = TRUE"
 	trackGetByIDInternalQuery = "SELECT id, album_id, name, url FROM tracks WHERE id = $1"
 	trackGetUserFavorites     = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN favorite f on t.id = f.track_id WHERE f.user_id = $1"
 	trackGetByAlbumID         = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN albums a ON t.album_id = a.id WHERE a.published = TRUE AND a.id = $1"
@@ -26,17 +27,17 @@ const (
 )
 
 type PostgresTrackRepository struct {
-	db *sqlx.DB
+	connection *sqlx.DB
 }
 
-func NewPostgresTrackRepository(db *sqlx.DB) *PostgresTrackRepository {
-	return &PostgresTrackRepository{db: db}
+func NewPostgresTrackRepository(connection *sqlx.DB) *PostgresTrackRepository {
+	return &PostgresTrackRepository{connection: connection}
 }
 
 func (tr *PostgresTrackRepository) Create(ctx context.Context, track domain.Track) (domain.Track, error) {
 	pgTrack := entity2.NewPgTrack(track)
 	queryString := entity2.InsertQueryString(pgTrack, "tracks")
-	_, err := tr.db.NamedExecContext(ctx, queryString, pgTrack)
+	_, err := tr.connection.NamedExecContext(ctx, queryString, pgTrack)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
@@ -48,7 +49,7 @@ func (tr *PostgresTrackRepository) Create(ctx context.Context, track domain.Trac
 	}
 
 	var createdTrack entity2.PgTrack
-	err = tr.db.GetContext(ctx, &createdTrack, trackGetByIDInternalQuery, pgTrack.ID)
+	err = tr.connection.GetContext(ctx, &createdTrack, trackGetByIDInternalQuery, pgTrack.ID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.Track{}, util.WrapError(ports.ErrTrackIDNotFound, err)
@@ -61,7 +62,7 @@ func (tr *PostgresTrackRepository) Create(ctx context.Context, track domain.Trac
 
 func (tr *PostgresTrackRepository) GetAll(ctx context.Context) ([]domain.Track, error) {
 	var tracks []entity2.PgTrack
-	err := tr.db.SelectContext(ctx, &tracks, trackGetAllQuery)
+	err := tr.connection.SelectContext(ctx, &tracks, trackGetAllQuery)
 	if err != nil {
 		return nil, util.WrapError(ports.ErrInternalTrackRepo, err)
 	}
@@ -76,7 +77,7 @@ func (tr *PostgresTrackRepository) GetAll(ctx context.Context) ([]domain.Track, 
 
 func (tr *PostgresTrackRepository) GetByID(ctx context.Context, trackID uuid.UUID) (domain.Track, error) {
 	var foundTrack entity2.PgTrack
-	err := tr.db.GetContext(ctx, &foundTrack, trackGetByIDQuery, trackID)
+	err := tr.connection.GetContext(ctx, &foundTrack, trackGetByIDQuery, trackID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.Track{}, util.WrapError(ports.ErrTrackIDNotFound, err)
@@ -89,7 +90,7 @@ func (tr *PostgresTrackRepository) GetByID(ctx context.Context, trackID uuid.UUI
 
 func (tr *PostgresTrackRepository) Delete(ctx context.Context, trackID uuid.UUID) (domain.Track, error) {
 	var deletedTrack entity2.PgTrack
-	err := tr.db.GetContext(ctx, &deletedTrack, trackGetByIDInternalQuery, trackID)
+	err := tr.connection.GetContext(ctx, &deletedTrack, trackGetByIDInternalQuery, trackID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.Track{}, util.WrapError(ports.ErrTrackIDNotFound, err)
@@ -97,7 +98,7 @@ func (tr *PostgresTrackRepository) Delete(ctx context.Context, trackID uuid.UUID
 		return domain.Track{}, util.WrapError(ports.ErrInternalTrackRepo, err)
 	}
 
-	_, err = tr.db.ExecContext(ctx, trackDeleteQuery, trackID)
+	_, err = tr.connection.ExecContext(ctx, trackDeleteQuery, trackID)
 	if err != nil {
 		return domain.Track{}, util.WrapError(ports.ErrTrackDelete, err)
 	}
@@ -107,7 +108,7 @@ func (tr *PostgresTrackRepository) Delete(ctx context.Context, trackID uuid.UUID
 
 func (tr *PostgresTrackRepository) GetUserFavorites(ctx context.Context, userID uuid.UUID) ([]domain.Track, error) {
 	var tracks []entity2.PgTrack
-	err := tr.db.SelectContext(ctx, &tracks, trackGetUserFavorites, userID)
+	err := tr.connection.SelectContext(ctx, &tracks, trackGetUserFavorites, userID)
 	if err != nil {
 		return nil, util.WrapError(ports.ErrInternalTrackRepo, err)
 	}
@@ -121,7 +122,7 @@ func (tr *PostgresTrackRepository) GetUserFavorites(ctx context.Context, userID 
 }
 
 func (tr *PostgresTrackRepository) AddToUserFavorites(ctx context.Context, trackID uuid.UUID, userID uuid.UUID) error {
-	_, err := tr.db.ExecContext(ctx, "INSERT INTO favorite(user_id, track_id) VALUES ($1, $2)", userID, trackID)
+	_, err := tr.connection.ExecContext(ctx, "INSERT INTO favorite(user_id, track_id) VALUES ($1, $2)", userID, trackID)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
@@ -137,7 +138,7 @@ func (tr *PostgresTrackRepository) AddToUserFavorites(ctx context.Context, track
 
 func (tr *PostgresTrackRepository) GetByAlbumID(ctx context.Context, albumID uuid.UUID) ([]domain.Track, error) {
 	var tracks []entity2.PgTrack
-	err := tr.db.SelectContext(ctx, &tracks, trackGetByAlbumID, albumID)
+	err := tr.connection.SelectContext(ctx, &tracks, trackGetByAlbumID, albumID)
 	if err != nil {
 		return nil, util.WrapError(ports.ErrInternalTrackRepo, err)
 	}
@@ -152,7 +153,7 @@ func (tr *PostgresTrackRepository) GetByAlbumID(ctx context.Context, albumID uui
 
 func (tr *PostgresTrackRepository) GetByMusicianID(ctx context.Context, musicianID uuid.UUID) ([]domain.Track, error) {
 	var tracks []entity2.PgTrack
-	err := tr.db.SelectContext(ctx, &tracks, trackGetByMusicianID, musicianID)
+	err := tr.connection.SelectContext(ctx, &tracks, trackGetByMusicianID, musicianID)
 	if err != nil {
 		return nil, util.WrapError(ports.ErrInternalTrackRepo, err)
 	}
@@ -167,7 +168,7 @@ func (tr *PostgresTrackRepository) GetByMusicianID(ctx context.Context, musician
 
 func (tr *PostgresTrackRepository) GetOwn(ctx context.Context, musicianID uuid.UUID) ([]domain.Track, error) {
 	var tracks []entity2.PgTrack
-	err := tr.db.SelectContext(ctx, &tracks, trackGetOwn, musicianID)
+	err := tr.connection.SelectContext(ctx, &tracks, trackGetOwn, musicianID)
 	if err != nil {
 		return nil, util.WrapError(ports.ErrInternalTrackRepo, err)
 	}

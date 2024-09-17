@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+
 	entity2 "github.com/hanoys/sigma-music/internal/adapters/repository/postgres/entity"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
@@ -18,17 +19,17 @@ const (
 )
 
 type PostgresSubscriptionRepository struct {
-	db *sqlx.DB
+	connection *sqlx.DB
 }
 
-func NewPostgresSubscriptionRepository(db *sqlx.DB) *PostgresSubscriptionRepository {
-	return &PostgresSubscriptionRepository{db: db}
+func NewPostgresSubscriptionRepository(connection *sqlx.DB) *PostgresSubscriptionRepository {
+	return &PostgresSubscriptionRepository{connection: connection}
 }
 
 func (sr *PostgresSubscriptionRepository) Create(ctx context.Context, sub domain.Subscription) (domain.Subscription, error) {
 	pgSubscription := entity2.NewPgSuscription(sub)
 	queryString := entity2.InsertQueryString(pgSubscription, "subscriptions")
-	_, err := sr.db.NamedExecContext(ctx, queryString, pgSubscription)
+	_, err := sr.connection.NamedExecContext(ctx, queryString, pgSubscription)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
@@ -40,7 +41,7 @@ func (sr *PostgresSubscriptionRepository) Create(ctx context.Context, sub domain
 	}
 
 	var createdSubscription entity2.PgSubscription
-	err = sr.db.GetContext(ctx, &createdSubscription, subscriptionGetByID, pgSubscription.ID)
+	err = sr.connection.GetContext(ctx, &createdSubscription, subscriptionGetByID, pgSubscription.ID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.Subscription{}, util.WrapError(ports.ErrSubIDNotFound, err)

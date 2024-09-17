@@ -40,10 +40,14 @@ func TestStatRepository(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer db.Close()
+		defer func() {
+			db.GuestConnection.Close()
+			db.UserConnection.Close()
+			db.MusicianConnection.Close()
+		}()
 
 		repo := postgres.NewPostgresStatRepository(db)
-		err = repo.Add(context.Background(), uuid.New(), uuid.New())
+		err = repo.Add(context.Background(), uuid.New(), uuid.New(), uuid.New())
 		if !errors.Is(err, ports.ErrInternalStatRepo) {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -61,7 +65,11 @@ func TestStatRepository(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer db.Close()
+		defer func() {
+			db.GuestConnection.Close()
+			db.UserConnection.Close()
+			db.MusicianConnection.Close()
+		}()
 
 		repo := postgres.NewPostgresStatRepository(db)
 		stat, err := repo.GetMostListenedMusicians(context.Background(), uuid.New(), 10)
@@ -82,7 +90,11 @@ func TestStatRepository(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer db.Close()
+		defer func() {
+			db.GuestConnection.Close()
+			db.UserConnection.Close()
+			db.MusicianConnection.Close()
+		}()
 
 		repo := postgres.NewPostgresStatRepository(db)
 		stat, err := repo.GetListenedGenres(context.Background(), uuid.New())

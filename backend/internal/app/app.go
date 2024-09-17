@@ -8,7 +8,6 @@ import (
 	"github.com/hanoys/sigma-music/internal/adapters/delivery/console"
 	"github.com/hanoys/sigma-music/internal/adapters/hash"
 	"github.com/hanoys/sigma-music/internal/adapters/miniostorage"
-	"github.com/hanoys/sigma-music/internal/adapters/repository/mongodb"
 	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres"
 	"github.com/hanoys/sigma-music/internal/app/config"
 	"github.com/hanoys/sigma-music/internal/ports"
@@ -83,8 +82,8 @@ func NewMongoDB(cfg *MongoConfig) (*mongo.Database, error) {
 	return client.Database(cfg.Database), nil
 }
 
-func NewPostgresDB(cfg *PostgresConfig) (*PostgresDBConnections, error) {
-	guestConnectionString := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s",
+func NewPostgresDB(cfg *PostgresConfig) (*sqlx.DB, error) {
+	connectionString := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s",
 		cfg.Host,
 		cfg.Port,
 		cfg.User,
@@ -240,27 +239,6 @@ func Run() {
 		repositories.Stat = postgres.NewPostgresStatRepository(dbConn)
 		repositories.Sub = postgres.NewPostgresSubscriptionRepository(dbConn)
 		repositories.Track = postgres.NewPostgresTrackRepository(dbConn)
-
-	case "mongodb":
-		dbConn, err := NewMongoDB(&MongoConfig{
-			Database: cfg.DB.Mongodb.Database,
-			User:     cfg.DB.Mongodb.User,
-			Password: cfg.DB.Mongodb.Password,
-			Url:      cfg.DB.Mongodb.URL,
-		})
-		if err != nil {
-			logger.Fatal("Error connecting mongodb", zap.Error(err))
-			return
-		}
-
-		repositories.User = mongodb.NewMongoUserRepository(dbConn)
-		repositories.Musician = mongodb.NewMongoMusicianRepository(dbConn)
-		repositories.Album = mongodb.NewMongoAlbumRepository(dbConn)
-		repositories.Comment = mongodb.NewMongoCommentRepository(dbConn)
-		repositories.Genre = mongodb.NewMongoGenreRepository(dbConn)
-		repositories.Stat = mongodb.NewMongoStatRepository(dbConn)
-		repositories.Sub = mongodb.NewMongoSubscriptionRepository(dbConn)
-		repositories.Track = mongodb.NewMongoTrackRepository(dbConn)
 	default:
 		logger.Fatal("Error unknown database name", zap.Error(err),
 			zap.String("Database name", cfg.DB.Type))

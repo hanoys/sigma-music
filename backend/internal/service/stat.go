@@ -28,7 +28,7 @@ func NewStatService(repo ports.IStatRepository, genreService ports.IGenreService
 }
 
 func (ss *StatService) Add(ctx context.Context, userID uuid.UUID, trackID uuid.UUID) error {
-	err := ss.repository.Add(ctx, userID, trackID)
+	err := ss.repository.Add(ctx, uuid.New(), userID, trackID)
 	if err != nil {
 		ss.logger.Error("Failed to add track to statistics", zap.Error(err),
 			zap.String("User ID", userID.String()), zap.String("Track ID", trackID.String()))

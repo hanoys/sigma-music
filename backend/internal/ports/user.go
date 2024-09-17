@@ -8,12 +8,13 @@ import (
 )
 
 var (
-	ErrUserDuplicate     = errors.New("user duplicate error")
-	ErrUserIDNotFound    = errors.New("user with such id not found")
-	ErrUserNameNotFound  = errors.New("user with such name doesn't exists")
-	ErrUserEmailNotFound = errors.New("user with such email doesn't exists")
-	ErrUserPhoneNotFound = errors.New("user with such email doesn't exists")
-	ErrInternalUserRepo  = errors.New("user repository internal error")
+	ErrUserDuplicate      = errors.New("user duplicate error")
+	ErrUserIDNotFound     = errors.New("user with such id not found")
+	ErrUserNameNotFound   = errors.New("user with such name doesn't exists")
+	ErrUserEmailNotFound  = errors.New("user with such email doesn't exists")
+	ErrUserPhoneNotFound  = errors.New("user with such email doesn't exists")
+	ErrUserUnknownCountry = errors.New("such country doesn't exists")
+	ErrInternalUserRepo   = errors.New("user repository internal error")
 )
 
 type IUserRepository interface {

@@ -9,6 +9,7 @@ import (
 	"github.com/hanoys/sigma-music/internal/ports"
 	"github.com/hanoys/sigma-music/internal/service"
 	"github.com/stretchr/testify/mock"
+	"go.uber.org/zap"
 	"testing"
 )
 
@@ -29,7 +30,7 @@ func TestAlbumServiceCreate(t *testing.T) {
 			req:  createAlbumReq,
 			repositoryMock: func(repository *mocks.AlbumRepository) {
 				repository.
-					On("Create", context.Background(), mock.AnythingOfType("domain.Album")).
+					On("Create", context.Background(), mock.AnythingOfType("domain.Album"), mock.AnythingOfType("uuid.UUID")).
 					Return(domain.Album{}, nil)
 			},
 			expected: nil,
@@ -39,7 +40,7 @@ func TestAlbumServiceCreate(t *testing.T) {
 			req:  createAlbumReq,
 			repositoryMock: func(repository *mocks.AlbumRepository) {
 				repository.
-					On("Create", context.Background(), mock.AnythingOfType("domain.Album")).
+					On("Create", context.Background(), mock.AnythingOfType("domain.Album"), mock.AnythingOfType("uuid.UUID")).
 					Return(domain.Album{}, ports.ErrAlbumDuplicate)
 			},
 			expected: ports.ErrAlbumDuplicate,
@@ -48,8 +49,9 @@ func TestAlbumServiceCreate(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			logger, _ := zap.NewProduction()
 			albumRepository := mocks.NewAlbumRepository(t)
-			albumService := service.NewAlbumService(albumRepository)
+			albumService := service.NewAlbumService(albumRepository, logger)
 			test.repositoryMock(albumRepository)
 
 			_, err := albumService.Create(context.Background(), test.req)
@@ -91,8 +93,9 @@ func TestAlbumServicePublish(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			logger, _ := zap.NewProduction()
 			albumRepository := mocks.NewAlbumRepository(t)
-			albumService := service.NewAlbumService(albumRepository)
+			albumService := service.NewAlbumService(albumRepository, logger)
 			test.repositoryMock(albumRepository)
 
 			err := albumService.Publish(context.Background(), test.id)

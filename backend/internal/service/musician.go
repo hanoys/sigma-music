@@ -74,6 +74,7 @@ func (ms *MusicianService) GetByID(ctx context.Context, musicianID uuid.UUID) (d
 	if err != nil {
 		ms.logger.Error("Failed to get musician by ID", zap.Error(err),
 			zap.String("Musician ID", musicianID.String()))
+		return domain.Musician{}, err
 	}
 
 	ms.logger.Info("Musician successfully received by id", zap.String("Musician ID", musicianID.String()))

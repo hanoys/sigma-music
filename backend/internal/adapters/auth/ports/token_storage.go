@@ -9,6 +9,7 @@ import (
 
 var (
 	ErrInternalTokenStorage = errors.New("internal token storage error")
+	ErrNotExistingKey       = errors.New("key doesn't exist")
 )
 
 type ITokenStorage interface {

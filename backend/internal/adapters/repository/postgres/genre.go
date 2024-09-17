@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+
 	"github.com/google/uuid"
 	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres/entity"
 	"github.com/hanoys/sigma-music/internal/domain"
@@ -20,16 +21,16 @@ const (
 )
 
 type PostgresGenreRepository struct {
-	db *sqlx.DB
+	connection *sqlx.DB
 }
 
-func NewPostgresGenreRepository(db *sqlx.DB) *PostgresGenreRepository {
-	return &PostgresGenreRepository{db: db}
+func NewPostgresGenreRepository(connection *sqlx.DB) *PostgresGenreRepository {
+	return &PostgresGenreRepository{connection: connection}
 }
 
 func (gr *PostgresGenreRepository) GetAll(ctx context.Context) ([]domain.Genre, error) {
 	var genres []entity.PgGenre
-	err := gr.db.SelectContext(ctx, &genres, genreGetAllQuery)
+	err := gr.connection.SelectContext(ctx, &genres, genreGetAllQuery)
 	if err != nil {
 		return nil, util.WrapError(ports.ErrInternalGenreRepo, err)
 	}
@@ -44,7 +45,7 @@ func (gr *PostgresGenreRepository) GetAll(ctx context.Context) ([]domain.Genre, 
 
 func (gr *PostgresGenreRepository) GetByID(ctx context.Context, id uuid.UUID) (domain.Genre, error) {
 	var foundGenre entity.PgGenre
-	err := gr.db.GetContext(ctx, &foundGenre, genreGetByIDQuery, id)
+	err := gr.connection.GetContext(ctx, &foundGenre, genreGetByIDQuery, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.Genre{}, util.WrapError(ports.ErrGenreIDNotFound, err)
@@ -56,7 +57,7 @@ func (gr *PostgresGenreRepository) GetByID(ctx context.Context, id uuid.UUID) (d
 }
 
 func (gr *PostgresGenreRepository) AddForTrack(ctx context.Context, trackID uuid.UUID, genresID []uuid.UUID) error {
-	tx := gr.db.MustBegin()
+	tx := gr.connection.MustBegin()
 	for _, genreID := range genresID {
 		tx.MustExec(genreAddForTrackQuery, trackID, genreID)
 	}
@@ -71,7 +72,7 @@ func (gr *PostgresGenreRepository) AddForTrack(ctx context.Context, trackID uuid
 
 func (gr *PostgresGenreRepository) GetByTrackID(ctx context.Context, trackID uuid.UUID) ([]domain.Genre, error) {
 	var genres []entity.PgGenre
-	err := gr.db.SelectContext(ctx, &genres, genreGetByTrack, trackID)
+	err := gr.connection.SelectContext(ctx, &genres, genreGetByTrack, trackID)
 	if err != nil {
 		return nil, util.WrapError(ports.ErrInternalGenreRepo, err)
 	}

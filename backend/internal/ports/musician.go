@@ -8,11 +8,12 @@ import (
 )
 
 var (
-	ErrMusicianDuplicate     = errors.New("musician duplicate error")
-	ErrMusicianIDNotFound    = errors.New("musician with such id not found")
-	ErrMusicianNameNotFound  = errors.New("musician with such name doesn't exists")
-	ErrMusicianEmailNotFound = errors.New("musician with such email doesn't exists")
-	ErrInternalMusicianRepo  = errors.New("musician repository internal error")
+	ErrMusicianDuplicate      = errors.New("musician duplicate error")
+	ErrMusicianIDNotFound     = errors.New("musician with such id not found")
+	ErrMusicianNameNotFound   = errors.New("musician with such name doesn't exists")
+	ErrMusicianEmailNotFound  = errors.New("musician with such email doesn't exists")
+	ErrMusicianUnknownCountry = errors.New("such country doesn't exists")
+	ErrInternalMusicianRepo   = errors.New("musician repository internal error")
 )
 
 type IMusicianRepository interface {

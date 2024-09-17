@@ -9,6 +9,7 @@ import (
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
 	"github.com/hanoys/sigma-music/internal/service"
+	"go.uber.org/zap"
 	"testing"
 )
 
@@ -228,16 +229,17 @@ func TestStatServiceFromReport(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			logger, _ := zap.NewProduction()
 			musicianRepo := mocks.NewMusicianRepository(t)
-			musicianService := service.NewMusicianService(musicianRepo, hash.NewHashPasswordProvider())
+			musicianService := service.NewMusicianService(musicianRepo, hash.NewHashPasswordProvider(), logger)
 			test.musicianRepoMock(musicianRepo)
 
 			genreRepo := mocks.NewGenreRepository(t)
-			genreService := service.NewGenreService(genreRepo)
+			genreService := service.NewGenreService(genreRepo, logger)
 			test.genreRepoMock(genreRepo)
 
 			statRepo := mocks.NewStatRepository(t)
-			statService := service.NewStatService(statRepo, genreService, musicianService)
+			statService := service.NewStatService(statRepo, genreService, musicianService, logger)
 			test.statRepoMock(statRepo)
 
 			res, err := statService.FormReport(context.Background(), userID)
@@ -283,16 +285,17 @@ func TestStatServiceAdd(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			logger, _ := zap.NewProduction()
 			musicianRepo := mocks.NewMusicianRepository(t)
-			musicianService := service.NewMusicianService(musicianRepo, hash.NewHashPasswordProvider())
+			musicianService := service.NewMusicianService(musicianRepo, hash.NewHashPasswordProvider(), logger)
 			test.musicianRepoMock(musicianRepo)
 
 			genreRepo := mocks.NewGenreRepository(t)
-			genreService := service.NewGenreService(genreRepo)
+			genreService := service.NewGenreService(genreRepo, logger)
 			test.genreRepoMock(genreRepo)
 
 			statRepo := mocks.NewStatRepository(t)
-			statService := service.NewStatService(statRepo, genreService, musicianService)
+			statService := service.NewStatService(statRepo, genreService, musicianService, logger)
 			test.statRepoMock(statRepo)
 
 			err := statService.Add(context.Background(), userID, trackID)

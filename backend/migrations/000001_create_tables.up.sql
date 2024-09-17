@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS comments (
 );
 
 CREATE TABLE IF NOT EXISTS users_history (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     user_id UUID REFERENCES users ON DELETE CASCADE,
     track_id UUID REFERENCES tracks ON DELETE CASCADE
-)
+);

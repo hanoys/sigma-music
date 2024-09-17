@@ -40,7 +40,11 @@ func TestGenreRepository(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer db.Close()
+		defer func() {
+			db.GuestConnection.Close()
+			db.UserConnection.Close()
+			db.MusicianConnection.Close()
+		}()
 
 		repo := postgres.NewPostgresGenreRepository(db)
 		genres, err := repo.GetAll(context.Background())
@@ -64,7 +68,11 @@ func TestGenreRepository(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer db.Close()
+			defer func() {
+				db.GuestConnection.Close()
+				db.UserConnection.Close()
+				db.MusicianConnection.Close()
+			}()
 
 			repo := postgres.NewPostgresGenreRepository(db)
 			_, err = repo.GetByID(context.Background(), uuid.New())

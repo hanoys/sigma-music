@@ -49,7 +49,11 @@ func TestCommentRepository(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer db.Close()
+		defer func() {
+			db.GuestConnection.Close()
+			db.UserConnection.Close()
+			db.MusicianConnection.Close()
+		}()
 
 		repo := postgres.NewPostgresCommentRepository(db)
 		_, err = repo.Create(ctx, newComment)
@@ -70,7 +74,11 @@ func TestCommentRepository(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer db.Close()
+		defer func() {
+			db.GuestConnection.Close()
+			db.UserConnection.Close()
+			db.MusicianConnection.Close()
+		}()
 
 		repo := postgres.NewPostgresCommentRepository(db)
 		comments, err := repo.GetByUserID(ctx, uuid.New())
@@ -91,7 +99,11 @@ func TestCommentRepository(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer db.Close()
+		defer func() {
+			db.GuestConnection.Close()
+			db.UserConnection.Close()
+			db.MusicianConnection.Close()
+		}()
 
 		repo := postgres.NewPostgresCommentRepository(db)
 		comments, err := repo.GetByUserID(ctx, uuid.New())

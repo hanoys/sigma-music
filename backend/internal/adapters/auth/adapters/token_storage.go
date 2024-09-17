@@ -40,3 +40,21 @@ func (ts *TokenStorage) Del(ctx context.Context, key string) error {
 
 	return nil
 }
+
+func (ts *TokenStorage) Get(ctx context.Context, key string) (*domain.Payload, error) {
+	val, err := ts.redisClient.Get(ctx, key).Result()
+	if err != nil {
+		if err == redis.Nil {
+			return nil, ports.ErrNotExistingKey
+		}
+
+		return nil, util.WrapError(ports.ErrInternalTokenStorage, err)
+	}
+
+	var payload domain.Payload
+	if err = json.Unmarshal([]byte(val), &payload); err != nil {
+		return nil, util.WrapError(ports.ErrInternalTokenStorage, err)
+	}
+
+	return &payload, nil
+}

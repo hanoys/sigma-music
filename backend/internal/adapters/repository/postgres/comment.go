@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"errors"
+
 	"github.com/google/uuid"
 	entity2 "github.com/hanoys/sigma-music/internal/adapters/repository/postgres/entity"
 	"github.com/hanoys/sigma-music/internal/domain"
@@ -20,17 +21,17 @@ const (
 )
 
 type PostgresCommentRepository struct {
-	db *sqlx.DB
+	connection *sqlx.DB
 }
 
-func NewPostgresCommentRepository(db *sqlx.DB) *PostgresCommentRepository {
-	return &PostgresCommentRepository{db: db}
+func NewPostgresCommentRepository(connection *sqlx.DB) *PostgresCommentRepository {
+	return &PostgresCommentRepository{connection: connection}
 }
 
 func (cr *PostgresCommentRepository) Create(ctx context.Context, comment domain.Comment) (domain.Comment, error) {
 	pgComment := entity2.NewPgComment(comment)
 	queryString := entity2.InsertQueryString(pgComment, "comments")
-	_, err := cr.db.NamedExecContext(ctx, queryString, pgComment)
+	_, err := cr.connection.NamedExecContext(ctx, queryString, pgComment)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
@@ -42,7 +43,7 @@ func (cr *PostgresCommentRepository) Create(ctx context.Context, comment domain.
 	}
 
 	var createdTrack entity2.PgComment
-	err = cr.db.GetContext(ctx, &createdTrack, commentGetByIDQuery, pgComment.ID)
+	err = cr.connection.GetContext(ctx, &createdTrack, commentGetByIDQuery, pgComment.ID)
 	if err != nil {
 		return domain.Comment{}, util.WrapError(ports.ErrCommentIDNotFound, err)
 	}
@@ -52,7 +53,7 @@ func (cr *PostgresCommentRepository) Create(ctx context.Context, comment domain.
 
 func (cr *PostgresCommentRepository) GetByUserID(ctx context.Context, userID uuid.UUID) ([]domain.Comment, error) {
 	var comments []entity2.PgComment
-	err := cr.db.SelectContext(ctx, &comments, commentGetByUserIDQuery, userID)
+	err := cr.connection.SelectContext(ctx, &comments, commentGetByUserIDQuery, userID)
 	if err != nil {
 		return nil, util.WrapError(ports.ErrInternalCommentRepo, err)
 	}
@@ -67,7 +68,7 @@ func (cr *PostgresCommentRepository) GetByUserID(ctx context.Context, userID uui
 
 func (cr *PostgresCommentRepository) GetByTrackID(ctx context.Context, trackID uuid.UUID) ([]domain.Comment, error) {
 	var comments []entity2.PgComment
-	err := cr.db.SelectContext(ctx, &comments, commentGetByTrackIDQuery, trackID)
+	err := cr.connection.SelectContext(ctx, &comments, commentGetByTrackIDQuery, trackID)
 	if err != nil {
 		return nil, util.WrapError(ports.ErrInternalCommentRepo, err)
 	}

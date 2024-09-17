@@ -41,10 +41,10 @@ func (ts *TrackService) Create(ctx context.Context, trackInfo ports.CreateTrackR
 	}
 
 	track, err := ts.repository.Create(ctx, domain.Track{
-		ID:      trackID,
-		AlbumID: trackInfo.AlbumID,
-		Name:    trackInfo.Name,
-		URL:     url.String(),
+		ID:       trackID,
+		AlbumID:  trackInfo.AlbumID,
+		Name:     trackInfo.Name,
+		URL:      url.String(),
 	})
 
 	if err != nil {

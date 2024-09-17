@@ -48,7 +48,11 @@ func TestTrackRepository(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer db.Close()
+		defer func() {
+			db.GuestConnection.Close()
+			db.UserConnection.Close()
+			db.MusicianConnection.Close()
+		}()
 
 		repo := postgres.NewPostgresTrackRepository(db)
 		_, err = repo.Create(ctx, newTrack)
@@ -69,7 +73,11 @@ func TestTrackRepository(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer db.Close()
+		defer func() {
+			db.GuestConnection.Close()
+			db.UserConnection.Close()
+			db.MusicianConnection.Close()
+		}()
 
 		repo := postgres.NewPostgresTrackRepository(db)
 		_, err = repo.Delete(ctx, uuid.New())

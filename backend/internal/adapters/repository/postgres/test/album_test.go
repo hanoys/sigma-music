@@ -40,7 +40,11 @@ func TestAlbumRepository(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer db.Close()
+		defer func() {
+			db.GuestConnection.Close()
+			db.UserConnection.Close()
+			db.MusicianConnection.Close()
+		}()
 
 		repo := postgres.NewPostgresAlbumRepository(db)
 		albums, err := repo.GetByMusicianID(ctx, uuid.New())
@@ -61,7 +65,11 @@ func TestAlbumRepository(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer db.Close()
+		defer func() {
+			db.GuestConnection.Close()
+			db.UserConnection.Close()
+			db.MusicianConnection.Close()
+		}()
 
 		repo := postgres.NewPostgresAlbumRepository(db)
 		_, err = repo.GetByID(ctx, uuid.New())
@@ -82,7 +90,11 @@ func TestAlbumRepository(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer db.Close()
+		defer func() {
+			db.GuestConnection.Close()
+			db.UserConnection.Close()
+			db.MusicianConnection.Close()
+		}()
 
 		repo := postgres.NewPostgresAlbumRepository(db)
 		err = repo.Publish(ctx, uuid.New())

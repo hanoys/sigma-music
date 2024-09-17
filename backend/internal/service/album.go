@@ -66,6 +66,7 @@ func (as *AlbumService) GetOwn(ctx context.Context, musicianID uuid.UUID) ([]dom
 	albums, err := as.repository.GetOwn(ctx, musicianID)
 	if err != nil {
 		as.logger.Error("Failed to get musician own albums", zap.Error(err))
+		return nil, err
 	}
 
 	as.logger.Info("Successfully received own musician albums", zap.String("Musician ID", musicianID.String()))
@@ -77,6 +78,7 @@ func (as *AlbumService) GetByID(ctx context.Context, id uuid.UUID) (domain.Album
 	album, err := as.repository.GetByID(ctx, id)
 	if err != nil {
 		as.logger.Error("Failed to get album by ID", zap.Error(err), zap.String("Album ID", id.String()))
+		return domain.Album{}, err
 	}
 
 	as.logger.Info("Successfully received album by ID", zap.String("Album ID", id.String()))
@@ -88,6 +90,7 @@ func (as *AlbumService) Publish(ctx context.Context, albumID uuid.UUID) error {
 	err := as.repository.Publish(ctx, albumID)
 	if err != nil {
 		as.logger.Error("Failed to publish album", zap.String("Album ID", albumID.String()))
+		return err
 	}
 
 	as.logger.Info("Successfully published album", zap.String("Album ID", albumID.String()))

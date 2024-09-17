@@ -9,6 +9,7 @@ import (
 	"github.com/hanoys/sigma-music/internal/ports"
 	"github.com/hanoys/sigma-music/internal/service"
 	"github.com/stretchr/testify/mock"
+	"go.uber.org/zap"
 	"testing"
 )
 
@@ -50,8 +51,9 @@ func TestCommentServicePost(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			logger, _ := zap.NewProduction()
 			commentRepository := mocks.NewCommentRepository(t)
-			commentService := service.NewCommentService(commentRepository)
+			commentService := service.NewCommentService(commentRepository, logger)
 			test.repositoryMock(commentRepository)
 
 			_, err := commentService.Post(context.Background(), test.req)
@@ -93,8 +95,9 @@ func TestCommentServiceGetCommentsOnTrack(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			logger, _ := zap.NewProduction()
 			commentRepository := mocks.NewCommentRepository(t)
-			commentService := service.NewCommentService(commentRepository)
+			commentService := service.NewCommentService(commentRepository, logger)
 			test.repositoryMock(commentRepository)
 
 			_, err := commentService.GetCommentsOnTrack(context.Background(), test.id)

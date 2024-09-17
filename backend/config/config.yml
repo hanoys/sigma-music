@@ -3,9 +3,9 @@ jwt:
   refresh_expiration_time: 60
   secret: jwt-secret
 log:
-  level: fatal
+  level: info
 db:
-  type: mongodb
+  type: postgres
   mongodb:
     database: sigma-music
     user: root

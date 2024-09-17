@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+
 	"github.com/google/uuid"
 	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres/entity"
 	"github.com/hanoys/sigma-music/internal/domain"
@@ -11,7 +12,7 @@ import (
 )
 
 const (
-	statAddQuery             = "INSERT INTO users_history(user_id, track_id) VALUES ($1, $2)"
+	statAddQuery             = "INSERT INTO users_history(id, user_id, track_id) VALUES ($1, $2, $3)"
 	statGetMostListenedQuery = "select musician_id, $1 user_id, cnt " +
 		"from (select a.id musician_id, count(*) cnt from (select m.id, uh.user_id from users_history uh " +
 		"join tracks t on uh.track_id = t.id " +
@@ -31,15 +32,15 @@ const (
 )
 
 type PostgresStatRepository struct {
-	db *sqlx.DB
+	connection *sqlx.DB
 }
 
-func NewPostgresStatRepository(db *sqlx.DB) *PostgresStatRepository {
-	return &PostgresStatRepository{db: db}
+func NewPostgresStatRepository(connection *sqlx.DB) *PostgresStatRepository {
+	return &PostgresStatRepository{connection: connection}
 }
 
-func (sr *PostgresStatRepository) Add(ctx context.Context, userID uuid.UUID, trackID uuid.UUID) error {
-	_, err := sr.db.ExecContext(ctx, statAddQuery, userID, trackID)
+func (sr *PostgresStatRepository) Add(ctx context.Context, recordID uuid.UUID, userID uuid.UUID, trackID uuid.UUID) error {
+	_, err := sr.connection.ExecContext(ctx, statAddQuery, recordID, userID, trackID)
 	if err != nil {
 		return util.WrapError(ports.ErrInternalStatRepo, err)
 	}
@@ -49,7 +50,7 @@ func (sr *PostgresStatRepository) Add(ctx context.Context, userID uuid.UUID, tra
 
 func (sr *PostgresStatRepository) GetMostListenedMusicians(ctx context.Context, userID uuid.UUID, maxCnt int) ([]domain.UserMusiciansStat, error) {
 	var musiciansStat []entity.PgUserMusiciansStat
-	err := sr.db.SelectContext(ctx, &musiciansStat, statGetMostListenedQuery, userID, maxCnt)
+	err := sr.connection.SelectContext(ctx, &musiciansStat, statGetMostListenedQuery, userID, maxCnt)
 	if err != nil {
 		return nil, util.WrapError(ports.ErrInternalStatRepo, err)
 	}
@@ -64,7 +65,7 @@ func (sr *PostgresStatRepository) GetMostListenedMusicians(ctx context.Context, 
 
 func (sr *PostgresStatRepository) GetListenedGenres(ctx context.Context, userID uuid.UUID) ([]domain.UserGenresStat, error) {
 	var genresStat []entity.PgUserGenresStat
-	err := sr.db.SelectContext(ctx, &genresStat, statGetListenedGenresQuery, userID)
+	err := sr.connection.SelectContext(ctx, &genresStat, statGetListenedGenresQuery, userID)
 	if err != nil {
 		return nil, util.WrapError(ports.ErrInternalStatRepo, err)
 	}

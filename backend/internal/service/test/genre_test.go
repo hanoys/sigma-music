@@ -9,6 +9,7 @@ import (
 	"github.com/hanoys/sigma-music/internal/ports"
 	"github.com/hanoys/sigma-music/internal/service"
 	"github.com/stretchr/testify/mock"
+	"go.uber.org/zap"
 	"testing"
 )
 
@@ -40,8 +41,9 @@ func TestGenreServiceGetAll(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			logger, _ := zap.NewProduction()
 			genreRepository := mocks.NewGenreRepository(t)
-			genreService := service.NewGenreService(genreRepository)
+			genreService := service.NewGenreService(genreRepository, logger)
 			test.repositoryMock(genreRepository)
 
 			_, err := genreService.GetAll(context.Background())
@@ -81,8 +83,9 @@ func TestGenreServiceGetByID(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			logger, _ := zap.NewProduction()
 			genreRepository := mocks.NewGenreRepository(t)
-			genreService := service.NewGenreService(genreRepository)
+			genreService := service.NewGenreService(genreRepository, logger)
 			test.repositoryMock(genreRepository)
 
 			_, err := genreService.GetByID(context.Background(), uuid.New())
@@ -116,8 +119,9 @@ func TestGenreServiceAddForTrack(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			logger, _ := zap.NewProduction()
 			genreRepository := mocks.NewGenreRepository(t)
-			genreService := service.NewGenreService(genreRepository)
+			genreService := service.NewGenreService(genreRepository, logger)
 			test.repositoryMock(genreRepository)
 
 			err := genreService.AddForTrack(context.Background(), test.trackID, test.genresID)
