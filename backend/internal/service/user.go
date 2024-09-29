@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	"github.com/google/uuid"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
@@ -56,7 +57,7 @@ func (us *UserService) Register(ctx context.Context, user ports.UserServiceCreat
 
 	u, err := us.repository.Create(ctx, createUser)
 	if err != nil {
-		us.logger.Error("Failed to register musician", zap.Error(err))
+		us.logger.Error("Failed to register user", zap.Error(err))
 		return domain.User{}, err
 	}
 

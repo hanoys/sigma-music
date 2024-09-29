@@ -6,11 +6,6 @@ log:
   level: info
 db:
   type: postgres
-  mongodb:
-    database: sigma-music
-    user: root
-    password: password
-    url: mongodb://mongodb:27017
   postgres:
     user: sigma
     password: sigma

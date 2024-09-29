@@ -11,6 +11,7 @@ var (
 	ErrCommentDuplicate         = errors.New("comment duplicate error")
 	ErrCommentIDNotFound        = errors.New("comment with such id not found")
 	ErrCommentByTrackIDNotFound = errors.New("comment with such track id not found")
+	ErrCommentByUserIDNotFound  = errors.New("comment with such track id not found")
 	ErrInternalCommentRepo      = errors.New("comment repository internal error")
 )
 

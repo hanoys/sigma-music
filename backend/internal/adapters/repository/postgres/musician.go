@@ -117,7 +117,7 @@ func (mr *PostgresMusicianRepository) GetByAlbumID(ctx context.Context, albumID 
 	err := mr.connection.GetContext(ctx, &foundMusician, musicianGetByAlbumIDQuery, albumID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return domain.Musician{}, util.WrapError(ports.ErrMusicianEmailNotFound, err)
+			return domain.Musician{}, util.WrapError(ports.ErrMusicianIDNotFound, err)
 		}
 		return domain.Musician{}, util.WrapError(ports.ErrInternalMusicianRepo, err)
 	}
@@ -130,7 +130,7 @@ func (mr *PostgresMusicianRepository) GetByTrackID(ctx context.Context, trackID 
 	err := mr.connection.GetContext(ctx, &foundMusician, musicianGetByTrackIDQuery, trackID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return domain.Musician{}, util.WrapError(ports.ErrMusicianEmailNotFound, err)
+			return domain.Musician{}, util.WrapError(ports.ErrMusicianIDNotFound, err)
 		}
 		return domain.Musician{}, util.WrapError(ports.ErrInternalMusicianRepo, err)
 	}

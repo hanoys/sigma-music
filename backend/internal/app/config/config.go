@@ -8,14 +8,7 @@ import (
 
 type Config struct {
 	DB struct {
-		Type    string `yaml:"type"`
-		Mongodb struct {
-			Database string `yaml:"database"`
-			User     string `yaml:"user"`
-			Password string `yaml:"password"`
-			URL      string `yaml:"url"`
-		} `yaml:"mongodb"`
-
+		Type     string `yaml:"type"`
 		Postgres struct {
 			User     string `yaml:"user"`
 			Password string `yaml:"password"`

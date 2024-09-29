@@ -15,7 +15,6 @@ type Handler struct {
 	genreService        ports.IGenreService
 	musicianService     ports.IMusicianService
 	statService         ports.IStatService
-	subscriptionService ports.ISubscriptionService
 	trackService        ports.ITrackService
 	userService         ports.IUserService
 }
@@ -27,7 +26,6 @@ type HandlerParams struct {
 	GenreService        ports.IGenreService
 	MusicianService     ports.IMusicianService
 	StatService         ports.IStatService
-	SubscriptionService ports.ISubscriptionService
 	TrackService        ports.ITrackService
 	UserService         ports.IUserService
 }
@@ -40,7 +38,6 @@ func NewHandler(params HandlerParams) *Handler {
 		genreService:        params.GenreService,
 		musicianService:     params.MusicianService,
 		statService:         params.StatService,
-		subscriptionService: params.SubscriptionService,
 		trackService:        params.TrackService,
 		userService:         params.UserService,
 	}

@@ -30,3 +30,4 @@ go.work
 
 backend/data/
 backend/log/
+allure-results/

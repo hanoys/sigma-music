@@ -197,7 +197,6 @@ type Repositories struct {
 	Comment  ports.ICommentRepository
 	Genre    ports.IGenreRepository
 	Stat     ports.IStatRepository
-	Sub      ports.ISubscriptionRepository
 	Track    ports.ITrackRepository
 }
 
@@ -237,7 +236,6 @@ func Run() {
 		repositories.Comment = postgres.NewPostgresCommentRepository(dbConn)
 		repositories.Genre = postgres.NewPostgresGenreRepository(dbConn)
 		repositories.Stat = postgres.NewPostgresStatRepository(dbConn)
-		repositories.Sub = postgres.NewPostgresSubscriptionRepository(dbConn)
 		repositories.Track = postgres.NewPostgresTrackRepository(dbConn)
 	default:
 		logger.Fatal("Error unknown database name", zap.Error(err),
@@ -273,7 +271,6 @@ func Run() {
 	commentRepo := repositories.Comment
 	genreRepo := repositories.Genre
 	statRepo := repositories.Stat
-	subRepo := repositories.Sub
 	trackRepo := repositories.Track
 
 	tokenStorage := adapters.NewTokenStorage(redisClient)
@@ -292,7 +289,6 @@ func Run() {
 	commentService := service.NewCommentService(commentRepo, logger)
 	genreService := service.NewGenreService(genreRepo, logger)
 	statService := service.NewStatService(statRepo, genreService, musicianService, logger)
-	subService := service.NewSubscriptionService(subRepo, logger)
 	trackService := service.NewTrackService(trackRepo, trackStorage, genreService, logger)
 
 	cons := console.NewConsole(console.NewHandler(console.HandlerParams{
@@ -302,7 +298,6 @@ func Run() {
 		GenreService:        genreService,
 		MusicianService:     musicianService,
 		StatService:         statService,
-		SubscriptionService: subService,
 		TrackService:        trackService,
 		UserService:         userService,
 	}))
