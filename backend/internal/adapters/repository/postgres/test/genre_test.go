@@ -2,84 +2,172 @@ package test
 
 import (
 	"context"
-	"errors"
+	"database/sql"
+	"testing"
+
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/google/uuid"
 	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres"
+	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres/entity"
+	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres/test/builder"
+	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
-	"testing"
+	"github.com/jmoiron/sqlx"
+	"github.com/ozontech/allure-go/pkg/framework/provider"
+	"github.com/ozontech/allure-go/pkg/framework/suite"
 )
 
-func TestGenreRepository(t *testing.T) {
-	ctx := context.Background()
-	container, err := newPostgresContainer(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
+type GenreSuite struct {
+	suite.Suite
+}
 
-	// Clean up the container after the test is complete
-	t.Cleanup(func() {
-		if err := container.Terminate(ctx); err != nil {
-			t.Fatalf("failed to terminate container: %s", err)
-		}
-	})
+func NewGenreRepository() (ports.IGenreRepository, sqlmock.Sqlmock) {
+	db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	conn := sqlx.NewDb(db, "pgx")
+	repo := postgres.NewPostgresGenreRepository(conn)
+	return repo, mock
+}
 
-	url, err := container.ConnectionString(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
+type GenreGetAllSuite struct {
+	GenreSuite
+}
 
-	t.Run("get all genre", func(t *testing.T) {
-		t.Cleanup(func() {
-			err = container.Restore(ctx)
-			if err != nil {
-				t.Fatal(err)
-			}
-		})
+func (s *GenreGetAllSuite) SuccessRepositoryMock(mock sqlmock.Sqlmock, genre domain.Genre) {
+	pgGenre := entity.NewPgGenre(genre)
+	expectedRows := sqlmock.NewRows(EntityColumns(pgGenre)).
+		AddRow(EntityValues(pgGenre)...)
+	mock.ExpectQuery(postgres.GenreGetAllQuery).
+		WillReturnRows(expectedRows)
+}
 
-		db, err := newPostgresDB(url)
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer func() {
-			db.GuestConnection.Close()
-			db.UserConnection.Close()
-			db.MusicianConnection.Close()
-		}()
+func (s *GenreGetAllSuite) TestSuccess(t provider.T) {
+	t.Parallel()
+	t.Title("Repository Genre get all test success")
+	repo, mock := NewGenreRepository()
+	genre := builder.NewGenreBuilder().Default().Build()
+	s.SuccessRepositoryMock(mock, genre)
 
-		repo := postgres.NewPostgresGenreRepository(db)
-		genres, err := repo.GetAll(context.Background())
-		if err != nil {
-			t.Errorf("unexcpected error: %v", err)
-		}
+	genres, err := repo.GetAll(context.Background())
 
-		if len(genres) != 0 {
-			t.Errorf("len is not zero")
-		}
+	t.Assert().Nil(err)
+	t.Assert().Equal(genre, genres[0])
+}
 
-		t.Run("get by id genre", func(t *testing.T) {
-			t.Cleanup(func() {
-				err = container.Restore(ctx)
-				if err != nil {
-					t.Fatal(err)
-				}
-			})
+func (s *GenreGetAllSuite) InternalErrorRepositoryMock(mock sqlmock.Sqlmock, album domain.Album) {
+	mock.ExpectQuery(postgres.GenreGetAllQuery).
+		WillReturnError(sql.ErrNoRows)
+}
 
-			db, err := newPostgresDB(url)
-			if err != nil {
-				t.Fatal(err)
-			}
-			defer func() {
-				db.GuestConnection.Close()
-				db.UserConnection.Close()
-				db.MusicianConnection.Close()
-			}()
+func (s *GenreGetAllSuite) TestInternalError(t provider.T) {
+	t.Parallel()
+	t.Title("Repository Genre get all test internal error")
+	repo, mock := NewGenreRepository()
+	genre := builder.NewAlbumBuilder().Default().Build()
+	s.InternalErrorRepositoryMock(mock, genre)
 
-			repo := postgres.NewPostgresGenreRepository(db)
-			_, err = repo.GetByID(context.Background(), uuid.New())
+	genres, err := repo.GetAll(context.Background())
 
-			if !errors.Is(err, ports.ErrGenreIDNotFound) {
-				t.Errorf("unexcpected error: %v", err)
-			}
-		})
-	})
+	t.Assert().Nil(genres)
+	t.Assert().ErrorIs(err, ports.ErrInternalGenreRepo)
+}
+
+func TestGenreGetAllSuite(t *testing.T) {
+	suite.RunNamedSuite(t, "GenreGetAllRepository", new(GenreGetAllSuite))
+}
+
+type GenreGetByIDSuite struct {
+	GenreSuite
+}
+
+func (s *GenreGetByIDSuite) SuccessRepositoryMock(mock sqlmock.Sqlmock, genre domain.Genre) {
+	pgGenre := entity.NewPgGenre(genre)
+	expectedRows := sqlmock.NewRows(EntityColumns(pgGenre)).
+		AddRow(EntityValues(pgGenre)...)
+	mock.ExpectQuery(postgres.GenreGetByIDQuery).
+		WithArgs(genre.ID).
+		WillReturnRows(expectedRows)
+}
+
+func (s *GenreGetByIDSuite) TestSuccess(t provider.T) {
+	t.Parallel()
+	t.Title("Repository Genre get by id test success")
+	repo, mock := NewGenreRepository()
+	genre := builder.NewGenreBuilder().Default().Build()
+	s.SuccessRepositoryMock(mock, genre)
+
+	resultGenre, err := repo.GetByID(context.Background(), genre.ID)
+
+	t.Assert().Nil(err)
+	t.Assert().Equal(genre, resultGenre)
+}
+
+func (s *GenreGetByIDSuite) InternalErrorRepositoryMock(mock sqlmock.Sqlmock, genre domain.Genre) {
+	mock.ExpectQuery(postgres.GenreGetByIDQuery).
+		WillReturnError(sql.ErrNoRows)
+}
+
+func (s *GenreGetByIDSuite) TestInternalError(t provider.T) {
+	t.Parallel()
+	t.Title("Repository Genre get by id test internal error")
+	repo, mock := NewGenreRepository()
+	genre := builder.NewGenreBuilder().Default().Build()
+	s.InternalErrorRepositoryMock(mock, genre)
+
+	_, err := repo.GetByID(context.Background(), genre.ID)
+
+	t.Assert().ErrorIs(err, ports.ErrGenreIDNotFound)
+}
+
+func TestGenreGetByIDSuite(t *testing.T) {
+	suite.RunNamedSuite(t, "GenreGetByIDRepository", new(GenreGetByIDSuite))
+}
+
+type GenreGetByTrackIDSuite struct {
+	GenreSuite
+}
+
+func (s *GenreGetByTrackIDSuite) SuccessRepositoryMock(mock sqlmock.Sqlmock, genre domain.Genre, trackID uuid.UUID) {
+	pgGenre := entity.NewPgGenre(genre)
+	expectedRows := sqlmock.NewRows(EntityColumns(pgGenre)).
+		AddRow(EntityValues(pgGenre)...)
+	mock.ExpectQuery(postgres.GenreGetByTrack).
+		WithArgs(trackID).
+		WillReturnRows(expectedRows)
+}
+
+func (s *GenreGetByTrackIDSuite) TestSuccess(t provider.T) {
+	t.Parallel()
+	t.Title("Repository Genre get by track id test success")
+	repo, mock := NewGenreRepository()
+	genre := builder.NewGenreBuilder().Default().Build()
+	trackID := uuid.New()
+	s.SuccessRepositoryMock(mock, genre, trackID)
+
+	genres, err := repo.GetByTrackID(context.Background(), trackID)
+
+	t.Assert().Nil(err)
+	t.Assert().Equal(genre, genres[0])
+}
+
+func (s *GenreGetByTrackIDSuite) InternalErrorRepositoryMock(mock sqlmock.Sqlmock, album domain.Album, trackID uuid.UUID) {
+	mock.ExpectQuery(postgres.GenreGetByTrack).
+		WillReturnError(sql.ErrNoRows)
+}
+
+func (s *GenreGetByTrackIDSuite) TestInternalError(t provider.T) {
+	t.Parallel()
+	t.Title("Repository Genre get by track id test internal error")
+	repo, mock := NewGenreRepository()
+	genre := builder.NewAlbumBuilder().Default().Build()
+	trackID := uuid.New()
+	s.InternalErrorRepositoryMock(mock, genre, trackID)
+
+	genres, err := repo.GetByTrackID(context.Background(), genre.ID)
+
+	t.Assert().Nil(genres)
+	t.Assert().ErrorIs(err, ports.ErrInternalGenreRepo)
+}
+
+func TestGenreGetByTrackIDSuite(t *testing.T) {
+	suite.RunNamedSuite(t, "GenreGetByTrackIDRepository", new(GenreGetByTrackIDSuite))
 }

@@ -16,17 +16,17 @@ type StatRepository struct {
 	mock.Mock
 }
 
-// Add provides a mock function with given fields: ctx, userID, trackID
-func (_m *StatRepository) Add(ctx context.Context, userID uuid.UUID, trackID uuid.UUID) error {
-	ret := _m.Called(ctx, userID, trackID)
+// Add provides a mock function with given fields: ctx, recordID, userID, trackID
+func (_m *StatRepository) Add(ctx context.Context, recordID uuid.UUID, userID uuid.UUID, trackID uuid.UUID) error {
+	ret := _m.Called(ctx, recordID, userID, trackID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Add")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
-		r0 = rf(ctx, userID, trackID)
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID, uuid.UUID) error); ok {
+		r0 = rf(ctx, recordID, userID, trackID)
 	} else {
 		r0 = ret.Error(0)
 	}

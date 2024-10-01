@@ -37,6 +37,7 @@ func (s *GenreGetAllSuite) CorrectRepositoryMock(repository *mocks.GenreReposito
 
 func (s *GenreGetAllSuite) TestCorrect(t provider.T) {
 	t.Parallel()
+	t.Title("Genre get all test correct")
 	repository := mocks.NewGenreRepository(t)
 	s.CorrectRepositoryMock(repository)
 	genreService := service.NewGenreService(repository, s.logger)
@@ -54,6 +55,7 @@ func (s *GenreGetAllSuite) InternalErrorRepositoryMock(repository *mocks.GenreRe
 
 func (s *GenreGetAllSuite) TestInternalError(t provider.T) {
 	t.Parallel()
+	t.Title("Genre get all test internal error")
 	repository := mocks.NewGenreRepository(t)
 	s.InternalErrorRepositoryMock(repository)
 	genreService := service.NewGenreService(repository, s.logger)
@@ -79,6 +81,7 @@ func (s *GenreGetByIDSuite) CorrectRepositoryMock(repository *mocks.GenreReposit
 
 func (s *GenreGetByIDSuite) TestCorrect(t provider.T) {
 	t.Parallel()
+	t.Title("Genre get by id test correct")
 	genreID := uuid.New()
 	repository := mocks.NewGenreRepository(t)
 	s.CorrectRepositoryMock(repository, genreID)
@@ -97,6 +100,7 @@ func (s *GenreGetByIDSuite) NotFoundRepositoryMock(repository *mocks.GenreReposi
 
 func (s *GenreGetByIDSuite) TestNotFound(t provider.T) {
 	t.Parallel()
+	t.Title("Genre get by id test not found")
 	genreID := uuid.New()
 	repository := mocks.NewGenreRepository(t)
 	s.NotFoundRepositoryMock(repository, genreID)
@@ -123,6 +127,7 @@ func (s *GenreAddForTrackSuite) CorrectRepositoryMock(repository *mocks.GenreRep
 
 func (s *GenreAddForTrackSuite) TestCorrect(t provider.T) {
 	t.Parallel()
+	t.Title("Genre add for track test correct")
 	trackID := uuid.New()
 	genreID := []uuid.UUID{uuid.New()}
 	repository := mocks.NewGenreRepository(t)
@@ -142,6 +147,7 @@ func (s *GenreAddForTrackSuite) InternalErrorRepositoryMock(repository *mocks.Ge
 
 func (s *GenreAddForTrackSuite) TestInternalError(t provider.T) {
 	t.Parallel()
+	t.Title("Genre add for track test internal error")
 	trackID := uuid.New()
 	genreID := []uuid.UUID{uuid.New()}
 	repository := mocks.NewGenreRepository(t)
@@ -169,6 +175,7 @@ func (s *GenreGetByTrackIDSuite) CorrectRepositoryMock(repository *mocks.GenreRe
 
 func (s *GenreGetByTrackIDSuite) TestCorrect(t provider.T) {
 	t.Parallel()
+	t.Title("Genre get by track id test correct")
 	trackID := uuid.New()
 	repository := mocks.NewGenreRepository(t)
 	s.CorrectRepositoryMock(repository, trackID)
@@ -188,6 +195,7 @@ func (s *GenreGetByTrackIDSuite) InternalErrorRepositoryMock(repository *mocks.G
 
 func (s *GenreGetByTrackIDSuite) TestInternalError(t provider.T) {
 	t.Parallel()
+	t.Title("Genre get by track id test internal error")
 	trackID := uuid.New()
 	repository := mocks.NewGenreRepository(t)
 	s.InternalErrorRepositoryMock(repository, trackID)

@@ -16,11 +16,11 @@ import (
 )
 
 const (
-	userGetAllQuery     = "SELECT * FROM users"
-	userGetByIDQuery    = "SELECT * FROM users WHERE id = $1"
-	userGetByNameQuery  = "SELECT * FROM users WHERE name = $1"
-	userGetByEmailQuery = "SELECT * FROM users WHERE email = $1"
-	userGetByPhoneQuery = "SELECT * FROM users WHERE phone = $1"
+	UserGetAllQuery     = "SELECT * FROM users"
+	UserGetByIDQuery    = "SELECT * FROM users WHERE id = $1"
+	UserGetByNameQuery  = "SELECT * FROM users WHERE name = $1"
+	UserGetByEmailQuery = "SELECT * FROM users WHERE email = $1"
+	UserGetByPhoneQuery = "SELECT * FROM users WHERE phone = $1"
 )
 
 type PostgresUserRepository struct {
@@ -47,7 +47,7 @@ func (ur *PostgresUserRepository) Create(ctx context.Context, user domain.User) 
 	}
 
 	var createdUser entity2.PgUser
-	err = ur.connection.GetContext(ctx, &createdUser, userGetByIDQuery, pgUser.ID)
+	err = ur.connection.GetContext(ctx, &createdUser, UserGetByIDQuery, pgUser.ID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.User{}, util.WrapError(ports.ErrUserIDNotFound, err)
@@ -60,7 +60,7 @@ func (ur *PostgresUserRepository) Create(ctx context.Context, user domain.User) 
 
 func (ur *PostgresUserRepository) GetAll(ctx context.Context) ([]domain.User, error) {
 	var users []entity2.PgUser
-	err := ur.connection.SelectContext(ctx, &users, userGetAllQuery)
+	err := ur.connection.SelectContext(ctx, &users, UserGetAllQuery)
 	if err != nil {
 		return nil, util.WrapError(ports.ErrInternalUserRepo, err)
 	}
@@ -75,7 +75,7 @@ func (ur *PostgresUserRepository) GetAll(ctx context.Context) ([]domain.User, er
 
 func (ur *PostgresUserRepository) GetByID(ctx context.Context, userID uuid.UUID) (domain.User, error) {
 	var foundUser entity2.PgUser
-	err := ur.connection.GetContext(ctx, &foundUser, userGetByIDQuery, userID)
+	err := ur.connection.GetContext(ctx, &foundUser, UserGetByIDQuery, userID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.User{}, util.WrapError(ports.ErrUserIDNotFound, err)
@@ -88,7 +88,7 @@ func (ur *PostgresUserRepository) GetByID(ctx context.Context, userID uuid.UUID)
 
 func (ur *PostgresUserRepository) GetByName(ctx context.Context, name string) (domain.User, error) {
 	var foundUser entity2.PgUser
-	err := ur.connection.GetContext(ctx, &foundUser, userGetByNameQuery, name)
+	err := ur.connection.GetContext(ctx, &foundUser, UserGetByNameQuery, name)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.User{}, util.WrapError(ports.ErrUserNameNotFound, err)
@@ -101,7 +101,7 @@ func (ur *PostgresUserRepository) GetByName(ctx context.Context, name string) (d
 
 func (ur *PostgresUserRepository) GetByEmail(ctx context.Context, email string) (domain.User, error) {
 	var foundUser entity2.PgUser
-	err := ur.connection.GetContext(ctx, &foundUser, userGetByEmailQuery, email)
+	err := ur.connection.GetContext(ctx, &foundUser, UserGetByEmailQuery, email)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.User{}, util.WrapError(ports.ErrUserEmailNotFound, err)
@@ -114,7 +114,7 @@ func (ur *PostgresUserRepository) GetByEmail(ctx context.Context, email string) 
 
 func (ur *PostgresUserRepository) GetByPhone(ctx context.Context, phone string) (domain.User, error) {
 	var foundUser entity2.PgUser
-	err := ur.connection.GetContext(ctx, &foundUser, userGetByPhoneQuery, phone)
+	err := ur.connection.GetContext(ctx, &foundUser, UserGetByPhoneQuery, phone)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.User{}, util.WrapError(ports.ErrUserPhoneNotFound, err)

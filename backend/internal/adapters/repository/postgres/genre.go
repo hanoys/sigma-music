@@ -14,10 +14,10 @@ import (
 )
 
 const (
-	genreGetByIDQuery     = "SELECT * FROM genres WHERE id = $1"
-	genreGetAllQuery      = "SELECT * FROM genres"
+	GenreGetByIDQuery     = "SELECT * FROM genres WHERE id = $1"
+	GenreGetAllQuery      = "SELECT * FROM genres"
 	genreAddForTrackQuery = "INSERT INTO track_genre (track_id, genre_id) VALUES ($1, $2)"
-	genreGetByTrack       = "SELECT g.id, g.name FROM genres g JOIN public.track_genre tg on g.id = tg.genre_id WHERE tg.track_id = $1"
+	GenreGetByTrack       = "SELECT g.id, g.name FROM genres g JOIN public.track_genre tg on g.id = tg.genre_id WHERE tg.track_id = $1"
 )
 
 type PostgresGenreRepository struct {
@@ -30,7 +30,7 @@ func NewPostgresGenreRepository(connection *sqlx.DB) *PostgresGenreRepository {
 
 func (gr *PostgresGenreRepository) GetAll(ctx context.Context) ([]domain.Genre, error) {
 	var genres []entity.PgGenre
-	err := gr.connection.SelectContext(ctx, &genres, genreGetAllQuery)
+	err := gr.connection.SelectContext(ctx, &genres, GenreGetAllQuery)
 	if err != nil {
 		return nil, util.WrapError(ports.ErrInternalGenreRepo, err)
 	}
@@ -45,7 +45,7 @@ func (gr *PostgresGenreRepository) GetAll(ctx context.Context) ([]domain.Genre, 
 
 func (gr *PostgresGenreRepository) GetByID(ctx context.Context, id uuid.UUID) (domain.Genre, error) {
 	var foundGenre entity.PgGenre
-	err := gr.connection.GetContext(ctx, &foundGenre, genreGetByIDQuery, id)
+	err := gr.connection.GetContext(ctx, &foundGenre, GenreGetByIDQuery, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.Genre{}, util.WrapError(ports.ErrGenreIDNotFound, err)
@@ -72,7 +72,7 @@ func (gr *PostgresGenreRepository) AddForTrack(ctx context.Context, trackID uuid
 
 func (gr *PostgresGenreRepository) GetByTrackID(ctx context.Context, trackID uuid.UUID) ([]domain.Genre, error) {
 	var genres []entity.PgGenre
-	err := gr.connection.SelectContext(ctx, &genres, genreGetByTrack, trackID)
+	err := gr.connection.SelectContext(ctx, &genres, GenreGetByTrack, trackID)
 	if err != nil {
 		return nil, util.WrapError(ports.ErrInternalGenreRepo, err)
 	}

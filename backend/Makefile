@@ -1,3 +1,6 @@
+include .env.local
+export
+
 mocks:
 	mockery --dir internal/ports --name IAlbumRepository --output internal/adapters/repository/mocks \
 		--filename album.go --structname AlbumRepository
@@ -18,6 +21,22 @@ mocks:
 	mockery --dir internal/ports --name ITrackRepository --output internal/adapters/repository/mocks \
     		--filename track.go --structname TrackRepository
 	mockery --dir internal/ports --name ITokenProvider --output internal/adapters/auth/mocks \
-        		--filename auth.go --structname TokenProvider
+		--filename auth.go --structname TokenProvider
 	mockery --dir internal/ports --name IHashPasswordProvider --output internal/adapters/hash/mocks \
-            		--filename hash.go --structname HashPasswordProvider
+		--filename hash.go --structname HashPasswordProvider
+
+test: 
+	rm -rf allure-results
+	go test -shuffle on \
+		./internal/service/test \
+		./internal/adapters/repository/postgres/test --parallel 8
+
+allure:
+	cp -R allure-reports/history allure-results
+	rm -rf allure-reports
+	allure generate allure-results -o allure-reports
+	allure serve allure-results -p 4000
+
+report: test allure
+
+

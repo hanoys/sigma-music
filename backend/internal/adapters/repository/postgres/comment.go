@@ -15,9 +15,9 @@ import (
 )
 
 const (
-	commentGetByIDQuery      = "SELECT * FROM comments WHERE id = $1"
-	commentGetByUserIDQuery  = "SELECT * FROM comments WHERE user_id = $1"
-	commentGetByTrackIDQuery = "SELECT * FROM comments WHERE track_id = $1"
+	CommentGetByIDQuery      = "SELECT * FROM comments WHERE id = $1"
+	CommentGetByUserIDQuery  = "SELECT * FROM comments WHERE user_id = $1"
+	CommentGetByTrackIDQuery = "SELECT * FROM comments WHERE track_id = $1"
 )
 
 type PostgresCommentRepository struct {
@@ -43,7 +43,7 @@ func (cr *PostgresCommentRepository) Create(ctx context.Context, comment domain.
 	}
 
 	var createdTrack entity2.PgComment
-	err = cr.connection.GetContext(ctx, &createdTrack, commentGetByIDQuery, pgComment.ID)
+	err = cr.connection.GetContext(ctx, &createdTrack, CommentGetByIDQuery, pgComment.ID)
 	if err != nil {
 		return domain.Comment{}, util.WrapError(ports.ErrCommentIDNotFound, err)
 	}
@@ -53,7 +53,7 @@ func (cr *PostgresCommentRepository) Create(ctx context.Context, comment domain.
 
 func (cr *PostgresCommentRepository) GetByUserID(ctx context.Context, userID uuid.UUID) ([]domain.Comment, error) {
 	var comments []entity2.PgComment
-	err := cr.connection.SelectContext(ctx, &comments, commentGetByUserIDQuery, userID)
+	err := cr.connection.SelectContext(ctx, &comments, CommentGetByUserIDQuery, userID)
 	if err != nil {
 		return nil, util.WrapError(ports.ErrInternalCommentRepo, err)
 	}
@@ -68,7 +68,7 @@ func (cr *PostgresCommentRepository) GetByUserID(ctx context.Context, userID uui
 
 func (cr *PostgresCommentRepository) GetByTrackID(ctx context.Context, trackID uuid.UUID) ([]domain.Comment, error) {
 	var comments []entity2.PgComment
-	err := cr.connection.SelectContext(ctx, &comments, commentGetByTrackIDQuery, trackID)
+	err := cr.connection.SelectContext(ctx, &comments, CommentGetByTrackIDQuery, trackID)
 	if err != nil {
 		return nil, util.WrapError(ports.ErrInternalCommentRepo, err)
 	}

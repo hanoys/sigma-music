@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	statAddQuery             = "INSERT INTO users_history(id, user_id, track_id) VALUES ($1, $2, $3)"
+	StatAddQuery             = "INSERT INTO users_history(id, user_id, track_id) VALUES ($1, $2, $3)"
 	statGetMostListenedQuery = "select musician_id, $1 user_id, cnt " +
 		"from (select a.id musician_id, count(*) cnt from (select m.id, uh.user_id from users_history uh " +
 		"join tracks t on uh.track_id = t.id " +
@@ -40,7 +40,7 @@ func NewPostgresStatRepository(connection *sqlx.DB) *PostgresStatRepository {
 }
 
 func (sr *PostgresStatRepository) Add(ctx context.Context, recordID uuid.UUID, userID uuid.UUID, trackID uuid.UUID) error {
-	_, err := sr.connection.ExecContext(ctx, statAddQuery, recordID, userID, trackID)
+	_, err := sr.connection.ExecContext(ctx, StatAddQuery, recordID, userID, trackID)
 	if err != nil {
 		return util.WrapError(ports.ErrInternalStatRepo, err)
 	}

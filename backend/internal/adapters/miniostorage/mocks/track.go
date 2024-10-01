@@ -8,6 +8,8 @@ import (
 	ports "github.com/hanoys/sigma-music/internal/ports"
 	mock "github.com/stretchr/testify/mock"
 
+	url "net/url"
+
 	uuid "github.com/google/uuid"
 )
 
@@ -35,21 +37,31 @@ func (_m *TrackObjectStorage) DeleteTrack(ctx context.Context, trackID uuid.UUID
 }
 
 // PutTrack provides a mock function with given fields: ctx, req
-func (_m *TrackObjectStorage) PutTrack(ctx context.Context, req ports.PutTrackReq) error {
+func (_m *TrackObjectStorage) PutTrack(ctx context.Context, req ports.PutTrackReq) (url.URL, error) {
 	ret := _m.Called(ctx, req)
 
 	if len(ret) == 0 {
 		panic("no return value specified for PutTrack")
 	}
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, ports.PutTrackReq) error); ok {
+	var r0 url.URL
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, ports.PutTrackReq) (url.URL, error)); ok {
+		return rf(ctx, req)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, ports.PutTrackReq) url.URL); ok {
 		r0 = rf(ctx, req)
 	} else {
-		r0 = ret.Error(0)
+		r0 = ret.Get(0).(url.URL)
 	}
 
-	return r0
+	if rf, ok := ret.Get(1).(func(context.Context, ports.PutTrackReq) error); ok {
+		r1 = rf(ctx, req)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // NewTrackObjectStorage creates a new instance of TrackObjectStorage. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

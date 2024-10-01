@@ -18,50 +18,53 @@ import (
 
 type AlbumSuite struct {
 	suite.Suite
-	logger       *zap.Logger
-	repository   *mocks.AlbumRepository
-	albumService *service.AlbumService
+	logger *zap.Logger
 }
 
 func (s *AlbumSuite) BeforeEach(t provider.T) {
 	loggerBuilder := zap.NewDevelopmentConfig()
 	loggerBuilder.Level = zap.NewAtomicLevelAt(zap.FatalLevel)
 	s.logger, _ = loggerBuilder.Build()
-
-	s.repository = mocks.NewAlbumRepository(t)
-	s.albumService = service.NewAlbumService(s.repository, s.logger)
 }
 
 type AlbumCreateSuite struct {
 	AlbumSuite
 }
 
-func (s *AlbumCreateSuite) CorrectRepositoryMock(musicianID uuid.UUID) {
-	s.repository.
+func (s *AlbumCreateSuite) CorrectRepositoryMock(repository *mocks.AlbumRepository, musicianID uuid.UUID) {
+	repository.
 		On("Create", context.Background(), mock.AnythingOfType("domain.Album"), musicianID).
 		Return(domain.Album{}, nil)
 }
 
 func (s *AlbumCreateSuite) TestCorrect(t provider.T) {
+	t.Parallel()
+	t.Title("Album create test correct")
 	req := builder.NewCreateAlbumServiceRequestBuilder().Default().Build()
-	s.CorrectRepositoryMock(req.MusicianID)
+	repository := mocks.NewAlbumRepository(t)
+	albumService := service.NewAlbumService(repository, s.logger)
+	s.CorrectRepositoryMock(repository, req.MusicianID)
 
-	_, err := s.albumService.Create(context.Background(), req)
+	_, err := albumService.Create(context.Background(), req)
 
 	t.Assert().Nil(err)
 }
 
-func (s *AlbumCreateSuite) DuplicateRepositoryMock(musicianID uuid.UUID) {
-	s.repository.
+func (s *AlbumCreateSuite) DuplicateRepositoryMock(repository *mocks.AlbumRepository, musicianID uuid.UUID) {
+	repository.
 		On("Create", context.Background(), mock.AnythingOfType("domain.Album"), musicianID).
 		Return(domain.Album{}, ports.ErrAlbumDuplicate)
 }
 
 func (s *AlbumCreateSuite) TestDuplicate(t provider.T) {
+	t.Parallel()
+	t.Title("Album create test duplicate")
 	req := builder.NewCreateAlbumServiceRequestBuilder().Default().Build()
-	s.DuplicateRepositoryMock(req.MusicianID)
+	repository := mocks.NewAlbumRepository(t)
+	albumService := service.NewAlbumService(repository, s.logger)
+	s.DuplicateRepositoryMock(repository, req.MusicianID)
 
-	_, err := s.albumService.Create(context.Background(), req)
+	_, err := albumService.Create(context.Background(), req)
 
 	t.Assert().ErrorIs(err, ports.ErrAlbumDuplicate)
 }
@@ -74,32 +77,40 @@ type AlbumPublishSuite struct {
 	AlbumSuite
 }
 
-func (s *AlbumPublishSuite) CorrectRepositoryMock(albumID uuid.UUID) {
-	s.repository.
+func (s *AlbumPublishSuite) CorrectRepositoryMock(repository *mocks.AlbumRepository, albumID uuid.UUID) {
+	repository.
 		On("Publish", context.Background(), albumID).
 		Return(nil)
 }
 
 func (s *AlbumPublishSuite) TestCorrect(t provider.T) {
+	t.Parallel()
+	t.Title("Album publish test correct")
 	albumID := uuid.New()
-	s.CorrectRepositoryMock(albumID)
+	repository := mocks.NewAlbumRepository(t)
+	albumService := service.NewAlbumService(repository, s.logger)
+	s.CorrectRepositoryMock(repository, albumID)
 
-	err := s.albumService.Publish(context.Background(), albumID)
+	err := albumService.Publish(context.Background(), albumID)
 
 	t.Assert().Nil(err)
 }
 
-func (s *AlbumPublishSuite) ErrorPublishRepositoryMock(albumID uuid.UUID) {
-	s.repository.
+func (s *AlbumPublishSuite) ErrorPublishRepositoryMock(repository *mocks.AlbumRepository, albumID uuid.UUID) {
+	repository.
 		On("Publish", context.Background(), albumID).
 		Return(ports.ErrAlbumPublish)
 }
 
 func (s *AlbumPublishSuite) TestErrorPublish(t provider.T) {
+	t.Parallel()
+	t.Title("Album publish test error")
 	albumID := uuid.New()
-	s.ErrorPublishRepositoryMock(albumID)
+	repository := mocks.NewAlbumRepository(t)
+	albumService := service.NewAlbumService(repository, s.logger)
+	s.ErrorPublishRepositoryMock(repository, albumID)
 
-	err := s.albumService.Publish(context.Background(), albumID)
+	err := albumService.Publish(context.Background(), albumID)
 
 	t.Assert().ErrorIs(err, ports.ErrAlbumPublish)
 }
@@ -112,30 +123,38 @@ type AlbumGetAllSuite struct {
 	AlbumSuite
 }
 
-func (s *AlbumGetAllSuite) CorrectRepositoryMock() {
-	s.repository.
+func (s *AlbumGetAllSuite) CorrectRepositoryMock(repository *mocks.AlbumRepository) {
+	repository.
 		On("GetAll", context.Background()).
 		Return([]domain.Album{}, nil)
 }
 
 func (s *AlbumGetAllSuite) TestCorrect(t provider.T) {
-	s.CorrectRepositoryMock()
+	t.Parallel()
+	t.Title("Album get all test correct")
+	repository := mocks.NewAlbumRepository(t)
+	albumService := service.NewAlbumService(repository, s.logger)
+	s.CorrectRepositoryMock(repository)
 
-	_, err := s.albumService.GetAll(context.Background())
+	_, err := albumService.GetAll(context.Background())
 
 	t.Assert().Nil(err)
 }
 
-func (s *AlbumGetAllSuite) InternalErrorRepositoryMock() {
-	s.repository.
+func (s *AlbumGetAllSuite) InternalErrorRepositoryMock(repository *mocks.AlbumRepository) {
+	repository.
 		On("GetAll", context.Background()).
 		Return(nil, ports.ErrInternalAlbumRepo)
 }
 
 func (s *AlbumGetAllSuite) TestInternalError(t provider.T) {
-	s.InternalErrorRepositoryMock()
+	t.Parallel()
+	t.Title("Album get all test internal error")
+	repository := mocks.NewAlbumRepository(t)
+	albumService := service.NewAlbumService(repository, s.logger)
+	s.InternalErrorRepositoryMock(repository)
 
-	_, err := s.albumService.GetAll(context.Background())
+	_, err := albumService.GetAll(context.Background())
 
 	t.Assert().ErrorIs(err, ports.ErrInternalAlbumRepo)
 }
@@ -148,32 +167,40 @@ type AlbumGetByMusicianIDSuite struct {
 	AlbumSuite
 }
 
-func (s *AlbumGetByMusicianIDSuite) CorrectRepositoryMock(musicianID uuid.UUID) {
-	s.repository.
+func (s *AlbumGetByMusicianIDSuite) CorrectRepositoryMock(repository *mocks.AlbumRepository, musicianID uuid.UUID) {
+	repository.
 		On("GetByMusicianID", context.Background(), musicianID).
 		Return([]domain.Album{}, nil)
 }
 
 func (s *AlbumGetByMusicianIDSuite) TestCorrect(t provider.T) {
+	t.Parallel()
+	t.Title("Album get by musician id test correct")
+	repository := mocks.NewAlbumRepository(t)
+	albumService := service.NewAlbumService(repository, s.logger)
 	musicianID := uuid.New()
-	s.CorrectRepositoryMock(musicianID)
+	s.CorrectRepositoryMock(repository, musicianID)
 
-	_, err := s.albumService.GetByMusicianID(context.Background(), musicianID)
+	_, err := albumService.GetByMusicianID(context.Background(), musicianID)
 
 	t.Assert().Nil(err)
 }
 
-func (s *AlbumGetByMusicianIDSuite) InternalErrorRepositoryMock(musicianID uuid.UUID) {
-	s.repository.
+func (s *AlbumGetByMusicianIDSuite) InternalErrorRepositoryMock(repository *mocks.AlbumRepository, musicianID uuid.UUID) {
+	repository.
 		On("GetByMusicianID", context.Background(), musicianID).
 		Return(nil, ports.ErrInternalAlbumRepo)
 }
 
 func (s *AlbumGetByMusicianIDSuite) TestInternalError(t provider.T) {
+	t.Parallel()
+	t.Title("Album get by musician id test internal error")
+	repository := mocks.NewAlbumRepository(t)
+	albumService := service.NewAlbumService(repository, s.logger)
 	musicianID := uuid.New()
-	s.InternalErrorRepositoryMock(musicianID)
+	s.InternalErrorRepositoryMock(repository, musicianID)
 
-	_, err := s.albumService.GetByMusicianID(context.Background(), musicianID)
+	_, err := albumService.GetByMusicianID(context.Background(), musicianID)
 
 	t.Assert().ErrorIs(err, ports.ErrInternalAlbumRepo)
 }
@@ -186,32 +213,40 @@ type AlbumGetOwnSuite struct {
 	AlbumSuite
 }
 
-func (s *AlbumGetOwnSuite) CorrectRepositoryMock(musicianID uuid.UUID) {
-	s.repository.
+func (s *AlbumGetOwnSuite) CorrectRepositoryMock(repository *mocks.AlbumRepository, musicianID uuid.UUID) {
+	repository.
 		On("GetOwn", context.Background(), musicianID).
 		Return([]domain.Album{}, nil)
 }
 
 func (s *AlbumGetOwnSuite) TestCorrect(t provider.T) {
+	t.Parallel()
+	t.Title("Album get own id test correct")
+	repository := mocks.NewAlbumRepository(t)
+	albumService := service.NewAlbumService(repository, s.logger)
 	musicianID := uuid.New()
-	s.CorrectRepositoryMock(musicianID)
+	s.CorrectRepositoryMock(repository, musicianID)
 
-	_, err := s.albumService.GetOwn(context.Background(), musicianID)
+	_, err := albumService.GetOwn(context.Background(), musicianID)
 
 	t.Assert().Nil(err)
 }
 
-func (s *AlbumGetOwnSuite) InternalErrorRepositoryMock(musicianID uuid.UUID) {
-	s.repository.
+func (s *AlbumGetOwnSuite) InternalErrorRepositoryMock(repository *mocks.AlbumRepository, musicianID uuid.UUID) {
+	repository.
 		On("GetOwn", context.Background(), musicianID).
 		Return(nil, ports.ErrInternalAlbumRepo)
 }
 
 func (s *AlbumGetOwnSuite) TestInternalError(t provider.T) {
+	t.Parallel()
+	t.Title("Album get own id test internal error")
+	repository := mocks.NewAlbumRepository(t)
+	albumService := service.NewAlbumService(repository, s.logger)
 	musicianID := uuid.New()
-	s.InternalErrorRepositoryMock(musicianID)
+	s.InternalErrorRepositoryMock(repository, musicianID)
 
-	_, err := s.albumService.GetOwn(context.Background(), musicianID)
+	_, err := albumService.GetOwn(context.Background(), musicianID)
 
 	t.Assert().ErrorIs(err, ports.ErrInternalAlbumRepo)
 }
@@ -224,32 +259,44 @@ type AlbumGetByIDSuite struct {
 	AlbumSuite
 }
 
-func (s *AlbumGetByIDSuite) CorrectRepositoryMock(albumID uuid.UUID) {
-	s.repository.
+func (s *AlbumGetByIDSuite) CorrectRepositoryMock(repository *mocks.AlbumRepository, albumID uuid.UUID) {
+	repository.
 		On("GetByID", context.Background(), albumID).
 		Return(domain.Album{}, nil)
 }
 
 func (s *AlbumGetByIDSuite) TestCorrect(t provider.T) {
+	t.Parallel()
+	t.Title("Album get by id test correct")
+	repository := mocks.NewAlbumRepository(t)
+	albumService := service.NewAlbumService(repository, s.logger)
 	albumID := uuid.New()
-	s.CorrectRepositoryMock(albumID)
+	s.CorrectRepositoryMock(repository, albumID)
 
-	_, err := s.albumService.GetByID(context.Background(), albumID)
+	_, err := albumService.GetByID(context.Background(), albumID)
 
 	t.Assert().Nil(err)
 }
 
-func (s *AlbumGetByIDSuite) NotFoundRepositoryMock(albumID uuid.UUID) {
-	s.repository.
+func (s *AlbumGetByIDSuite) NotFoundRepositoryMock(repository *mocks.AlbumRepository, albumID uuid.UUID) {
+	repository.
 		On("GetByID", context.Background(), albumID).
 		Return(domain.Album{}, ports.ErrAlbumIDNotFound)
 }
 
 func (s *AlbumGetByIDSuite) TestNotFound(t provider.T) {
+	t.Parallel()
+	t.Title("Album get by id test not found")
+	repository := mocks.NewAlbumRepository(t)
+	albumService := service.NewAlbumService(repository, s.logger)
 	albumID := uuid.New()
-	s.NotFoundRepositoryMock(albumID)
+	s.NotFoundRepositoryMock(repository, albumID)
 
-	_, err := s.albumService.GetByID(context.Background(), albumID)
+	_, err := albumService.GetByID(context.Background(), albumID)
 
 	t.Assert().ErrorIs(err, ports.ErrAlbumIDNotFound)
+}
+
+func TestAlbumGetByIDSuite(t *testing.T) {
+	suite.RunSuite(t, new(AlbumGetByIDSuite))
 }

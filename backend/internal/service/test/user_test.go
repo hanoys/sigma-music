@@ -10,54 +10,12 @@ import (
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
 	"github.com/hanoys/sigma-music/internal/service"
+	"github.com/hanoys/sigma-music/internal/service/test/builder"
 	"github.com/ozontech/allure-go/pkg/framework/provider"
 	"github.com/ozontech/allure-go/pkg/framework/suite"
 	"github.com/stretchr/testify/mock"
 	"go.uber.org/zap"
 )
-
-type UserServiceCreateRequestBuilder struct {
-	obj ports.UserServiceCreateRequest
-}
-
-func NewUserServiceCreateRequestBuilder() *UserServiceCreateRequestBuilder {
-	return new(UserServiceCreateRequestBuilder)
-}
-
-func (b *UserServiceCreateRequestBuilder) Build() ports.UserServiceCreateRequest {
-	return b.obj
-}
-
-func (b *UserServiceCreateRequestBuilder) Default() *UserServiceCreateRequestBuilder {
-	b.obj = ports.UserServiceCreateRequest{
-		Name:     "test",
-		Email:    "test@mail.com",
-		Phone:    "+79999999999",
-		Password: "test",
-		Country:  "Russia",
-	}
-	return b
-}
-
-func (b *UserServiceCreateRequestBuilder) SetName(name string) {
-	b.obj.Name = name
-}
-
-func (b *UserServiceCreateRequestBuilder) SetEmail(email string) {
-	b.obj.Email = email
-}
-
-func (b *UserServiceCreateRequestBuilder) SetPhone(phone string) {
-	b.obj.Phone = phone
-}
-
-func (b *UserServiceCreateRequestBuilder) SetPassword(password string) {
-	b.obj.Password = password
-}
-
-func (b *UserServiceCreateRequestBuilder) SetCountry(country string) {
-	b.obj.Country = country
-}
 
 type UserSuite struct {
 	suite.Suite
@@ -92,7 +50,8 @@ func (s *UserRegisterSuite) CorrectRepositoryMock(repository *mocks.UserReposito
 
 func (s *UserRegisterSuite) TestCorrect(t provider.T) {
 	t.Parallel()
-	req := NewUserServiceCreateRequestBuilder().Default().Build()
+	t.Title("User register test correct")
+	req := builder.NewUserServiceCreateRequestBuilder().Default().Build()
 	repository := mocks.NewUserRepository(t)
 	userService := service.NewUserService(repository, s.hashProvider, s.logger)
 	s.CorrectRepositoryMock(repository, req)
@@ -110,7 +69,8 @@ func (s *UserRegisterSuite) NameExistsRepositoryMock(repository *mocks.UserRepos
 
 func (s *UserRegisterSuite) TestNameExists(t provider.T) {
 	t.Parallel()
-	req := NewUserServiceCreateRequestBuilder().Default().Build()
+	t.Title("User register test name exists")
+	req := builder.NewUserServiceCreateRequestBuilder().Default().Build()
 	repository := mocks.NewUserRepository(t)
 	userService := service.NewUserService(repository, s.hashProvider, s.logger)
 	s.NameExistsRepositoryMock(repository, req)
@@ -130,7 +90,8 @@ func (s *UserRegisterSuite) EmailExistsRepositoryMock(repository *mocks.UserRepo
 
 func (s *UserRegisterSuite) TestEmailExists(t provider.T) {
 	t.Parallel()
-	req := NewUserServiceCreateRequestBuilder().Default().Build()
+	t.Title("User register test email exists")
+	req := builder.NewUserServiceCreateRequestBuilder().Default().Build()
 	repository := mocks.NewUserRepository(t)
 	userService := service.NewUserService(repository, s.hashProvider, s.logger)
 	s.EmailExistsRepositoryMock(repository, req)
@@ -152,7 +113,8 @@ func (s *UserRegisterSuite) PhoneExistsRepositoryMock(repository *mocks.UserRepo
 
 func (s *UserRegisterSuite) TestPhoneExists(t provider.T) {
 	t.Parallel()
-	req := NewUserServiceCreateRequestBuilder().Default().Build()
+	t.Title("User register test phone exists")
+	req := builder.NewUserServiceCreateRequestBuilder().Default().Build()
 	repository := mocks.NewUserRepository(t)
 	userService := service.NewUserService(repository, s.hashProvider, s.logger)
 	s.PhoneExistsRepositoryMock(repository, req)
@@ -178,6 +140,7 @@ func (s *UserGetAllSuite) RepositoryErrorRepositoryMock(repository *mocks.UserRe
 
 func (s *UserGetAllSuite) TestRepositoryError(t provider.T) {
 	t.Parallel()
+	t.Title("User get all test error")
 	repository := mocks.NewUserRepository(t)
 	userService := service.NewUserService(repository, s.hashProvider, s.logger)
 	s.RepositoryErrorRepositoryMock(repository)
@@ -195,6 +158,7 @@ func (s *UserGetAllSuite) SuccessRepositoryMock(repository *mocks.UserRepository
 
 func (s *UserGetAllSuite) TestSuccess(t provider.T) {
 	t.Parallel()
+	t.Title("User get all test success")
 	repository := mocks.NewUserRepository(t)
 	userService := service.NewUserService(repository, s.hashProvider, s.logger)
 	s.SuccessRepositoryMock(repository)
@@ -220,6 +184,7 @@ func (s *UserGetByIdSuite) IdNotFoundRepositoryMock(repository *mocks.UserReposi
 
 func (s *UserGetByIdSuite) TestIDNotFound(t provider.T) {
 	t.Parallel()
+	t.Title("User get by id test id not found")
 	repository := mocks.NewUserRepository(t)
 	userService := service.NewUserService(repository, s.hashProvider, s.logger)
 	s.IdNotFoundRepositoryMock(repository)
@@ -237,6 +202,7 @@ func (s *UserGetByIdSuite) SuccessRepositoryMock(repository *mocks.UserRepositor
 
 func (s *UserGetByIdSuite) TestSuccess(t provider.T) {
 	t.Parallel()
+	t.Title("User get by id test success")
 	repository := mocks.NewUserRepository(t)
 	userService := service.NewUserService(repository, s.hashProvider, s.logger)
 	s.SuccessRepositoryMock(repository)
@@ -263,6 +229,7 @@ func (s *UserGetByNameSuite) NameNotFoundRepositoryMock(repository *mocks.UserRe
 
 func (s *UserGetByNameSuite) TestNameNotFound(t provider.T) {
 	t.Parallel()
+	t.Title("User get by name test not found")
 	repository := mocks.NewUserRepository(t)
 	userService := service.NewUserService(repository, s.hashProvider, s.logger)
 	s.NameNotFoundRepositoryMock(repository)
@@ -280,6 +247,7 @@ func (s *UserGetByNameSuite) SuccessRepositoryMock(repository *mocks.UserReposit
 
 func (s *UserGetByNameSuite) TestSuccess(t provider.T) {
 	t.Parallel()
+	t.Title("User get by name test success")
 	repository := mocks.NewUserRepository(t)
 	userService := service.NewUserService(repository, s.hashProvider, s.logger)
 	s.SuccessRepositoryMock(repository)
@@ -306,6 +274,7 @@ func (s *UserGetByEmailSuite) EmailNotFoundRepositoryMock(repository *mocks.User
 
 func (s *UserGetByEmailSuite) TestEmailNotFoundError(t provider.T) {
 	t.Parallel()
+	t.Title("User get by email test not found")
 	repository := mocks.NewUserRepository(t)
 	userService := service.NewUserService(repository, s.hashProvider, s.logger)
 	s.EmailNotFoundRepositoryMock(repository)
@@ -323,6 +292,7 @@ func (s *UserGetByEmailSuite) SuccessRepositoryMock(repository *mocks.UserReposi
 
 func (s *UserGetByEmailSuite) TestSuccess(t provider.T) {
 	t.Parallel()
+	t.Title("User get by email test success")
 	repository := mocks.NewUserRepository(t)
 	userService := service.NewUserService(repository, s.hashProvider, s.logger)
 	s.SuccessRepositoryMock(repository)
@@ -348,6 +318,7 @@ func (s *UserGetByPhoneSuite) PhoneNotFoundRepositoryMock(repository *mocks.User
 
 func (s *UserGetByPhoneSuite) TestRepositoryError(t provider.T) {
 	t.Parallel()
+	t.Title("User get by phone test error")
 	repository := mocks.NewUserRepository(t)
 	userService := service.NewUserService(repository, s.hashProvider, s.logger)
 	s.PhoneNotFoundRepositoryMock(repository)
@@ -365,6 +336,7 @@ func (s *UserGetByPhoneSuite) SuccessRepositoryMock(repository *mocks.UserReposi
 
 func (s *UserGetByPhoneSuite) TestSuccess(t provider.T) {
 	t.Parallel()
+	t.Title("User get by phone test success")
 	repository := mocks.NewUserRepository(t)
 	userService := service.NewUserService(repository, s.hashProvider, s.logger)
 	s.SuccessRepositoryMock(repository)

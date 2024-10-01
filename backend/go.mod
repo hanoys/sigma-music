@@ -12,7 +12,7 @@ require (
 	github.com/guregu/null/v5 v5.0.0
 	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438
 	github.com/jackc/pgx/v5 v5.5.5
-	github.com/jmoiron/sqlx v1.3.5
+	github.com/jmoiron/sqlx v1.4.0
 	github.com/minio/minio-go/v7 v7.0.70
 	github.com/ozontech/allure-go/pkg/framework v0.6.32
 	github.com/pkg/errors v0.9.1
@@ -29,6 +29,7 @@ require (
 require (
 	dario.cat/mergo v1.0.0 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 // indirect
+	github.com/DATA-DOG/go-sqlmock v1.5.2 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/Microsoft/hcsshim v0.12.3 // indirect
 	github.com/bytedance/sonic v1.12.1 // indirect

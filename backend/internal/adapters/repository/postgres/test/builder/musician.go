@@ -114,19 +114,3 @@ func (b *MusicianBuilder) SetDescription(description string) *MusicianBuilder {
 	b.obj.Description = description
 	return b
 }
-
-type MusicianNamedMother struct {
-    name string 
-    b *MusicianBuilder
-}
-
-func NewMusicianNamedMother(name string) *MusicianNamedMother {
-    return &MusicianNamedMother{
-    	name: name,
-    	b:    NewMusicianBuilder(),
-    }
-}
-
-func (m *MusicianNamedMother) Create() domain.Musician {
-    return m.b.Default().SetName(m.name).Build()
-}

@@ -2,181 +2,314 @@ package test
 
 import (
 	"context"
-	"errors"
-	"github.com/google/uuid"
+	"database/sql"
+	"testing"
+
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres"
+	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres/entity"
+	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres/test/builder"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
-	"github.com/stretchr/testify/require"
-	"testing"
+	"github.com/jackc/pgerrcode"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jmoiron/sqlx"
+	"github.com/ozontech/allure-go/pkg/framework/provider"
+	"github.com/ozontech/allure-go/pkg/framework/suite"
 )
 
-var newUser = domain.User{
-	ID:       uuid.New(),
-	Name:     "CreatedUser",
-	Email:    "CreatedUser@mail.com",
-	Phone:    "+71111111111",
-	Password: "CreatedUserPassword",
-	Country:  "CreatedUserCountry",
+type UserSuite struct {
+	suite.Suite
 }
 
-func TestUserRepository(t *testing.T) {
-	ctx := context.Background()
-	container, err := newPostgresContainer(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
+func NewUserRepository() (ports.IUserRepository, sqlmock.Sqlmock) {
+	db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	conn := sqlx.NewDb(db, "pgx")
+	repo := postgres.NewPostgresUserRepository(conn)
+	return repo, mock
+}
 
-	// Clean up the container after the test is complete
-	t.Cleanup(func() {
-		if err := container.Terminate(ctx); err != nil {
-			t.Fatalf("failed to terminate container: %s", err)
-		}
-	})
+type UserCreateSuite struct {
+	UserSuite
+}
 
-	url, err := container.ConnectionString(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
+func (s *UserCreateSuite) SuccessRepositoryMock(mock sqlmock.Sqlmock, user domain.User) {
+	pgUser := entity.NewPgUser(user)
+	queryString := InsertQueryString(pgUser, "users")
+	mock.ExpectExec(queryString).
+		WithArgs(EntityValues(pgUser)...).
+		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	t.Run("create user", func(t *testing.T) {
-		t.Cleanup(func() {
-			err = container.Restore(ctx)
-			if err != nil {
-				t.Fatal(err)
-			}
-		})
+	expectedRows := sqlmock.NewRows(EntityColumns(pgUser)).
+		AddRow(EntityValues(pgUser)...)
+	mock.ExpectQuery(postgres.UserGetByIDQuery).
+		WithArgs(pgUser.ID).
+		WillReturnRows(expectedRows)
+}
 
-		db, err := newPostgresDB(url)
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer func() {
-			db.GuestConnection.Close()
-			db.UserConnection.Close()
-			db.MusicianConnection.Close()
-		}()
+func (s *UserCreateSuite) TestSuccess(t provider.T) {
+	t.Parallel()
+	repo, mock := NewUserRepository()
+	user := builder.NewUserBuilder().Default().Build()
+	s.SuccessRepositoryMock(mock, user)
 
-		repo := postgres.NewPostgresUserRepository(db)
-		createdUser, err := repo.Create(ctx, newUser)
-		if err != nil {
-			t.Errorf("unexcpected error: %v", err)
-		}
+	userResult, err := repo.Create(context.Background(), user)
 
-		require.Equal(t, newUser, createdUser)
-	})
+	t.Assert().Nil(err)
+	t.Assert().Equal(user, userResult)
+}
 
-	t.Run("find by id duplicate", func(t *testing.T) {
-		t.Cleanup(func() {
-			err = container.Restore(ctx)
-			if err != nil {
-				t.Fatal(err)
-			}
-		})
+func (s *UserCreateSuite) DuplicateRepositoryMock(mock sqlmock.Sqlmock, user domain.User) {
+	pgUser := entity.NewPgUser(user)
+	queryString := InsertQueryString(pgUser, "users")
+	mock.ExpectExec(queryString).
+		WithArgs(EntityValues(pgUser)...).
+		WillReturnError(&pgconn.PgError{Code: pgerrcode.UniqueViolation})
+}
 
-		db, err := newPostgresDB(url)
-		if err != nil {
-			t.Fatal(err)
-		}
+func (s *UserCreateSuite) TestDuplicate(t provider.T) {
+	t.Parallel()
+	repo, mock := NewUserRepository()
+	user := builder.NewUserBuilder().Default().Build()
+	s.DuplicateRepositoryMock(mock, user)
 
-		defer func() {
-			db.GuestConnection.Close()
-			db.UserConnection.Close()
-			db.MusicianConnection.Close()
-		}()
-		repo := postgres.NewPostgresUserRepository(db)
-		repo.Create(ctx, newUser)
-		_, err = repo.Create(ctx, newUser)
+	userResult, err := repo.Create(context.Background(), user)
 
-		if !errors.Is(err, ports.ErrUserDuplicate) {
-			t.Errorf("unexpected error %v", err)
-		}
-	})
+	t.Assert().ErrorIs(err, ports.ErrUserDuplicate)
+	t.Assert().Equal(domain.User{}, userResult)
+}
 
-	t.Run("find by id", func(t *testing.T) {
-		t.Cleanup(func() {
-			err = container.Restore(ctx)
-			if err != nil {
-				t.Fatal(err)
-			}
-		})
+func TestUserCreateSuite(t *testing.T) {
+	suite.RunNamedSuite(t, "UserCreateRepository", new(UserCreateSuite))
+}
 
-		db, err := newPostgresDB(url)
-		if err != nil {
-			t.Fatal(err)
-		}
+type UserGetAllSuite struct {
+	UserSuite
+}
 
-		defer func() {
-			db.GuestConnection.Close()
-			db.UserConnection.Close()
-			db.MusicianConnection.Close()
-		}()
-		repo := postgres.NewPostgresUserRepository(db)
-		repo.Create(ctx, newUser)
-		foundUser, err := repo.GetByID(ctx, newUser.ID)
+func (s *UserGetAllSuite) SuccessRepositoryMock(mock sqlmock.Sqlmock, user domain.User) {
+	pgUser := entity.NewPgUser(user)
+	expectedRows := sqlmock.NewRows(EntityColumns(pgUser)).
+		AddRow(EntityValues(pgUser)...)
+	mock.ExpectQuery(postgres.UserGetAllQuery).
+		WillReturnRows(expectedRows)
+}
 
-		if err != nil {
-			t.Errorf("unexpected error: %v", err)
-		}
+func (s *UserGetAllSuite) TestSuccess(t provider.T) {
+	t.Parallel()
+	t.Title("Repository User get all test success")
+	repo, mock := NewUserRepository()
+	user := builder.NewUserBuilder().Default().Build()
+	s.SuccessRepositoryMock(mock, user)
 
-		require.Equal(t, newUser, foundUser)
-	})
+	users, err := repo.GetAll(context.Background())
 
-	t.Run("find by email", func(t *testing.T) {
-		t.Cleanup(func() {
-			err = container.Restore(ctx)
-			if err != nil {
-				t.Fatal(err)
-			}
-		})
+	t.Assert().Nil(err)
+	t.Assert().Equal(user, users[0])
+}
 
-		db, err := newPostgresDB(url)
-		if err != nil {
-			t.Fatal(err)
-		}
+func (s *UserGetAllSuite) InternalErrorRepositoryMock(mock sqlmock.Sqlmock, album domain.User) {
+	mock.ExpectQuery(postgres.UserGetAllQuery).
+		WillReturnError(sql.ErrNoRows)
+}
 
-		defer func() {
-			db.GuestConnection.Close()
-			db.UserConnection.Close()
-			db.MusicianConnection.Close()
-		}()
-		repo := postgres.NewPostgresUserRepository(db)
-		repo.Create(ctx, newUser)
-		foundUser, err := repo.GetByEmail(ctx, newUser.Email)
+func (s *UserGetAllSuite) TestInternalError(t provider.T) {
+	t.Parallel()
+	t.Title("Repository User get all test internal error")
+	repo, mock := NewUserRepository()
+	album := builder.NewUserBuilder().Default().Build()
+	s.InternalErrorRepositoryMock(mock, album)
 
-		if err != nil {
-			t.Errorf("unexpected error: %v", err)
-		}
+	albums, err := repo.GetAll(context.Background())
 
-		require.Equal(t, newUser, foundUser)
-	})
+	t.Assert().Nil(albums)
+	t.Assert().ErrorIs(err, ports.ErrInternalUserRepo)
+}
 
-	t.Run("find by phone", func(t *testing.T) {
-		t.Cleanup(func() {
-			err = container.Restore(ctx)
-			if err != nil {
-				t.Fatal(err)
-			}
-		})
+func TestUserGetAllSuite(t *testing.T) {
+	suite.RunNamedSuite(t, "UserGetAllRepository", new(UserGetAllSuite))
+}
 
-		db, err := newPostgresDB(url)
-		if err != nil {
-			t.Fatal(err)
-		}
+type UserGetByIDSuite struct {
+	UserSuite
+}
 
-		defer func() {
-			db.GuestConnection.Close()
-			db.UserConnection.Close()
-			db.MusicianConnection.Close()
-		}()
-		repo := postgres.NewPostgresUserRepository(db)
-		repo.Create(ctx, newUser)
-		foundUser, err := repo.GetByPhone(ctx, newUser.Phone)
+func (s *UserGetByIDSuite) SuccessRepositoryMock(mock sqlmock.Sqlmock, user domain.User) {
+	pgUser := entity.NewPgUser(user)
+	expectedRows := sqlmock.NewRows(EntityColumns(pgUser)).
+		AddRow(EntityValues(pgUser)...)
+	mock.ExpectQuery(postgres.UserGetByIDQuery).
+		WithArgs(user.ID).
+		WillReturnRows(expectedRows)
+}
 
-		if err != nil {
-			t.Errorf("unexpected error: %v", err)
-		}
+func (s *UserGetByIDSuite) TestSuccess(t provider.T) {
+	t.Parallel()
+	repo, mock := NewUserRepository()
+	user := builder.NewUserBuilder().Default().Build()
+	s.SuccessRepositoryMock(mock, user)
 
-		require.Equal(t, newUser, foundUser)
-	})
+	resultUser, err := repo.GetByID(context.Background(), user.ID)
+
+	t.Assert().Nil(err)
+	t.Assert().Equal(user, resultUser)
+}
+
+func (s *UserGetByIDSuite) NotFoundRepositoryMock(mock sqlmock.Sqlmock, user domain.User) {
+	mock.ExpectQuery(postgres.UserGetByIDQuery).
+		WillReturnError(sql.ErrNoRows)
+}
+
+func (s *UserGetByIDSuite) TestNotFound(t provider.T) {
+	t.Parallel()
+	repo, mock := NewUserRepository()
+	user := builder.NewUserBuilder().Default().Build()
+	s.NotFoundRepositoryMock(mock, user)
+
+	resultUser, err := repo.GetByID(context.Background(), user.ID)
+
+	t.Assert().ErrorIs(err, ports.ErrUserIDNotFound)
+	t.Assert().Equal(resultUser, domain.User{})
+}
+
+func TestUserGetByIDSuite(t *testing.T) {
+	suite.RunNamedSuite(t, "UserGetByIDRepository", new(UserGetByIDSuite))
+}
+
+type UserGetByNameSuite struct {
+	UserSuite
+}
+
+func (s *UserGetByNameSuite) SuccessRepositoryMock(mock sqlmock.Sqlmock, user domain.User) {
+	pgUser := entity.NewPgUser(user)
+	expectedRows := sqlmock.NewRows(EntityColumns(pgUser)).
+		AddRow(EntityValues(pgUser)...)
+	mock.ExpectQuery(postgres.UserGetByNameQuery).
+		WithArgs(user.Name).
+		WillReturnRows(expectedRows)
+}
+
+func (s *UserGetByNameSuite) TestSuccess(t provider.T) {
+	t.Parallel()
+	repo, mock := NewUserRepository()
+	user := builder.NewUserBuilder().Default().Build()
+	s.SuccessRepositoryMock(mock, user)
+
+	resultUser, err := repo.GetByName(context.Background(), user.Name)
+
+	t.Assert().Nil(err)
+	t.Assert().Equal(user, resultUser)
+}
+
+func (s *UserGetByNameSuite) NotFoundRepositoryMock(mock sqlmock.Sqlmock, user domain.User) {
+	mock.ExpectQuery(postgres.UserGetByNameQuery).
+		WillReturnError(sql.ErrNoRows)
+}
+
+func (s *UserGetByNameSuite) TestNotFound(t provider.T) {
+	t.Parallel()
+	repo, mock := NewUserRepository()
+	user := builder.NewUserBuilder().Default().Build()
+	s.NotFoundRepositoryMock(mock, user)
+
+	resultUser, err := repo.GetByName(context.Background(), user.Name)
+
+	t.Assert().ErrorIs(err, ports.ErrUserNameNotFound)
+	t.Assert().Equal(resultUser, domain.User{})
+}
+
+func TestUserGetByNameSuite(t *testing.T) {
+	suite.RunNamedSuite(t, "UserGetByNameRepository", new(UserGetByNameSuite))
+}
+
+type UserGetByEmailSuite struct {
+	UserSuite
+}
+
+func (s *UserGetByEmailSuite) SuccessRepositoryMock(mock sqlmock.Sqlmock, user domain.User) {
+	pgUser := entity.NewPgUser(user)
+	expectedRows := sqlmock.NewRows(EntityColumns(pgUser)).
+		AddRow(EntityValues(pgUser)...)
+	mock.ExpectQuery(postgres.UserGetByEmailQuery).
+		WithArgs(user.Email).
+		WillReturnRows(expectedRows)
+}
+
+func (s *UserGetByEmailSuite) TestSuccess(t provider.T) {
+	t.Parallel()
+	repo, mock := NewUserRepository()
+	user := builder.NewUserBuilder().Default().Build()
+	s.SuccessRepositoryMock(mock, user)
+
+	resultUser, err := repo.GetByEmail(context.Background(), user.Email)
+
+	t.Assert().Nil(err)
+	t.Assert().Equal(user, resultUser)
+}
+
+func (s *UserGetByEmailSuite) NotFoundRepositoryMock(mock sqlmock.Sqlmock, user domain.User) {
+	mock.ExpectQuery(postgres.UserGetByEmailQuery).
+		WillReturnError(sql.ErrNoRows)
+}
+
+func (s *UserGetByEmailSuite) TestNotFound(t provider.T) {
+	t.Parallel()
+	repo, mock := NewUserRepository()
+	user := builder.NewUserBuilder().Default().Build()
+	s.NotFoundRepositoryMock(mock, user)
+
+	resultUser, err := repo.GetByEmail(context.Background(), user.Email)
+
+	t.Assert().ErrorIs(err, ports.ErrUserEmailNotFound)
+	t.Assert().Equal(resultUser, domain.User{})
+}
+
+func TestUserGetByEmailSuite(t *testing.T) {
+	suite.RunNamedSuite(t, "UserGetByEmailRepository", new(UserGetByEmailSuite))
+}
+
+type UserGetByPhoneSuite struct {
+	UserSuite
+}
+
+func (s *UserGetByPhoneSuite) SuccessRepositoryMock(mock sqlmock.Sqlmock, user domain.User) {
+	pgUser := entity.NewPgUser(user)
+	expectedRows := sqlmock.NewRows(EntityColumns(pgUser)).
+		AddRow(EntityValues(pgUser)...)
+	mock.ExpectQuery(postgres.UserGetByPhoneQuery).
+		WithArgs(user.Phone).
+		WillReturnRows(expectedRows)
+}
+
+func (s *UserGetByPhoneSuite) TestSuccess(t provider.T) {
+	t.Parallel()
+	repo, mock := NewUserRepository()
+	user := builder.NewUserBuilder().Default().Build()
+	s.SuccessRepositoryMock(mock, user)
+
+	resultUser, err := repo.GetByPhone(context.Background(), user.Phone)
+
+	t.Assert().Nil(err)
+	t.Assert().Equal(user, resultUser)
+}
+
+func (s *UserGetByPhoneSuite) NotFoundRepositoryMock(mock sqlmock.Sqlmock, user domain.User) {
+	mock.ExpectQuery(postgres.UserGetByPhoneQuery).
+		WillReturnError(sql.ErrNoRows)
+}
+
+func (s *UserGetByPhoneSuite) TestNotFound(t provider.T) {
+	t.Parallel()
+	repo, mock := NewUserRepository()
+	user := builder.NewUserBuilder().Default().Build()
+	s.NotFoundRepositoryMock(mock, user)
+
+	resultUser, err := repo.GetByPhone(context.Background(), user.Phone)
+
+	t.Assert().ErrorIs(err, ports.ErrUserPhoneNotFound)
+	t.Assert().Equal(resultUser, domain.User{})
+}
+
+func TestUserGetByPhoneSuite(t *testing.T) {
+	suite.RunNamedSuite(t, "UserGetByPhoneRepository", new(UserGetByPhoneSuite))
 }

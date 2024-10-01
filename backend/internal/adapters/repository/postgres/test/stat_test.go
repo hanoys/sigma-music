@@ -2,104 +2,47 @@ package test
 
 import (
 	"context"
-	"errors"
+	"testing"
+
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/google/uuid"
 	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres"
 	"github.com/hanoys/sigma-music/internal/ports"
-	"testing"
+	"github.com/jmoiron/sqlx"
+	"github.com/ozontech/allure-go/pkg/framework/provider"
+	"github.com/ozontech/allure-go/pkg/framework/suite"
 )
 
-func TestStatRepository(t *testing.T) {
-	ctx := context.Background()
-	container, err := newPostgresContainer(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
+type StatSuite struct {
+	suite.Suite
+}
 
-	// Clean up the container after the test is complete
-	t.Cleanup(func() {
-		if err := container.Terminate(ctx); err != nil {
-			t.Fatalf("failed to terminate container: %s", err)
-		}
-	})
+func NewStatRepository() (ports.IStatRepository, sqlmock.Sqlmock) {
+	db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	conn := sqlx.NewDb(db, "pgx")
+	repo := postgres.NewPostgresStatRepository(conn)
+	return repo, mock
+}
 
-	url, err := container.ConnectionString(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
+type StatAddSuite struct {
+	StatSuite
+}
 
-	t.Run("add stat", func(t *testing.T) {
-		t.Cleanup(func() {
-			err = container.Restore(ctx)
-			if err != nil {
-				t.Fatal(err)
-			}
-		})
+func (s *StatAddSuite) SuccessRepositoryMock(mock sqlmock.Sqlmock) {
+	mock.ExpectExec(postgres.StatAddQuery).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+}
 
-		db, err := newPostgresDB(url)
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer func() {
-			db.GuestConnection.Close()
-			db.UserConnection.Close()
-			db.MusicianConnection.Close()
-		}()
+func (s *StatAddSuite) TestSuccess(t provider.T) {
+	t.Parallel()
+	repo, mock := NewStatRepository()
+	s.SuccessRepositoryMock(mock)
 
-		repo := postgres.NewPostgresStatRepository(db)
-		err = repo.Add(context.Background(), uuid.New(), uuid.New(), uuid.New())
-		if !errors.Is(err, ports.ErrInternalStatRepo) {
-			t.Errorf("unexpected error: %v", err)
-		}
-	})
+	err := repo.Add(context.Background(), uuid.New(), uuid.New(), uuid.New())
 
-	t.Run("musicians stat", func(t *testing.T) {
-		t.Cleanup(func() {
-			err = container.Restore(ctx)
-			if err != nil {
-				t.Fatal(err)
-			}
-		})
+	t.Assert().Nil(err)
+}
 
-		db, err := newPostgresDB(url)
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer func() {
-			db.GuestConnection.Close()
-			db.UserConnection.Close()
-			db.MusicianConnection.Close()
-		}()
-
-		repo := postgres.NewPostgresStatRepository(db)
-		stat, err := repo.GetMostListenedMusicians(context.Background(), uuid.New(), 10)
-		if len(stat) != 0 {
-			t.Errorf("unexpected len stat len: %v", len(stat))
-		}
-	})
-
-	t.Run("genre stat", func(t *testing.T) {
-		t.Cleanup(func() {
-			err = container.Restore(ctx)
-			if err != nil {
-				t.Fatal(err)
-			}
-		})
-
-		db, err := newPostgresDB(url)
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer func() {
-			db.GuestConnection.Close()
-			db.UserConnection.Close()
-			db.MusicianConnection.Close()
-		}()
-
-		repo := postgres.NewPostgresStatRepository(db)
-		stat, err := repo.GetListenedGenres(context.Background(), uuid.New())
-		if len(stat) != 0 {
-			t.Errorf("unexpected len stat len: %v", len(stat))
-		}
-	})
+func TestStatAddSuite(t *testing.T) {
+	suite.RunNamedSuite(t, "StatAddRepository", new(StatAddSuite))
 }

@@ -1,112 +1,69 @@
 package test
 
 import (
-	"context"
+	"database/sql/driver"
 	"fmt"
-	"github.com/golang-migrate/migrate"
-	migratepg "github.com/golang-migrate/migrate/database/postgres"
-	_ "github.com/golang-migrate/migrate/source/file"
-	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres"
-	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/jmoiron/sqlx"
-	"github.com/testcontainers/testcontainers-go"
-	testpg "github.com/testcontainers/testcontainers-go/modules/postgres"
-	"github.com/testcontainers/testcontainers-go/wait"
-	"path/filepath"
-	"runtime"
-	"time"
+	"reflect"
+	"strings"
 )
 
-var (
-	DatabaseName = "sigma-music"
-	UserName     = "sigma-music"
-	Password     = "sigma-music"
-)
-
-func newPostgresContainer(ctx context.Context) (*testpg.PostgresContainer, error) {
-	container, err := testpg.RunContainer(
-		ctx,
-		testpg.WithDatabase(DatabaseName),
-		testpg.WithUsername(UserName),
-		testpg.WithPassword(Password),
-		testcontainers.WithWaitStrategy(
-			wait.ForLog("database system is ready to accept connections").
-				WithOccurrence(2).
-				WithStartupTimeout(5*time.Second)),
-	)
-
-	if err != nil {
-		return nil, fmt.Errorf("creating container failure: %w", err)
+func EntityColumns(entity interface{}) []string {
+	v := reflect.ValueOf(entity)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	var fields []string
+	if v.Kind() == reflect.Struct {
+		for i := 0; i < v.NumField(); i++ {
+			field := v.Type().Field(i).Tag.Get("db")
+			if field != "" {
+				fields = append(fields, field)
+			}
+		}
+	} else if v.Kind() == reflect.Map {
+		for _, key := range v.MapKeys() {
+			fields = append(fields, key.String())
+		}
 	}
 
-	_, path, _, ok := runtime.Caller(0)
-	if !ok {
-		return nil, fmt.Errorf("failed to get caller path")
-	}
-
-	sourceUrl := "file://" + filepath.Dir(path) + "/migrations"
-	url, err := container.ConnectionString(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get postgres db url: %s", err)
-	}
-
-	db, err := newPostgresDB(url)
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to postgres db: %s", err)
-	}
-	defer func() {
-		db.GuestConnection.Close()
-		db.UserConnection.Close()
-		db.MusicianConnection.Close()
-	}()
-
-	driver, err := migratepg.WithInstance(db.GuestConnection.DB, &migratepg.Config{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to get db driver from instance: %s", err)
-	}
-
-	mig, err := migrate.NewWithDatabaseInstance(sourceUrl, DatabaseName, driver)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create migrator driver: %s", err)
-	}
-
-	err = mig.Up()
-	if err != nil {
-		return nil, fmt.Errorf("failed to up migrations: %s", err)
-	}
-
-	err = container.Snapshot(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make a snapshot of postgres db: %s", err)
-	}
-
-	return container, nil
+	return fields
 }
 
-const (
-	maxConn         = 100
-	maxConnIdleTime = 1 * time.Minute
-	maxConnLifetime = 3 * time.Minute
-)
-
-func newPostgresDB(url string) (postgres.PostgresConnections, error) {
-	db, err := sqlx.Connect("pgx", url)
-	if err != nil {
-		return postgres.PostgresConnections{}, fmt.Errorf("failed to connect postgres db: %s", err)
+func EntityValues(entity interface{}) []driver.Value {
+	v := reflect.ValueOf(entity)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	var values []driver.Value
+	if v.Kind() == reflect.Struct {
+		for i := 0; i < v.NumField(); i++ {
+			value := v.Field(i).Interface()
+			values = append(values, value)
+		}
 	}
 
-	db.SetMaxOpenConns(maxConn)
-	db.SetConnMaxLifetime(maxConnLifetime)
-	db.SetConnMaxIdleTime(maxConnIdleTime)
+	return values
+}
 
-	err = db.Ping()
-	if err != nil {
-		return postgres.PostgresConnections{}, fmt.Errorf("failed to ping postgres db: %s", err)
+func UpdateQueryString(entity interface{}, tableName string) string {
+	columnNames := EntityColumns(entity)
+	params := make([]string, len(columnNames))
+	for i, columnName := range columnNames {
+		params[i] = fmt.Sprintf("%s = $%d", columnName, i+1)
 	}
+	paramsString := strings.Join(params, ", ")
+	return fmt.Sprintf("UPDATE %s SET %s WHERE id = $%d",
+		tableName, paramsString, len(columnNames)+1)
+}
 
-	return postgres.PostgresConnections{
-		GuestConnection:    db,
-		UserConnection:     db,
-		MusicianConnection: db,
-	}, nil
+func InsertQueryString(entity interface{}, tableName string) string {
+	columnNames := EntityColumns(entity)
+	values := make([]string, len(columnNames))
+	for i, _ := range columnNames {
+		values[i] = fmt.Sprintf("$%d", i+1)
+	}
+	valuesString := strings.Join(values, ", ")
+	columnsString := strings.Join(columnNames, ", ")
+	return fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s) RETURNING *",
+		tableName, columnsString, valuesString)
 }

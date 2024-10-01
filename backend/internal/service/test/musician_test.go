@@ -46,6 +46,7 @@ func (s *MusicianRegisterSuite) CorrectRepositoryMock(repository *mocks.Musician
 }
 
 func (s *MusicianRegisterSuite) TestCorrect(t provider.T) {
+	t.Title("Musician register test correct")
 	req := builder.NewMusicianServiceCreateRequestBuilder().Default().Build()
 	repository := mocks.NewMusicianRepository(t)
 	musicianService := service.NewMusicianService(repository, s.hashProvider, s.logger)
@@ -63,6 +64,7 @@ func (s *MusicianRegisterSuite) NameExistsRepositoryMock(repository *mocks.Music
 }
 
 func (s *MusicianRegisterSuite) TestNameExists(t provider.T) {
+	t.Title("Musician register test name exists")
 	req := builder.NewMusicianServiceCreateRequestBuilder().Default().Build()
 	repository := mocks.NewMusicianRepository(t)
 	musicianService := service.NewMusicianService(repository, s.hashProvider, s.logger)
@@ -82,6 +84,7 @@ func (s *MusicianRegisterSuite) EmailExistsRepositoryMock(repository *mocks.Musi
 }
 
 func (s *MusicianRegisterSuite) TestEmailExists(t provider.T) {
+	t.Title("Musician register test email exists")
 	req := builder.NewMusicianServiceCreateRequestBuilder().Default().Build()
 	repository := mocks.NewMusicianRepository(t)
 	musicianService := service.NewMusicianService(repository, s.hashProvider, s.logger)
@@ -110,6 +113,7 @@ func (s *MusicianGetAllSuite) CorrectRepositoryMock(repository *mocks.MusicianRe
 }
 
 func (s *MusicianGetAllSuite) TestCorrect(t provider.T) {
+	t.Title("Musician get all test correct")
 	repository := mocks.NewMusicianRepository(t)
 	musicianService := service.NewMusicianService(repository, s.hashProvider, s.logger)
 	s.CorrectRepositoryMock(repository)
@@ -127,6 +131,7 @@ func (s *MusicianGetAllSuite) RepositoryErrorRepositoryMock(repository *mocks.Mu
 }
 
 func (s *MusicianGetAllSuite) TestRepositoryError(t provider.T) {
+	t.Title("Musician get all test error")
 	repository := mocks.NewMusicianRepository(t)
 	musicianService := service.NewMusicianService(repository, s.hashProvider, s.logger)
 	s.RepositoryErrorRepositoryMock(repository)
@@ -153,6 +158,7 @@ func (s *MusicianGetByIDSuite) CorrectRepositoryMock(repository *mocks.MusicianR
 }
 
 func (s *MusicianGetByIDSuite) TestCorrect(t provider.T) {
+	t.Title("Musician get by id test correct")
 	musicianID := uuid.New()
 	repository := mocks.NewMusicianRepository(t)
 	musicianService := service.NewMusicianService(repository, s.hashProvider, s.logger)
@@ -171,6 +177,7 @@ func (s *MusicianGetByIDSuite) NotFoundRepositoryMock(repository *mocks.Musician
 }
 
 func (s *MusicianGetByIDSuite) TestIDNotFound(t provider.T) {
+	t.Title("Musician get by id test not found")
 	musicianID := uuid.New()
 	repository := mocks.NewMusicianRepository(t)
 	musicianService := service.NewMusicianService(repository, s.hashProvider, s.logger)
@@ -190,7 +197,7 @@ type MusicianGetByNameSuite struct {
 }
 
 func (s *MusicianGetByNameSuite) CorrectRepositoryMock(repository *mocks.MusicianRepository, name string) {
-	musician := builder.NewMusicianBuilder().Default().SetName(name).Build()
+	musician := builder.NewMusicianNamedMother(name).Create()
 
 	repository.
 		On("GetByName", context.Background(), name).
@@ -198,6 +205,7 @@ func (s *MusicianGetByNameSuite) CorrectRepositoryMock(repository *mocks.Musicia
 }
 
 func (s *MusicianGetByNameSuite) TestCorrect(t provider.T) {
+	t.Title("Musician get by name test correct")
 	name := "Test Musician"
 	repository := mocks.NewMusicianRepository(t)
 	musicianService := service.NewMusicianService(repository, s.hashProvider, s.logger)
@@ -216,6 +224,7 @@ func (s *MusicianGetByNameSuite) NotFoundRepositoryMock(repository *mocks.Musici
 }
 
 func (s *MusicianGetByNameSuite) TestNameNotFound(t provider.T) {
+	t.Title("Musician get by name test not found")
 	name := "Test Musician"
 	repository := mocks.NewMusicianRepository(t)
 	musicianService := service.NewMusicianService(repository, s.hashProvider, s.logger)
@@ -243,6 +252,7 @@ func (s *MusicianGetByEmailSuite) CorrectRepositoryMock(repository *mocks.Musici
 }
 
 func (s *MusicianGetByEmailSuite) TestCorrect(t provider.T) {
+	t.Title("Musician get by email test correct")
 	email := "test.musician@mail.com"
 	repository := mocks.NewMusicianRepository(t)
 	musicianService := service.NewMusicianService(repository, s.hashProvider, s.logger)
@@ -261,6 +271,7 @@ func (s *MusicianGetByEmailSuite) NotFoundRepositoryMock(repository *mocks.Music
 }
 
 func (s *MusicianGetByEmailSuite) TestNotFound(t provider.T) {
+	t.Title("Musician get by email test not found")
 	email := "test.musician@mail.com"
 	repository := mocks.NewMusicianRepository(t)
 	musicianService := service.NewMusicianService(repository, s.hashProvider, s.logger)
@@ -288,6 +299,7 @@ func (s *MusicianGetByAlbumIDSuite) CorrectRepositoryMock(repository *mocks.Musi
 }
 
 func (s *MusicianGetByAlbumIDSuite) TestCorrect(t provider.T) {
+	t.Title("Musician get by album id test correct")
 	albumID := uuid.New()
 	repository := mocks.NewMusicianRepository(t)
 	musicianService := service.NewMusicianService(repository, s.hashProvider, s.logger)
@@ -307,6 +319,7 @@ func (s *MusicianGetByAlbumIDSuite) NotFoundRepositoryMock(repository *mocks.Mus
 }
 
 func (s *MusicianGetByAlbumIDSuite) TestNotFound(t provider.T) {
+	t.Title("Musician get by album id test not found")
 	albumID := uuid.New()
 	repository := mocks.NewMusicianRepository(t)
 	musicianService := service.NewMusicianService(repository, s.hashProvider, s.logger)
@@ -334,6 +347,7 @@ func (s *MusicianGetByTrackIDSuite) CorrectRepositoryMock(repository *mocks.Musi
 }
 
 func (s *MusicianGetByTrackIDSuite) TestCorrect(t provider.T) {
+	t.Title("Musician get by track id test correct")
 	trackID := uuid.New()
 	repository := mocks.NewMusicianRepository(t)
 	musicianService := service.NewMusicianService(repository, s.hashProvider, s.logger)
@@ -351,6 +365,7 @@ func (s *MusicianGetByTrackIDSuite) NotFoundRepositoryMock(repository *mocks.Mus
 }
 
 func (s *MusicianGetByTrackIDSuite) TestNotFound(t provider.T) {
+	t.Title("Musician get by track id test not found")
 	trackID := uuid.New()
 	repository := mocks.NewMusicianRepository(t)
 	musicianService := service.NewMusicianService(repository, s.hashProvider, s.logger)
