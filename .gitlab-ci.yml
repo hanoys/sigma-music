@@ -20,12 +20,12 @@ unit:
     - echo TESTTEST=1 > .env
     - go test -shuffle on ./internal/service/test/unit ./internal/adapters/repository/postgres/test/ -v --parallel 4
   after_script:
-    - if [[ $CI_JOB_STATUS != "success" ]]; then echo TEST_FAILED=1 > .env; else TEST_FAILED=0 > .env; fi
+    - if [[ $CI_JOB_STATUS != "success" ]]; then echo TEST_FAILED=1 | tee >> $GITLAB_ENV test.env; else TEST_FAILED=0 | tee >> $GITLAB_ENV test.env; fi
   artifacts:
     paths:
       - allure-results
     reports:
-      dotenv: .env
+      dotenv: test.env
   rules:
     - when: always
 
