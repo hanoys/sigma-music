@@ -3,17 +3,16 @@ package integrationtest
 import (
 	"context"
 	"fmt"
+	"path/filepath"
+	"runtime"
+	"time"
+
 	"github.com/golang-migrate/migrate"
 	migratepg "github.com/golang-migrate/migrate/database/postgres"
 	_ "github.com/golang-migrate/migrate/source/file"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
-	"github.com/testcontainers/testcontainers-go"
 	testpg "github.com/testcontainers/testcontainers-go/modules/postgres"
-	"github.com/testcontainers/testcontainers-go/wait"
-	"path/filepath"
-	"runtime"
-	"time"
 )
 
 var (
@@ -23,15 +22,14 @@ var (
 )
 
 func newPostgresContainer(ctx context.Context) (*testpg.PostgresContainer, error) {
-	container, err := testpg.RunContainer(
+	container, err := testpg.Run(
 		ctx,
+		"docker.io/postgres:16-alpine",
 		testpg.WithDatabase(DatabaseName),
 		testpg.WithUsername(UserName),
 		testpg.WithPassword(Password),
-		testcontainers.WithWaitStrategy(
-			wait.ForLog("database system is ready to accept connections").
-				WithOccurrence(2).
-				WithStartupTimeout(5*time.Second)),
+		testpg.BasicWaitStrategies(),
+		testpg.WithSQLDriver("pgx"),
 	)
 
 	if err != nil {
@@ -68,12 +66,6 @@ func newPostgresContainer(ctx context.Context) (*testpg.PostgresContainer, error
 	err = mig.Up()
 	if err != nil {
 		return nil, fmt.Errorf("failed to up migrations: %s", err)
-	}
-
-	err = container.Snapshot(ctx)
-    container.Snapshot(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make a snapshot of postgres db: %s", err)
 	}
 
 	return container, nil

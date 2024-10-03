@@ -58,11 +58,6 @@ func (s *UserSuite) AfterAll(t provider.T) {
 }
 
 func (s *UserSuite) AfterEach(t provider.T) {
-	err := s.container.Restore(context.Background())
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	s.db.Close()
 }
 
