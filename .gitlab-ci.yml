@@ -6,7 +6,7 @@ variables:
   DOCKER_TLS_CERTDIR: ""
   DOCKER_DRIVER: overlay2
   TESTCONTAINERS_HOST_OVERRIDE: "host.docker.internal"
-  ALLURE_OUTPUT_PATH: "/builds/shpa21u524/testing-sem7"
+  ALLURE_OUTPUT_PATH: "/builds/mta21u184/sigma-music-test"
 
 stages:
   - unit-test
