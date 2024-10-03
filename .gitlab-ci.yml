@@ -1,0 +1,39 @@
+services:
+  - name: docker:dind
+    command: ["--tls=false"]
+
+variables:
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_DRIVER: overlay2
+  TESTCONTAINERS_HOST_OVERRIDE: "host.docker.internal"
+  ALLURE_OUTPUT_PATH: "/builds/shpa21u524/testing-sem7"
+
+stages:
+  - unit-test
+    #  - integration-test
+    #  - e2e-test
+
+unit:
+  stage: unit-test
+  image: golang:1.22
+  script: go test -shuffle on ./backend/internal/service/test/unit 
+    .backend/internal/adapters/repository/postgres/test/ -v --parallel 4
+  artifacts:
+    paths:
+      - allure-results
+
+        #integration:
+        #  stage: integration-test
+        #  image: golang:1.22
+        #  script: go test -shuffle on ./internal/core/service/test/integration/ -v --parallel 4
+        #  artifacts:
+        #    paths:
+        #      - allure-results
+
+        #e2e:
+        #  stage: e2e-test
+        #  image: golang:1.22
+        #  script: go test -shuffle on ./internal/core/service/test/e2e/ -v
+        #  artifacts:
+        #    paths:
+        #      - allure-results
