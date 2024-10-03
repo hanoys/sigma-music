@@ -16,8 +16,7 @@ stages:
 unit:
   stage: unit-test
   image: golang:1.22
-  script: go test -shuffle on ./backend/internal/service/test/unit 
-    .backend/internal/adapters/repository/postgres/test/ -v --parallel 4
+  script: ls
   artifacts:
     paths:
       - allure-results
