@@ -63,6 +63,9 @@ func (s *UserSuite) AfterEach(t provider.T) {
 
 func (s *UserSuite) TestCreateSuccess(t provider.T) {
     t.Title("user create integration test")
+    if (isPreviousTestsFailed()) {
+        t.Skip()
+    }
 	repo := postgres.NewPostgresUserRepository(s.db)
 	userService := service.NewUserService(repo, s.hash, s.logger)
 	req := builder.NewUserServiceCreateRequestBuilder().
@@ -81,6 +84,9 @@ func (s *UserSuite) TestCreateSuccess(t provider.T) {
 
 func (s *UserSuite) TestGetByIDSuccess(t provider.T) {
     t.Title("user get by id integration test")
+    if (isPreviousTestsFailed()) {
+        t.Skip()
+    }
 	repo := postgres.NewPostgresUserRepository(s.db)
 	userService := service.NewUserService(repo, s.hash, s.logger)
 
@@ -93,6 +99,9 @@ func (s *UserSuite) TestGetByIDSuccess(t provider.T) {
 
 func (s *UserSuite) TestGetByNameSuccess(t provider.T) {
     t.Title("user get by name integration test")
+    if (isPreviousTestsFailed()) {
+        t.Skip()
+    }
 	repo := postgres.NewPostgresUserRepository(s.db)
 	userService := service.NewUserService(repo, s.hash, s.logger)
 
@@ -105,6 +114,9 @@ func (s *UserSuite) TestGetByNameSuccess(t provider.T) {
 
 func (s *UserSuite) TestGetByEmailSuccess(t provider.T) {
     t.Title("user get by email integration test")
+    if (isPreviousTestsFailed()) {
+        t.Skip()
+    }
 	repo := postgres.NewPostgresUserRepository(s.db)
 	userService := service.NewUserService(repo, s.hash, s.logger)
 
@@ -117,6 +129,9 @@ func (s *UserSuite) TestGetByEmailSuccess(t provider.T) {
 
 func (s *UserSuite) TestGetByPhoneSuccess(t provider.T) {
     t.Title("user get by phone integration test")
+    if (isPreviousTestsFailed()) {
+        t.Skip()
+    }
 	repo := postgres.NewPostgresUserRepository(s.db)
 	userService := service.NewUserService(repo, s.hash, s.logger)
 
