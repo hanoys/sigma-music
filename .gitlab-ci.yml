@@ -20,8 +20,8 @@ collect_report_history:
     - echo $CI_COMMIT_BRANCH
     - echo $REPORT_TOKEN
     - 'curl --header "PRIVATE-TOKEN: $REPORT_TOKEN" --location "https://git.iu7.bmstu.ru/api/v4/projects/$CI_PROJECT_ID/jobs/artifacts/$CI_COMMIT_BRANCH/download?job=e2e" --output artifacts.zip' 
-    - unzip artifacts.zip
-    - chmod -R 777 allure-results
+    - unzip artifacts.zip | true
+    - chmod -R 777 allure-results | true
   allow_failure: true
   artifacts:
     paths:
