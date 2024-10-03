@@ -19,7 +19,7 @@ unit:
   script: go test -shuffle on ./internal/service/test/unit 
     ./internal/adapters/repository/postgres/test/ -v --parallel 4
   after_script:
-    - if [[ $CI_JOB_STATUS != "success" ]]; echo TEST_FAILED=1 > .env; fi
+    - if [[ $CI_JOB_STATUS != "success" ]]; then echo TEST_FAILED=1 > .env; else TEST_FAILED=0 > .env; fi
   artifacts:
     paths:
       - allure-results
