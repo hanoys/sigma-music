@@ -86,6 +86,7 @@ func (s *AlbumPublishSuite) CorrectRepositoryMock(repository *mocks.AlbumReposit
 func (s *AlbumPublishSuite) TestCorrect(t provider.T) {
 	t.Parallel()
 	t.Title("Album publish test correct")
+    t.Assert().True(false) // DELETE
 	albumID := uuid.New()
 	repository := mocks.NewAlbumRepository(t)
 	albumService := service.NewAlbumService(repository, s.logger)
