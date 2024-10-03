@@ -10,8 +10,8 @@ variables:
 
 stages:
   - unit-test
-    #  - integration-test
-    #  - e2e-test
+  - integration-test
+  - e2e-test
 
 unit:
   stage: unit-test
