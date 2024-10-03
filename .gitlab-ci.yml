@@ -10,12 +10,13 @@ variables:
 
 stages:
   - report history
-    #  - unit-test
-    #  - integration-test
-    #  - e2e-test
+  - unit-test
+  - integration-test
+  - e2e-test
 
 collect_report_history:
   stage: report history
+  image: golang:1.22
   script:
     - echo $CI_COMMIT_BRANCH
     - echo $REPORT_TOKEN
@@ -30,28 +31,33 @@ collect_report_history:
   rules:
     - when: always
 
+unit:
+  stage: unit-test
+  image: golang:1.22
+  script: go test -shuffle on ./internal/service/test/unit 
+    ./internal/adapters/repository/postgres/test/ -v --parallel 4
+  artifacts:
+    paths:
+      - allure-results
+  rules:
+    - when: always
 
-      #unit:
-      #  stage: unit-test
-      #  image: golang:1.22
-      #  script: go test -shuffle on ./internal/service/test/unit 
-      #    ./internal/adapters/repository/postgres/test/ -v --parallel 4
-      #  artifacts:
-      #    paths:
-      #      - allure-results
-      #
-      #integration:
-      #  stage: integration-test
-      #  image: golang:1.22
-      #  script: go test -shuffle on ./internal/service/test/integration/ -v --parallel 4
-      #  artifacts:
-      #    paths:
-      #      - allure-results
-      #
-      #e2e:
-      #  stage: e2e-test
-      #  image: golang:1.22
-      #  script: go test -shuffle on ./internal/service/test/e2e/ -v
-      #  artifacts:
-      #    paths:
-      #      - allure-results
+integration:
+  stage: integration-test
+  image: golang:1.22
+  script: go test -shuffle on ./internal/service/test/integration/ -v --parallel 4
+  artifacts:
+    paths:
+      - allure-results
+  rules:
+    - when: always
+
+e2e:
+  stage: e2e-test
+  image: golang:1.22
+  script: go test -shuffle on ./internal/service/test/e2e/ -v
+  artifacts:
+    paths:
+      - allure-results
+  rules:
+    - when: always
