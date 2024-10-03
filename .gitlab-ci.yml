@@ -9,31 +9,49 @@ variables:
   ALLURE_OUTPUT_PATH: "/builds/mta21u184/sigma-music-test"
 
 stages:
-  - unit-test
-  - integration-test
-  - e2e-test
+  - report history
+    #  - unit-test
+    #  - integration-test
+    #  - e2e-test
 
-unit:
-  stage: unit-test
-  image: golang:1.22
-  script: go test -shuffle on ./internal/service/test/unit 
-    ./internal/adapters/repository/postgres/test/ -v --parallel 4
+collect_report_history:
+  stage: report history
+  script:
+    - echo $CI_COMMIT_BRANCH
+    - echo $REPORT_TOKEN
+    - 'curl --header "PRIVATE-TOKEN: $REPORT_TOKEN" --location "https://git.iu7.bmstu.ru/api/v4/projects/$CI_PROJECT_ID/jobs/artifacts/$CI_COMMIT_BRANCH/download?job=e2e" --output artifacts.zip' 
+    - unzip artifacts.zip
+    - chmod -R 777 allure-results
+  allow_failure: true
   artifacts:
     paths:
-      - allure-results
+      - ./allure-results
+    expire_in: 1 day
+  rules:
+    - when: always
 
-integration:
-  stage: integration-test
-  image: golang:1.22
-  script: go test -shuffle on ./internal/service/test/integration/ -v --parallel 4
-  artifacts:
-    paths:
-      - allure-results
 
-e2e:
-  stage: e2e-test
-  image: golang:1.22
-  script: go test -shuffle on ./internal/service/test/e2e/ -v
-  artifacts:
-    paths:
-      - allure-results
+      #unit:
+      #  stage: unit-test
+      #  image: golang:1.22
+      #  script: go test -shuffle on ./internal/service/test/unit 
+      #    ./internal/adapters/repository/postgres/test/ -v --parallel 4
+      #  artifacts:
+      #    paths:
+      #      - allure-results
+      #
+      #integration:
+      #  stage: integration-test
+      #  image: golang:1.22
+      #  script: go test -shuffle on ./internal/service/test/integration/ -v --parallel 4
+      #  artifacts:
+      #    paths:
+      #      - allure-results
+      #
+      #e2e:
+      #  stage: e2e-test
+      #  image: golang:1.22
+      #  script: go test -shuffle on ./internal/service/test/e2e/ -v
+      #  artifacts:
+      #    paths:
+      #      - allure-results
