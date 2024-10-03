@@ -17,10 +17,9 @@ unit:
   stage: unit-test
   image: golang:1.22
   script: 
-    - echo TESTTEST=1 > .env
+    - touch .env
     - go test -shuffle on ./internal/service/test/unit ./internal/adapters/repository/postgres/test/ -v --parallel 4
-    - EXIT_STATUS=$?
-    - if [[ $EXIT_STATUS -eq 0 ]]; then echo TEST_FAILED=0 | tee >> $GITLAB_ENV .env; else echo TEST_FAILED=1 | tee >> $GITLAB_ENV .env; fi
+    - echo TEST_SUCCESS=1 | tee >> $GITLAB_ENV .env
   artifacts:
     paths:
       - allure-results
