@@ -18,7 +18,7 @@ stages:
 install:
   stage: test
   script: 
-    - apt install openjdk-8-jre
+    - apt install default-jdk
     - wget https://github.com/allure-framework/allure2/releases/download/2.18.1/allure_2.18.1-1_all.deb
     - dpkg -i allure_2.18.1-1_all.deb
     - allure --help
