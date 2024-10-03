@@ -74,12 +74,6 @@ func newPostgresContainer(ctx context.Context) (*testpg.PostgresContainer, error
 		return nil, fmt.Errorf("failed to up migrations: %s", err)
 	}
 
-	err = container.Snapshot(ctx)
-	container.Snapshot(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make a snapshot of postgres db: %s", err)
-	}
-
 	return container, nil
 }
 

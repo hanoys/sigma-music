@@ -78,11 +78,6 @@ func (s *E2ESuite) AfterAll(t provider.T) {
 }
 
 func (s *E2ESuite) AfterEach(t provider.T) {
-	err := s.container.Restore(context.Background())
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	s.db.Close()
 }
 

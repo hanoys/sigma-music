@@ -19,7 +19,7 @@ require (
 	github.com/redis/go-redis/v9 v9.5.1
 	github.com/stretchr/testify v1.9.0
 	github.com/testcontainers/testcontainers-go v0.33.0
-	github.com/testcontainers/testcontainers-go/modules/minio v0.30.0
+	github.com/testcontainers/testcontainers-go/modules/minio v0.31.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.32.0
 	go.mongodb.org/mongo-driver v1.15.0
 	go.uber.org/zap v1.27.0
