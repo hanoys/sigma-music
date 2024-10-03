@@ -21,6 +21,7 @@ unit:
     - go test -shuffle on ./internal/service/test/unit ./internal/adapters/repository/postgres/test/ -v --parallel 4
     - echo TEST_SUCCESS=1 | tee >> $GITLAB_ENV .env
   artifacts:
+    when: always
     paths:
       - allure-results
     reports:
@@ -35,6 +36,7 @@ integration:
     - printenv
     - go test -shuffle on ./internal/service/test/integration/ -v --parallel 4
   artifacts:
+    when: always
     paths:
       - allure-results
   rules:
@@ -45,6 +47,7 @@ e2e:
   image: golang:1.22
   script: go test -shuffle on ./internal/service/test/e2e/ -v
   artifacts:
+    when: always
     paths:
       - allure-results
   rules:
