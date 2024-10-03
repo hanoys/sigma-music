@@ -62,6 +62,7 @@ func (s *AlbumSuite) AfterEach(t provider.T) {
 }
 
 func (s *AlbumSuite) TestCreate(t provider.T) {
+    t.Title("Album create integration test")
 	repo := postgres.NewPostgresAlbumRepository(s.db)
 	albumService := service.NewAlbumService(repo, s.logger)
 	musicianID, _ := uuid.Parse("1add32df-d439-4fd1-9d4c-bef946b4a1fa")
@@ -77,6 +78,7 @@ func (s *AlbumSuite) TestCreate(t provider.T) {
 }
 
 func (s *AlbumSuite) TestGetAll(t provider.T) {
+    t.Title("Album get all integration test")
 	repo := postgres.NewPostgresAlbumRepository(s.db)
 	albumService := service.NewAlbumService(repo, s.logger)
 
@@ -87,6 +89,7 @@ func (s *AlbumSuite) TestGetAll(t provider.T) {
 }
 
 func (s *AlbumSuite) TestGetByID(t provider.T) {
+    t.Title("Album get by id integration test")
 	repo := postgres.NewPostgresAlbumRepository(s.db)
 	albumService := service.NewAlbumService(repo, s.logger)
 	id, _ := uuid.Parse("b24fa8eb-9df6-406c-9b45-763d7b5a5078")
@@ -97,6 +100,7 @@ func (s *AlbumSuite) TestGetByID(t provider.T) {
 }
 
 func (s *AlbumSuite) TestGetOwn(t provider.T) {
+    t.Title("Album get own integration test")
 	repo := postgres.NewPostgresAlbumRepository(s.db)
 	albumService := service.NewAlbumService(repo, s.logger)
 	id, _ := uuid.Parse("b24fa8eb-9df6-406c-9b45-763d7b5a5078")
@@ -107,6 +111,7 @@ func (s *AlbumSuite) TestGetOwn(t provider.T) {
 }
 
 func (s *AlbumSuite) TestGetByMusicianID(t provider.T) {
+    t.Title("Album get by musician id integration test")
 	repo := postgres.NewPostgresAlbumRepository(s.db)
 	albumService := service.NewAlbumService(repo, s.logger)
 	id, _ := uuid.Parse("1add32df-d439-4fd1-9d4c-bef946b4a1fa")
@@ -118,6 +123,7 @@ func (s *AlbumSuite) TestGetByMusicianID(t provider.T) {
 }
 
 func (s *AlbumSuite) TestPublish(t provider.T) {
+    t.Title("Album publish integration test")
 	repo := postgres.NewPostgresAlbumRepository(s.db)
 	albumService := service.NewAlbumService(repo, s.logger)
 	id, _ := uuid.Parse("b24fa8eb-9df6-406c-9b45-763d7b5a5078")

@@ -61,6 +61,7 @@ func (s *GenreSuite) AfterEach(t provider.T) {
 }
 
 func (s *GenreSuite) TestGetAll(t provider.T) {
+    t.Title("genre get all integration test")
 	repo := postgres.NewPostgresGenreRepository(s.db)
 	genreService := service.NewGenreService(repo, s.logger)
 
@@ -71,6 +72,7 @@ func (s *GenreSuite) TestGetAll(t provider.T) {
 }
 
 func (s *GenreSuite) TestGetByID(t provider.T) {
+    t.Title("genre get by id integration test")
 	repo := postgres.NewPostgresGenreRepository(s.db)
 	genreService := service.NewGenreService(repo, s.logger)
 	genreID, _ := uuid.Parse("32f24dfc-3823-41e4-a073-c3553c981db1")

@@ -62,6 +62,7 @@ func (s *CommentSuite) AfterEach(t provider.T) {
 }
 
 func (s *CommentSuite) TestPost(t provider.T) {
+    t.Title("comment post integration test")
 	repo := postgres.NewPostgresCommentRepository(s.db)
 	commentService := service.NewCommentService(repo, s.logger)
 	userID, _ := uuid.Parse("1add32df-d439-4fd1-9d4c-bef946b4a1fc")
@@ -79,6 +80,7 @@ func (s *CommentSuite) TestPost(t provider.T) {
 }
 
 func (s *CommentSuite) TestGetUserComments(t provider.T) {
+    t.Title("comment get user comments integration test")
 	repo := postgres.NewPostgresCommentRepository(s.db)
 	commentService := service.NewCommentService(repo, s.logger)
 	userID, _ := uuid.Parse("1add32df-d439-4fd1-9d4c-bef946b4a1fc")
@@ -90,6 +92,7 @@ func (s *CommentSuite) TestGetUserComments(t provider.T) {
 }
 
 func (s *CommentSuite) TestGetCommentsOnTrack(t provider.T) {
+    t.Title("comment get comments on track integration test")
 	repo := postgres.NewPostgresCommentRepository(s.db)
 	commentService := service.NewCommentService(repo, s.logger)
 	trackID, _ := uuid.Parse("41623ac1-b98d-4478-a10f-870a80c697b6")
