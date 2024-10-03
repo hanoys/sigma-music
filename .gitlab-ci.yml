@@ -16,7 +16,6 @@ stages:
 
 collect_report_history:
   stage: report history
-  image: golang:1.22
   script:
     - echo $CI_COMMIT_BRANCH
     - echo $REPORT_TOKEN
