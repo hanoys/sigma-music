@@ -3,6 +3,7 @@ package integrationtest
 import (
 	"context"
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
 	"time"
@@ -93,4 +94,12 @@ func newPostgresDB(url string) (*sqlx.DB, error) {
 	}
 
 	return db, nil
+}
+
+func isPreviousTestsFailed() bool {
+    if (os.Getenv("TEST_FAILED") == "1") {
+        return true
+    }
+
+    return false
 }

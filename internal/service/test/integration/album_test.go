@@ -2,7 +2,6 @@ package integrationtest
 
 import (
 	"context"
-	"os"
 	"testing"
 
 	"github.com/google/uuid"
@@ -64,7 +63,7 @@ func (s *AlbumSuite) AfterEach(t provider.T) {
 
 func (s *AlbumSuite) TestCreate(t provider.T) {
     t.Title("Album create integration test")
-    if (os.Getenv("TEST_FAILED") == "1") {
+    if (isPreviousTestsFailed()) {
         t.Skip()
     }
 	repo := postgres.NewPostgresAlbumRepository(s.db)
