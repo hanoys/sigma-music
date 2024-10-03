@@ -20,12 +20,12 @@ unit:
     - echo TESTTEST=1 > .env
     - go test -shuffle on ./internal/service/test/unit ./internal/adapters/repository/postgres/test/ -v --parallel 4
     - EXIT_STATUS=$?
-    - test $EXIT_STATUS && echo TEST_FAILED=1 | tee >> $GITLAB_ENV test.env || TEST_FAILED=0 | tee >> $GITLAB_ENV test.env
+    - test $EXIT_STATUS && echo TEST_FAILED=0 > .env || echo TEST_FAILED=1 > .env
   artifacts:
     paths:
       - allure-results
     reports:
-      dotenv: test.env
+      dotenv: .env
   rules:
     - when: always
 
