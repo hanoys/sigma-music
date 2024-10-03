@@ -22,18 +22,18 @@ unit:
     paths:
       - allure-results
 
-        #integration:
-        #  stage: integration-test
-        #  image: golang:1.22
-        #  script: go test -shuffle on ./internal/core/service/test/integration/ -v --parallel 4
-        #  artifacts:
-        #    paths:
-        #      - allure-results
+integration:
+  stage: integration-test
+  image: golang:1.22
+  script: go test -shuffle on ./internal/service/test/integration/ -v --parallel 4
+  artifacts:
+    paths:
+      - allure-results
 
-        #e2e:
-        #  stage: e2e-test
-        #  image: golang:1.22
-        #  script: go test -shuffle on ./internal/core/service/test/e2e/ -v
-        #  artifacts:
-        #    paths:
-        #      - allure-results
+e2e:
+  stage: e2e-test
+  image: golang:1.22
+  script: go test -shuffle on ./internal/service/test/e2e/ -v
+  artifacts:
+    paths:
+      - allure-results
