@@ -32,7 +32,7 @@ integration:
   stage: integration-test
   image: golang:1.22
   script: 
-    - echo TEST_FAILED
+    - echo $TEST_FAILED
     - go test -shuffle on ./internal/service/test/integration/ -v --parallel 4
   artifacts:
     paths:
