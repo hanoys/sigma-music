@@ -20,7 +20,7 @@ unit:
     - echo TESTTEST=1 > .env
     - go test -shuffle on ./internal/service/test/unit ./internal/adapters/repository/postgres/test/ -v --parallel 4
     - EXIT_STATUS=$?
-    - test $EXIT_STATUS && echo TEST_FAILED=0 > .env || echo TEST_FAILED=1 > .env
+    - if [[ $EXIT_STATUS -eq 0 ]]; then echo TEST_FAILED=0 > .env; else echo TEST_FAILED=1 > .env; fi
   artifacts:
     paths:
       - allure-results
