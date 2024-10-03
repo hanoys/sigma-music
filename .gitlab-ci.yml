@@ -16,8 +16,9 @@ stages:
 unit:
   stage: unit-test
   image: golang:1.22
-  script: go test -shuffle on ./internal/service/test/unit 
-    ./internal/adapters/repository/postgres/test/ -v --parallel 4
+  script: 
+    - echo TESTTEST=1 > .env
+    - go test -shuffle on ./internal/service/test/unit ./internal/adapters/repository/postgres/test/ -v --parallel 4
   after_script:
     - if [[ $CI_JOB_STATUS != "success" ]]; then echo TEST_FAILED=1 > .env; else TEST_FAILED=0 > .env; fi
   artifacts:
