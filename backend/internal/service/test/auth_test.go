@@ -70,6 +70,36 @@ func (s *AuthLogInSuite) TestCorrect(t provider.T) {
 	t.Assert().Nil(err)
 }
 
+func (s *AuthLogInSuite) ErrorRepositoryMock(userRepository *mocks3.UserRepository,
+	musicianRepository *mocks3.MusicianRepository, tokenProvider *mocks.TokenProvider,
+	user domain.User) {
+	userRepository.
+		On("GetByName", context.Background(), user.Name).
+		Return(domain.User{}, ports.ErrUserNameNotFound)
+
+	musicianRepository.
+		On("GetByName", context.Background(), user.Name).
+		Return(domain.Musician{}, ports.ErrMusicianNameNotFound)
+
+}
+
+func (s *AuthLogInSuite) TestError(t provider.T) {
+	t.Parallel()
+	t.Title("Auth login test correct")
+	user := builder.NewUserBuilder().Default().Build()
+	loginCred := builder.NewLoginCredentialsMother(user.Name, user.Password).Create()
+	tokenProvider := mocks.NewTokenProvider(t)
+	userRepository := mocks3.NewUserRepository(t)
+	musicianRepository := mocks3.NewMusicianRepository(t)
+	authService := service.NewAuthorizationService(userRepository, musicianRepository,
+		tokenProvider, s.hashProvider, s.logger)
+	s.ErrorRepositoryMock(userRepository, musicianRepository, tokenProvider, user)
+
+	_, err := authService.LogIn(context.Background(), loginCred)
+
+	t.Assert().NotNil(err)
+}
+
 func TestAuthLogInSuite(t *testing.T) {
 	suite.RunSuite(t, new(AuthLogInSuite))
 }
