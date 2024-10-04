@@ -25,9 +25,6 @@ type AlbumSuite struct {
 }
 
 func (s *AlbumSuite) BeforeAll(t provider.T) {
-    if (isPreviousTestsFailed()) {
-        t.Skip()
-    }
 	loggerBuilder := zap.NewDevelopmentConfig()
 	loggerBuilder.Level = zap.NewAtomicLevelAt(zap.FatalLevel)
 	s.logger, _ = loggerBuilder.Build()
@@ -43,6 +40,9 @@ func (s *AlbumSuite) BeforeAll(t provider.T) {
 }
 
 func (s *AlbumSuite) BeforeEach(t provider.T) {
+    if (isPreviousTestsFailed()) {
+        t.Skip()
+    }
 	url, err := s.container.ConnectionString(context.Background())
 	if err != nil {
 		t.Fatal(err)
