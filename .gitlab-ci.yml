@@ -37,7 +37,6 @@ unit:
   stage: unit-test
   image: golang:1.22
   script: 
-    - echo UNIT_SUCCESS=0 | tee >> $GITLAB_ENV
     - export UNIT_SUCCESS=0
     - printenv
     - go test -shuffle on ./internal/service/test/unit ./internal/adapters/repository/postgres/test/ -v --parallel 4
@@ -53,7 +52,6 @@ integration:
   stage: integration-test
   image: golang:1.22
   script: 
-    - echo INTEGRATION_SUCCESS=0 | tee >> $GITLAB_ENV
     - export INTEGRATION_SUCCESS=0
     - printenv
     - go test -shuffle on ./internal/service/test/integration/ -v --parallel 4
