@@ -35,7 +35,6 @@ integration:
   stage: integration-test
   image: golang:1.22
   script: 
-    - printenv
     - go test -shuffle on ./internal/service/test/integration/ -v --parallel 4
     - echo INTEGRATION_SUCCESS=1 | tee >> $GITLAB_ENV .env
   artifacts:
