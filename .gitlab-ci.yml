@@ -39,6 +39,7 @@ unit:
   stage: unit-test
   image: golang:1.22
   script: 
+    - printenv
     - touch .env
     - go test -shuffle on ./internal/service/test/unit ./internal/adapters/repository/postgres/test/ -v --parallel 4
     - echo UNIT_SUCCESS=1 | tee >> $GITLAB_ENV .env
