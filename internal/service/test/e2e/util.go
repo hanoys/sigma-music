@@ -155,9 +155,10 @@ func newMinioClient(url string) (*minio.Client, error) {
 }
 
 func isPreviousTestsFailed() bool {
-    if (os.Getenv("INTEGRATION_SUCCESS") == "1") {
-        return false
-    }
+	if os.Getenv("INTEGRATION_SUCCESS") == "1" &&
+		os.Getenv("UNIT_SUCCESS") == "1" {
+		return false
+	}
 
-    return true
+	return true
 }

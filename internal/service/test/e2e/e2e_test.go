@@ -82,7 +82,10 @@ func (s *E2ESuite) AfterEach(t provider.T) {
 }
 
 func (s *E2ESuite) TestE2E(t provider.T) {
-    t.Title("user e2e integration test")
+	t.Title("user e2e integration test")
+	if isPreviousTestsFailed() {
+		t.Skip()
+	}
 	repo := postgres.NewPostgresUserRepository(s.db)
 	userService := service.NewUserService(repo, s.hash, s.logger)
 	createUserReq := builder.NewUserServiceCreateRequestBuilder().
