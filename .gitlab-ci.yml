@@ -7,6 +7,8 @@ variables:
   DOCKER_DRIVER: overlay2
   TESTCONTAINERS_HOST_OVERRIDE: "host.docker.internal"
   ALLURE_OUTPUT_PATH: "/builds/mta21u184/sigma-music-test"
+  UNIT_SUCCESS: '0'
+  INTEGRATION_SUCCESS: '0'
 
 stages:
   - unit-test
@@ -16,9 +18,6 @@ stages:
 unit:
   stage: unit-test
   image: golang:1.22
-  variables:
-    UNIT_SUCCESS: '0'
-    INTEGRATION_SUCCESS: '0'
   script: 
     - touch .env
     - go test -shuffle on ./internal/service/test/unit ./internal/adapters/repository/postgres/test/ -v --parallel 4
