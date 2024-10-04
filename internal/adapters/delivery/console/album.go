@@ -44,7 +44,7 @@ func (h *Handler) GetAllAlbums(c *Console) {
 
 	for _, album := range albums {
 		dto.NewAlbumDTO(album).Print()
-        fmt.Println("-----------------------")
+		fmt.Println("-----------------------")
 	}
 }
 
@@ -93,7 +93,7 @@ func (h *Handler) GetByMusicianIDAlbum(c *Console) {
 
 	for _, album := range albums {
 		dto.NewAlbumDTO(album).Print()
-        fmt.Println("-----------------------")
+		fmt.Println("-----------------------")
 	}
 }
 
@@ -113,7 +113,7 @@ func (h *Handler) GetOwn(c *Console) {
 
 	for _, album := range albums {
 		dto.NewAlbumDTO(album).Print()
-        fmt.Println("-----------------------")
+		fmt.Println("-----------------------")
 	}
 }
 

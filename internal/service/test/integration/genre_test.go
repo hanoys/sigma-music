@@ -61,10 +61,10 @@ func (s *GenreSuite) AfterEach(t provider.T) {
 }
 
 func (s *GenreSuite) TestGetAll(t provider.T) {
-    t.Title("genre get all integration test")
-    if (isPreviousTestsFailed()) {
-        t.Skip()
-    }
+	t.Title("genre get all integration test")
+	if isPreviousTestsFailed() {
+		t.Skip()
+	}
 	repo := postgres.NewPostgresGenreRepository(s.db)
 	genreService := service.NewGenreService(repo, s.logger)
 
@@ -75,10 +75,10 @@ func (s *GenreSuite) TestGetAll(t provider.T) {
 }
 
 func (s *GenreSuite) TestGetByID(t provider.T) {
-    t.Title("genre get by id integration test")
-    if (isPreviousTestsFailed()) {
-        t.Skip()
-    }
+	t.Title("genre get by id integration test")
+	if isPreviousTestsFailed() {
+		t.Skip()
+	}
 	repo := postgres.NewPostgresGenreRepository(s.db)
 	genreService := service.NewGenreService(repo, s.logger)
 	genreID, _ := uuid.Parse("32f24dfc-3823-41e4-a073-c3553c981db1")
@@ -90,5 +90,5 @@ func (s *GenreSuite) TestGetByID(t provider.T) {
 }
 
 func TestGenreSuite(t *testing.T) {
-    suite.RunSuite(t, new(GenreSuite))
+	suite.RunSuite(t, new(GenreSuite))
 }

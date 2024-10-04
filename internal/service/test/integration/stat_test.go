@@ -61,10 +61,10 @@ func (s *StatSuite) AfterEach(t provider.T) {
 }
 
 func (s *StatSuite) TestAdd(t provider.T) {
-    t.Title("stat add integration test")
-    if (isPreviousTestsFailed()) {
-        t.Skip()
-    }
+	t.Title("stat add integration test")
+	if isPreviousTestsFailed() {
+		t.Skip()
+	}
 	repo := postgres.NewPostgresStatRepository(s.db)
 	musrepo := postgres.NewPostgresMusicianRepository(s.db)
 	musicianService := service.NewMusicianService(musrepo, s.hash, s.logger)
@@ -80,10 +80,10 @@ func (s *StatSuite) TestAdd(t provider.T) {
 }
 
 func (s *StatSuite) TestFormReport(t provider.T) {
-    t.Title("stat form report integration test")
-    if (isPreviousTestsFailed()) {
-        t.Skip()
-    }
+	t.Title("stat form report integration test")
+	if isPreviousTestsFailed() {
+		t.Skip()
+	}
 	repo := postgres.NewPostgresStatRepository(s.db)
 	musrepo := postgres.NewPostgresMusicianRepository(s.db)
 	musicianService := service.NewMusicianService(musrepo, s.hash, s.logger)

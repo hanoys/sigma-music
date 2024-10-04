@@ -62,10 +62,10 @@ func (s *MusicianSuite) AfterEach(t provider.T) {
 }
 
 func (s *MusicianSuite) TestRegister(t provider.T) {
-    t.Title("musician register integration test")
-    if (isPreviousTestsFailed()) {
-        t.Skip()
-    }
+	t.Title("musician register integration test")
+	if isPreviousTestsFailed() {
+		t.Skip()
+	}
 	repo := postgres.NewPostgresMusicianRepository(s.db)
 	musicianService := service.NewMusicianService(repo, s.hash, s.logger)
 
@@ -81,10 +81,10 @@ func (s *MusicianSuite) TestRegister(t provider.T) {
 }
 
 func (s *MusicianSuite) TestGetByIDSuccess(t provider.T) {
-    t.Title("musician get by id integration test")
-    if (isPreviousTestsFailed()) {
-        t.Skip()
-    }
+	t.Title("musician get by id integration test")
+	if isPreviousTestsFailed() {
+		t.Skip()
+	}
 	repo := postgres.NewPostgresMusicianRepository(s.db)
 	musicianService := service.NewMusicianService(repo, s.hash, s.logger)
 
@@ -96,10 +96,10 @@ func (s *MusicianSuite) TestGetByIDSuccess(t provider.T) {
 }
 
 func (s *MusicianSuite) TestGetByNameSuccess(t provider.T) {
-    t.Title("musician get by name integration test")
-    if (isPreviousTestsFailed()) {
-        t.Skip()
-    }
+	t.Title("musician get by name integration test")
+	if isPreviousTestsFailed() {
+		t.Skip()
+	}
 	repo := postgres.NewPostgresMusicianRepository(s.db)
 	musicianService := service.NewMusicianService(repo, s.hash, s.logger)
 
@@ -111,10 +111,10 @@ func (s *MusicianSuite) TestGetByNameSuccess(t provider.T) {
 }
 
 func (s *MusicianSuite) TestGetByEmailSuccess(t provider.T) {
-    t.Title("musician get by email integration test")
-    if (isPreviousTestsFailed()) {
-        t.Skip()
-    }
+	t.Title("musician get by email integration test")
+	if isPreviousTestsFailed() {
+		t.Skip()
+	}
 	repo := postgres.NewPostgresMusicianRepository(s.db)
 	musicianService := service.NewMusicianService(repo, s.hash, s.logger)
 

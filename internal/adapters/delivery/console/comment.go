@@ -54,7 +54,7 @@ func (h *Handler) GetCommentsOnTrack(c *Console) {
 
 	for _, comment := range comments {
 		dto.NewCommentDTO(comment).Print()
-        fmt.Println("-----------------------")
+		fmt.Println("-----------------------")
 	}
 }
 
@@ -73,6 +73,6 @@ func (h *Handler) GetUserComments(c *Console) {
 
 	for _, comment := range comments {
 		dto.NewCommentDTO(comment).Print()
-        fmt.Println("-----------------------")
+		fmt.Println("-----------------------")
 	}
 }

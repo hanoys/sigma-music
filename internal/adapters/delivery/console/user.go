@@ -21,7 +21,7 @@ func (h *Handler) GetAllUsers(c *Console) {
 
 	for _, user := range users {
 		dto.NewUserDTO(user).Print()
-        fmt.Println("-----------------------")
+		fmt.Println("-----------------------")
 	}
 }
 

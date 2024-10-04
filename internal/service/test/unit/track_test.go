@@ -260,4 +260,3 @@ func (s *TrackDeleteSuite) TestNotFound(t provider.T) {
 func TestTrackDeleteSuite(t *testing.T) {
 	suite.RunSuite(t, new(TrackDeleteSuite))
 }
-

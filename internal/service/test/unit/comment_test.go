@@ -16,7 +16,6 @@ import (
 	"go.uber.org/zap"
 )
 
-
 type CommentSuite struct {
 	suite.Suite
 	logger *zap.Logger
@@ -39,7 +38,7 @@ func (s *CommentPostSuite) CorrectRepositoryMock(repository *mocks.CommentReposi
 }
 
 func (s *CommentPostSuite) TestCorrect(t provider.T) {
-    t.Parallel()
+	t.Parallel()
 	t.Title("Comment post test correct")
 	req := builder.NewPostCommentServiceRequestBuilder().Default().Build()
 	repository := mocks.NewCommentRepository(t)
@@ -58,7 +57,7 @@ func (s *CommentPostSuite) DuplicateRepositoryMock(repository *mocks.CommentRepo
 }
 
 func (s *CommentPostSuite) TestDuplicate(t provider.T) {
-    t.Parallel()
+	t.Parallel()
 	t.Title("Comment post test duplicate")
 	req := builder.NewPostCommentServiceRequestBuilder().Default().Build()
 	repository := mocks.NewCommentRepository(t)
@@ -85,7 +84,7 @@ func (s *CommentGetCommentsOnTrack) CorrectRepositoryMock(repository *mocks.Comm
 }
 
 func (s *CommentGetCommentsOnTrack) TestCorrect(t provider.T) {
-    t.Parallel()
+	t.Parallel()
 	t.Title("Comment get comments on track test correct")
 	trackID := uuid.New()
 	repository := mocks.NewCommentRepository(t)
@@ -104,7 +103,7 @@ func (s *CommentGetCommentsOnTrack) NotFoundRepositoryMock(repository *mocks.Com
 }
 
 func (s *CommentGetCommentsOnTrack) TestIDNotFound(t provider.T) {
-    t.Parallel()
+	t.Parallel()
 	t.Title("Comment get comments on track test not found")
 	trackID := uuid.New()
 	repository := mocks.NewCommentRepository(t)
@@ -131,7 +130,7 @@ func (s *CommentGetUserComments) CorrectRepositoryMock(repository *mocks.Comment
 }
 
 func (s *CommentGetUserComments) TestCorrect(t provider.T) {
-    t.Parallel()
+	t.Parallel()
 	t.Title("Comment get user comments test correct")
 	userID := uuid.New()
 	repository := mocks.NewCommentRepository(t)
@@ -150,7 +149,7 @@ func (s *CommentGetUserComments) NotFoundRepositoryMock(repository *mocks.Commen
 }
 
 func (s *CommentGetUserComments) TestIDNotFound(t provider.T) {
-    t.Parallel()
+	t.Parallel()
 	t.Title("Comment get user comments test not found")
 	userID := uuid.New()
 	repository := mocks.NewCommentRepository(t)

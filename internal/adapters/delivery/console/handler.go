@@ -9,37 +9,37 @@ import (
 )
 
 type Handler struct {
-	albumService        ports.IAlbumService
-	authService         ports.IAuthorizationService
-	commentService      ports.ICommentService
-	genreService        ports.IGenreService
-	musicianService     ports.IMusicianService
-	statService         ports.IStatService
-	trackService        ports.ITrackService
-	userService         ports.IUserService
+	albumService    ports.IAlbumService
+	authService     ports.IAuthorizationService
+	commentService  ports.ICommentService
+	genreService    ports.IGenreService
+	musicianService ports.IMusicianService
+	statService     ports.IStatService
+	trackService    ports.ITrackService
+	userService     ports.IUserService
 }
 
 type HandlerParams struct {
-	AlbumService        ports.IAlbumService
-	AuthService         ports.IAuthorizationService
-	CommentService      ports.ICommentService
-	GenreService        ports.IGenreService
-	MusicianService     ports.IMusicianService
-	StatService         ports.IStatService
-	TrackService        ports.ITrackService
-	UserService         ports.IUserService
+	AlbumService    ports.IAlbumService
+	AuthService     ports.IAuthorizationService
+	CommentService  ports.ICommentService
+	GenreService    ports.IGenreService
+	MusicianService ports.IMusicianService
+	StatService     ports.IStatService
+	TrackService    ports.ITrackService
+	UserService     ports.IUserService
 }
 
 func NewHandler(params HandlerParams) *Handler {
 	return &Handler{
-		albumService:        params.AlbumService,
-		authService:         params.AuthService,
-		commentService:      params.CommentService,
-		genreService:        params.GenreService,
-		musicianService:     params.MusicianService,
-		statService:         params.StatService,
-		trackService:        params.TrackService,
-		userService:         params.UserService,
+		albumService:    params.AlbumService,
+		authService:     params.AuthService,
+		commentService:  params.CommentService,
+		genreService:    params.GenreService,
+		musicianService: params.MusicianService,
+		statService:     params.StatService,
+		trackService:    params.TrackService,
+		userService:     params.UserService,
 	}
 }
 

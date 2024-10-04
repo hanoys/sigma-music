@@ -50,7 +50,7 @@ func (b *CommentBuilder) SetStars(stars int) *CommentBuilder {
 }
 
 func (b *CommentBuilder) SetText(text string) *CommentBuilder {
-    b.obj.Text = text
+	b.obj.Text = text
 	return b
 }
 

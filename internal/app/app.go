@@ -292,14 +292,14 @@ func Run() {
 	trackService := service.NewTrackService(trackRepo, trackStorage, genreService, logger)
 
 	cons := console.NewConsole(console.NewHandler(console.HandlerParams{
-		AlbumService:        albumService,
-		AuthService:         authService,
-		CommentService:      commentService,
-		GenreService:        genreService,
-		MusicianService:     musicianService,
-		StatService:         statService,
-		TrackService:        trackService,
-		UserService:         userService,
+		AlbumService:    albumService,
+		AuthService:     authService,
+		CommentService:  commentService,
+		GenreService:    genreService,
+		MusicianService: musicianService,
+		StatService:     statService,
+		TrackService:    trackService,
+		UserService:     userService,
 	}))
 
 	cons.Start()

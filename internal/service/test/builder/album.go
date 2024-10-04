@@ -41,4 +41,3 @@ func (b *CreateAlbumServiceRequestBuilder) SetDescription(description string) *C
 	b.obj.Description = description
 	return b
 }
-

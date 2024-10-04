@@ -97,9 +97,9 @@ func newPostgresDB(url string) (*sqlx.DB, error) {
 }
 
 func isPreviousTestsFailed() bool {
-    if (os.Getenv("UNIT_SUCCESS") == "1") {
-        return false
-    }
+	if os.Getenv("UNIT_SUCCESS") == "1" {
+		return false
+	}
 
-    return true
+	return true
 }
