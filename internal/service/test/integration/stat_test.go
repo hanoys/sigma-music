@@ -28,6 +28,10 @@ func (s *StatSuite) BeforeAll(t provider.T) {
 	loggerBuilder.Level = zap.NewAtomicLevelAt(zap.FatalLevel)
 	s.logger, _ = loggerBuilder.Build()
 
+	s.hash = hash.NewHashPasswordProvider()
+}
+
+func (s *StatSuite) BeforeEach(t provider.T) {
 	ctx := context.Background()
 	var err error
 	s.container, err = newPostgresContainer(ctx)
@@ -35,10 +39,6 @@ func (s *StatSuite) BeforeAll(t provider.T) {
 		t.Fatal(err)
 	}
 
-	s.hash = hash.NewHashPasswordProvider()
-}
-
-func (s *StatSuite) BeforeEach(t provider.T) {
 	url, err := s.container.ConnectionString(context.Background())
 	if err != nil {
 		t.Fatal(err)
