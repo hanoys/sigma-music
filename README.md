@@ -47,7 +47,7 @@ Sigma Music
 
 ## Диаграмма базы данных
 
-![DB](pics/db.png)
+![DB](pics/db.svg)
 
 ## Сложные сценарии
 
