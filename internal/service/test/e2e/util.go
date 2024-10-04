@@ -3,6 +3,7 @@ package e2e
 import (
 	"context"
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
 	"time"
@@ -151,4 +152,12 @@ func newMinioClient(url string) (*minio.Client, error) {
 	}
 
 	return minioClient, nil
+}
+
+func isPreviousTestsFailed() bool {
+    if (os.Getenv("INTEGRATION_SUCCESS") == "1") {
+        return false
+    }
+
+    return true
 }
