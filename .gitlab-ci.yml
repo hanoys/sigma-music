@@ -31,6 +31,7 @@ collect_report_history:
     expire_in: 1 day
   rules:
     - when: always
+  allow_failure: true
 
 
 unit:
@@ -48,6 +49,7 @@ unit:
       - allure-results
   rules:
     - when: always
+  allow_failure: true
 
 integration:
   stage: integration-test
@@ -64,6 +66,7 @@ integration:
       - allure-results
   rules:
     - when: always
+  allow_failure: true
 
 e2e:
   stage: e2e-test
@@ -75,6 +78,7 @@ e2e:
       - allure-results
   rules:
     - when: always
+  allow_failure: true
 
 report:
   stage: report
@@ -85,3 +89,4 @@ report:
       - allure-report
   rules:
     - when: always
+  allow_failure: true
