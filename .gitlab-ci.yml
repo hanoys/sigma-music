@@ -36,20 +36,15 @@ collect_report_history:
 unit:
   stage: unit-test
   image: golang:1.22
-  variables:
-    UNIT_SUCCESS: '0'
-    INTEGRATION_SUCCESS: '0'
   script: 
+    - echo UNIT_SUCCESS=0 | tee >> $GITLAB_ENV
     - printenv
-    - touch .env
     - go test -shuffle on ./internal/service/test/unit ./internal/adapters/repository/postgres/test/ -v --parallel 4
-    - echo UNIT_SUCCESS=1 | tee >> $GITLAB_ENV .env
+    - echo UNIT_SUCCESS=1 | tee >> $GITLAB_ENV
   artifacts:
     when: always
     paths:
       - allure-results
-    reports:
-      dotenv: .env
   rules:
     - when: always
 
@@ -57,9 +52,10 @@ integration:
   stage: integration-test
   image: golang:1.22
   script: 
+    - echo INTEGRATION_SUCCESS=0 | tee >> $GITLAB_ENV
     - printenv
     - go test -shuffle on ./internal/service/test/integration/ -v --parallel 4
-    - echo INTEGRATION_SUCCESS=1 | tee >> $GITLAB_ENV .env
+    - echo INTEGRATION_SUCCESS=1 | tee >> $GITLAB_ENV
   artifacts:
     when: always
     paths:
