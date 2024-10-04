@@ -43,7 +43,11 @@ Sigma Music
 
 ## ER диаграмма
 
-![ER](pics/er.png)
+![ER](pics/er.svg)
+
+## Диаграмма базы данных
+
+![DB](pics/db.png)
 
 ## Сложные сценарии
 
