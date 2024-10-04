@@ -19,7 +19,7 @@ unit:
   script: 
     - touch .env
     - go test -shuffle on ./internal/service/test/unit ./internal/adapters/repository/postgres/test/ -v --parallel 4
-    - echo TEST_SUCCESS=1 | tee >> $GITLAB_ENV .env
+    - echo UNIT_SUCCESS=1 | tee >> $GITLAB_ENV .env
   artifacts:
     when: always
     paths:
@@ -35,6 +35,7 @@ integration:
   script: 
     - printenv
     - go test -shuffle on ./internal/service/test/integration/ -v --parallel 4
+    - echo INTEGRATION_SUCCESS=1 | tee >> $GITLAB_ENV .env
   artifacts:
     when: always
     paths:
