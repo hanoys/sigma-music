@@ -16,10 +16,10 @@ stages:
 unit:
   stage: unit-test
   image: golang:1.22
+  variables:
+    UNIT_SUCCESS: '0'
+    INTEGRATION_SUCCESS: '0'
   script: 
-    - unset TEST_FAILED
-    - unset UNIT_SUCCESS
-    - unset INTEGRATION_SUCCESS
     - touch .env
     - go test -shuffle on ./internal/service/test/unit ./internal/adapters/repository/postgres/test/ -v --parallel 4
     - echo UNIT_SUCCESS=1 | tee >> $GITLAB_ENV .env
