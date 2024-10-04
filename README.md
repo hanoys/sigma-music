@@ -39,7 +39,7 @@ Sigma Music
 
 ## Use-Case диаграмма
 
-![Use-case](pics/use-cases.png)
+![Use-case](pics/use-cases.svg)
 
 ## ER диаграмма
 
@@ -104,3 +104,7 @@ Sigma Music
 
 ![BPMN](pics/bpmn.png)
 
+
+## Экраны веб приложения
+
+![WEB](pics/web.svg)
