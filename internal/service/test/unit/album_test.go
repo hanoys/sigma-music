@@ -40,7 +40,6 @@ func (s *AlbumCreateSuite) CorrectRepositoryMock(repository *mocks.AlbumReposito
 func (s *AlbumCreateSuite) TestCorrect(t provider.T) {
 	t.Parallel()
 	t.Title("Album create test correct")
-    t.Assert().True(false)
 	req := builder.NewCreateAlbumServiceRequestBuilder().Default().Build()
 	repository := mocks.NewAlbumRepository(t)
 	albumService := service.NewAlbumService(repository, s.logger)
