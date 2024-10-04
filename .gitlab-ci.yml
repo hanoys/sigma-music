@@ -11,9 +11,29 @@ variables:
   INTEGRATION_SUCCESS: '0'
 
 stages:
+  - report history
   - unit-test
   - integration-test
   - e2e-test
+  - report 
+
+collect_report_history:
+  stage: report history
+  script:
+    - echo $CI_COMMIT_BRANCH
+    - echo $REPORT_TOKEN
+    - 'curl --header "PRIVATE-TOKEN: $REPORT_TOKEN" --location "https://git.iu7.bmstu.ru/api/v4/projects/$CI_PROJECT_ID/jobs/artifacts/$CI_COMMIT_BRANCH/download?job=report" --output artifacts.zip' 
+    - unzip artifacts.zip
+    - mkdir -p ./allure-results
+    - cp -r ./allure-report/history ./allure-results
+  allow_failure: true
+  artifacts:
+    paths:
+      - ./allure-results
+    expire_in: 1 day
+  rules:
+    - when: always
+
 
 unit:
   stage: unit-test
@@ -52,5 +72,15 @@ e2e:
     when: always
     paths:
       - allure-results
+  rules:
+    - when: always
+
+report:
+  stage: report
+  image: frankescobar/allure-docker-service:latest
+  script: allure generate allure-results -o allure-report
+  artifacts:
+    paths:
+      - allure-report
   rules:
     - when: always
