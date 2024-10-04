@@ -24,7 +24,6 @@ collect_report_history:
     - unzip artifacts.zip
     - mkdir -p ./allure-results
     - cp -r ./allure-report/history ./allure-results
-  allow_failure: true
   artifacts:
     paths:
       - ./allure-results
@@ -32,7 +31,6 @@ collect_report_history:
   rules:
     - when: always
   allow_failure: true
-
 
 unit:
   stage: unit-test
