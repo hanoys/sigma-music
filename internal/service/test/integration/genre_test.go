@@ -9,7 +9,8 @@ import (
 	"github.com/ozontech/allure-go/pkg/framework/provider"
 )
 
-func (s *AllSuite) TestGetAll(t provider.T) {
+func (s *AllSuite) TestGenreGetAll(t provider.T) {
+    t.Parallel()
 	t.Title("genre get all integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()
@@ -23,7 +24,8 @@ func (s *AllSuite) TestGetAll(t provider.T) {
 	t.Assert().NotNil(genres)
 }
 
-func (s *AllSuite) TestGetByID(t provider.T) {
+func (s *AllSuite) TestGenreGetByID(t provider.T) {
+    t.Parallel()
 	t.Title("genre get by id integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()

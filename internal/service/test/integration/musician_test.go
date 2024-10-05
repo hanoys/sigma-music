@@ -11,6 +11,7 @@ import (
 )
 
 func (s *AllSuite) TestRegister(t provider.T) {
+    t.Parallel()
 	t.Title("musician register integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()
@@ -29,7 +30,8 @@ func (s *AllSuite) TestRegister(t provider.T) {
 	t.Assert().Equal(req.Name, createdMusician.Name)
 }
 
-func (s *AllSuite) TestGetByIDSuccess(t provider.T) {
+func (s *AllSuite) TestGenreGetByIDSuccess(t provider.T) {
+    t.Parallel()
 	t.Title("musician get by id integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()
@@ -44,7 +46,8 @@ func (s *AllSuite) TestGetByIDSuccess(t provider.T) {
 	t.Assert().Equal(id, foundMusician.ID)
 }
 
-func (s *AllSuite) TestGetByNameSuccess(t provider.T) {
+func (s *AllSuite) TestGenreGetByNameSuccess(t provider.T) {
+    t.Parallel()
 	t.Title("musician get by name integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()
@@ -59,7 +62,8 @@ func (s *AllSuite) TestGetByNameSuccess(t provider.T) {
 	t.Assert().Equal(name, foundMusician.Name)
 }
 
-func (s *AllSuite) TestGetByEmailSuccess(t provider.T) {
+func (s *AllSuite) TestGenreGetByEmailSuccess(t provider.T) {
+    t.Parallel()
 	t.Title("musician get by email integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()

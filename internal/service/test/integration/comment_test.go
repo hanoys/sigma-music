@@ -12,6 +12,7 @@ import (
 
 
 func (s *AllSuite) TestPost(t provider.T) {
+    t.Parallel()
 	t.Title("comment post integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()
@@ -33,6 +34,7 @@ func (s *AllSuite) TestPost(t provider.T) {
 }
 
 func (s *AllSuite) TestGetUserComments(t provider.T) {
+    t.Parallel()
 	t.Title("comment get user comments integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()
@@ -48,6 +50,7 @@ func (s *AllSuite) TestGetUserComments(t provider.T) {
 }
 
 func (s *AllSuite) TestGetCommentsOnTrack(t provider.T) {
+    t.Parallel()
 	t.Title("comment get comments on track integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()

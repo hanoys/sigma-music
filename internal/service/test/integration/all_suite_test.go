@@ -53,10 +53,6 @@ func (s *AllSuite) AfterAll(t provider.T) {
 	}
 }
 
-func (s *AllSuite) AfterEach(t provider.T) {
-	s.db.Close()
-}
-
 func TestAllSuite(t *testing.T) {
     suite.RunSuite(t, new(AllSuite))
 }

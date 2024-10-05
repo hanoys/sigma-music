@@ -2,65 +2,16 @@ package integrationtest
 
 import (
 	"context"
-	"testing"
 
 	"github.com/google/uuid"
-	"github.com/hanoys/sigma-music/internal/adapters/hash"
 	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres"
 	"github.com/hanoys/sigma-music/internal/service"
 	"github.com/hanoys/sigma-music/internal/service/test/builder"
-	"github.com/jmoiron/sqlx"
 	"github.com/ozontech/allure-go/pkg/framework/provider"
-	"github.com/ozontech/allure-go/pkg/framework/suite"
-	testpg "github.com/testcontainers/testcontainers-go/modules/postgres"
-	"go.uber.org/zap"
 )
 
-type AlbumSuite struct {
-	suite.Suite
-	logger    *zap.Logger
-	hash      *hash.HashPasswordProvider
-	container *testpg.PostgresContainer
-	db        *sqlx.DB
-}
-
-func (s *AlbumSuite) BeforeAll(t provider.T) {
-	ctx := context.Background()
-	var err error
-	s.container, err = newPostgresContainer(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	loggerBuilder := zap.NewDevelopmentConfig()
-	loggerBuilder.Level = zap.NewAtomicLevelAt(zap.FatalLevel)
-	s.logger, _ = loggerBuilder.Build()
-	s.hash = hash.NewHashPasswordProvider()
-}
-
-func (s *AlbumSuite) BeforeEach(t provider.T) {
-	url, err := s.container.ConnectionString(context.Background())
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	s.db, err = newPostgresDB(url)
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
-func (s *AlbumSuite) AfterAll(t provider.T) {
-	if err := s.container.Terminate(context.Background()); err != nil {
-		t.Fatalf("failed to terminate container: %s", err)
-	}
-}
-
-func (s *AlbumSuite) AfterEach(t provider.T) {
-	s.db.Close()
-}
-
-func (s *AlbumSuite) TestCreate(t provider.T) {
+func (s *AllSuite) TestAlbumCreate(t provider.T) {
+    t.Parallel()
 	t.Title("Album create integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()
@@ -79,7 +30,8 @@ func (s *AlbumSuite) TestCreate(t provider.T) {
 	t.Assert().Equal(album.Name, req.Name)
 }
 
-func (s *AlbumSuite) TestGetAll(t provider.T) {
+func (s *AllSuite) TestAlbumGetAll(t provider.T) {
+    t.Parallel()
 	t.Title("Album get all integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()
@@ -93,7 +45,8 @@ func (s *AlbumSuite) TestGetAll(t provider.T) {
 	t.Assert().NotNil(albums)
 }
 
-func (s *AlbumSuite) TestGetByID(t provider.T) {
+func (s *AllSuite) TestAlbumGetByID(t provider.T) {
+    t.Parallel()
 	t.Title("Album get by id integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()
@@ -107,7 +60,8 @@ func (s *AlbumSuite) TestGetByID(t provider.T) {
 	t.Assert().Nil(err)
 }
 
-func (s *AlbumSuite) TestGetOwn(t provider.T) {
+func (s *AllSuite) TestAlbumGetOwn(t provider.T) {
+    t.Parallel()
 	t.Title("Album get own integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()
@@ -121,7 +75,8 @@ func (s *AlbumSuite) TestGetOwn(t provider.T) {
 	t.Assert().Nil(err)
 }
 
-func (s *AlbumSuite) TestGetByMusicianID(t provider.T) {
+func (s *AllSuite) TestAlbumGetByMusicianID(t provider.T) {
+    t.Parallel()
 	t.Title("Album get by musician id integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()
@@ -136,8 +91,9 @@ func (s *AlbumSuite) TestGetByMusicianID(t provider.T) {
 	t.Assert().NotNil(albums)
 }
 
-func (s *AlbumSuite) TestPublish(t provider.T) {
+func (s *AllSuite) TestAlbumPublish(t provider.T) {
 	t.Title("Album publish integration test")
+    t.Parallel()
 	if isPreviousTestsFailed() {
 		t.Skip()
 	}
@@ -148,8 +104,4 @@ func (s *AlbumSuite) TestPublish(t provider.T) {
 	err := albumService.Publish(context.Background(), id)
 
 	t.Assert().Nil(err)
-}
-
-func TestAlbumSuite(t *testing.T) {
-	suite.RunSuite(t, new(AlbumSuite))
 }
