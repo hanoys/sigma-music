@@ -25,13 +25,6 @@ type AlbumSuite struct {
 }
 
 func (s *AlbumSuite) BeforeAll(t provider.T) {
-	loggerBuilder := zap.NewDevelopmentConfig()
-	loggerBuilder.Level = zap.NewAtomicLevelAt(zap.FatalLevel)
-	s.logger, _ = loggerBuilder.Build()
-	s.hash = hash.NewHashPasswordProvider()
-}
-
-func (s *AlbumSuite) BeforeEach(t provider.T) {
 	ctx := context.Background()
 	var err error
 	s.container, err = newPostgresContainer(ctx)
@@ -39,6 +32,13 @@ func (s *AlbumSuite) BeforeEach(t provider.T) {
 		t.Fatal(err)
 	}
 
+	loggerBuilder := zap.NewDevelopmentConfig()
+	loggerBuilder.Level = zap.NewAtomicLevelAt(zap.FatalLevel)
+	s.logger, _ = loggerBuilder.Build()
+	s.hash = hash.NewHashPasswordProvider()
+}
+
+func (s *AlbumSuite) BeforeEach(t provider.T) {
 	url, err := s.container.ConnectionString(context.Background())
 	if err != nil {
 		t.Fatal(err)
