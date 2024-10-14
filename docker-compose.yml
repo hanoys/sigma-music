@@ -1,0 +1,79 @@
+services:
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+    networks:
+      - backend
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: sigma
+      POSTGRES_USER: sigma
+      POSTGRES_DB: sigmamusic
+    ports:
+      - 5433:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U marketplace"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    env_file:
+      - .env.local
+    networks:
+      - backend
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  migrations:
+    build:
+      context: migrations
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env.local
+    networks:
+      - backend
+  minio:
+    image: minio/minio
+    container_name: 'minio'
+    command: minio server /data --console-address :9001
+    logging:
+      driver: none
+    volumes:
+      - ./.data/minio:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    env_file:
+      - .env.local
+    networks:
+      - backend
+  app:
+    build: .
+    ports:
+      - 8080:8080
+    depends_on:
+      db:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+    env_file:
+      - .env.local
+    networks:
+      - backend
+    volumes:
+      - ./log:/usr/src/app/log
+      - ./config:/usr/src/app/config
+      - ./data:/usr/src/app/data
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  postgres-data:
+

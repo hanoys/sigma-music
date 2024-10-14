@@ -1,0 +1,90 @@
+services:
+  - name: docker:dind
+    command: ["--tls=false"]
+
+variables:
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_DRIVER: overlay2
+  TESTCONTAINERS_HOST_OVERRIDE: "host.docker.internal"
+  ALLURE_OUTPUT_PATH: "/builds/mta21u184/sigma-music-test"
+
+stages:
+  - report history
+  - unit-test
+  - integration-test
+  - e2e-test
+  - report 
+
+collect_report_history:
+  stage: report history
+  script:
+    - echo $CI_COMMIT_BRANCH
+    - echo $REPORT_TOKEN
+    - 'curl --header "PRIVATE-TOKEN: $REPORT_TOKEN" --location "https://git.iu7.bmstu.ru/api/v4/projects/$CI_PROJECT_ID/jobs/artifacts/$CI_COMMIT_BRANCH/download?job=report" --output artifacts.zip' 
+    - unzip artifacts.zip
+    - mkdir -p ./allure-results
+    - cp -r ./allure-report/history ./allure-results
+  artifacts:
+    paths:
+      - ./allure-results
+    expire_in: 1 day
+  rules:
+    - when: always
+  allow_failure: true
+
+unit:
+  stage: unit-test
+  image: golang:1.22
+  script: 
+    - echo UNIT_SUCCESS=0 | tee >> $GITLAB_ENV
+    - export UNIT_SUCCESS=0
+    - printenv
+    - go test -shuffle on ./internal/service/test/unit ./internal/adapters/repository/postgres/test/ -v --parallel 4
+    - echo UNIT_SUCCESS=1 | tee >> $GITLAB_ENV
+  artifacts:
+    when: always
+    paths:
+      - allure-results
+  rules:
+    - when: always
+  allow_failure: true
+
+integration:
+  stage: integration-test
+  image: golang:1.22
+  script: 
+    - echo INTEGRATION_SUCCESS=0 | tee >> $GITLAB_ENV
+    - export INTEGRATION_SUCCESS=0
+    - printenv
+    - go test -shuffle on ./internal/service/test/integration/ -v --parallel 4
+    - echo INTEGRATION_SUCCESS=1 | tee >> $GITLAB_ENV
+  artifacts:
+    when: always
+    paths:
+      - allure-results
+  rules:
+    - when: always
+  allow_failure: true
+
+e2e:
+  stage: e2e-test
+  image: golang:1.22
+  script: go test -shuffle on ./internal/service/test/e2e/ -v
+  artifacts:
+    when: always
+    paths:
+      - allure-results
+  rules:
+    - when: always
+  allow_failure: true
+
+report:
+  stage: report
+  image: frankescobar/allure-docker-service:latest
+  script: allure generate allure-results -o allure-report
+  artifacts:
+    paths:
+      - allure-report
+  rules:
+    - when: always
+  allow_failure: true
