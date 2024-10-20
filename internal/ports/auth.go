@@ -31,6 +31,7 @@ var (
 	ErrIncorrectPassword = errors.New("authentication error: incorrect password")
 	ErrUnexpectedRole    = errors.New("authentication error: role doesn't exists")
 	ErrInternalAuthRepo  = errors.New("authentication error: internal repository error")
+	ErrInvalidToken      = errors.New("authentication error: invalid token")
 )
 
 type IAuthorizationService interface {

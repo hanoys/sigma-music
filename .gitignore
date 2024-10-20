@@ -32,3 +32,5 @@ backend/data/
 backend/log/
 allure-results/
 allure-reports/
+
+.env.local

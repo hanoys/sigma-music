@@ -18,7 +18,7 @@ import (
 const (
 	TrackGetAllQuery          = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN albums a ON t.album_id = a.id WHERE a.published = TRUE"
 	TrackDeleteQuery          = "DELETE FROM tracks WHERE id = $1"
-	TrackGetByIDQuery         = "SELECT t.id, t.album_id, t.name, t.url t.avg_stars FROM tracks t JOIN albums a ON t.album_id = a.id WHERE t.id = $1 AND a.published = TRUE"
+	TrackGetByIDQuery         = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN albums a ON t.album_id = a.id WHERE t.id = $1 AND a.published = TRUE"
 	TrackGetByIDInternalQuery = "SELECT id, album_id, name, url FROM tracks WHERE id = $1"
 	TrackGetUserFavorites     = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN favorite f on t.id = f.track_id WHERE f.user_id = $1"
 	TrackGetByAlbumID         = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN albums a ON t.album_id = a.id WHERE a.published = TRUE AND a.id = $1"

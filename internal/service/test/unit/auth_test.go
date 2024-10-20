@@ -217,7 +217,7 @@ func (s *AuthVerifyTokenSuite) TestInvalidToken(t provider.T) {
 	servicePayload, err := authService.VerifyToken(context.Background(), tokenString)
 
 	t.Assert().Equal(domain.Payload{}, servicePayload)
-	t.Assert().ErrorIs(err, ports.ErrTokenProviderInvalidToken)
+	t.Assert().ErrorIs(err, ports.ErrInvalidToken)
 }
 
 func TestAuthVerifyTokenSuite(t *testing.T) {

@@ -39,4 +39,7 @@ allure:
 
 report: test allure
 
+swagger:
+	swag init --parseDependency --parseInternal --parseDepth 1 -g ./cmd/web/main.go
+	swagger2openapi docs/swagger.yaml -o docs/openapi3.yaml
 

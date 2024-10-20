@@ -3,8 +3,14 @@ package app
 import (
 	"context"
 	"fmt"
+	"log"
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/hanoys/sigma-music/internal/adapters/auth"
 	"github.com/hanoys/sigma-music/internal/adapters/auth/adapters"
+	"github.com/hanoys/sigma-music/internal/adapters/delivery/api"
 	"github.com/hanoys/sigma-music/internal/adapters/delivery/console"
 	"github.com/hanoys/sigma-music/internal/adapters/hash"
 	"github.com/hanoys/sigma-music/internal/adapters/miniostorage"
@@ -22,9 +28,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"log"
-	"strings"
-	"time"
 )
 
 type PostgresConfig struct {
@@ -291,7 +294,7 @@ func Run() {
 	statService := service.NewStatService(statRepo, genreService, musicianService, logger)
 	trackService := service.NewTrackService(trackRepo, trackStorage, genreService, logger)
 
-	cons := console.NewConsole(console.NewHandler(console.HandlerParams{
+	_ = console.NewConsole(console.NewHandler(console.HandlerParams{
 		AlbumService:    albumService,
 		AuthService:     authService,
 		CommentService:  commentService,
@@ -302,5 +305,29 @@ func Run() {
 		UserService:     userService,
 	}))
 
-	cons.Start()
+	//cons.Start()
+
+	handler := api.NewHandler(logger)
+	services := api.Services{
+		AuthService:     authService,
+		AlbumService:    albumService,
+		MusicianService: musicianService,
+		UserService:     userService,
+		TrackService:    trackService,
+		CommentService:  commentService,
+		GenreService:    genreService,
+	}
+	handler.SetServices(&services)
+	handler.ConfigureHandlers()
+
+	server := http.Server{
+		Handler:      handler.GetRouter(),
+		Addr:         ":8080",
+		WriteTimeout: time.Second * 15,
+		ReadTimeout:  time.Second * 15,
+	}
+
+	if err = server.ListenAndServe(); err != nil {
+		log.Fatalf("error while listening: %v", err)
+	}
 }

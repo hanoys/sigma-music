@@ -1,82 +1,127 @@
 package api
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/hanoys/sigma-music/internal/adapters/delivery/api/dto"
 	"github.com/hanoys/sigma-music/internal/ports"
-	"net/http"
+	"go.uber.org/zap"
 )
 
 type UserHandler struct {
 	router      *gin.RouterGroup
-	userService ports.IUserService
-	authService ports.IAuthorizationService
+	logger      *zap.Logger
+	s           *Services
+	authHandler *AuthHandler
 }
 
-func NewUserHandler(router *gin.RouterGroup, service ports.IUserService, authorizationService ports.IAuthorizationService) *UserHandler {
+func NewUserHandler(router *gin.RouterGroup,
+	logger *zap.Logger,
+	services *Services,
+	authHandler *AuthHandler) *UserHandler {
 	userHandler := &UserHandler{
 		router:      router,
-		userService: service,
-		authService: authorizationService,
+		logger:      logger,
+		s:           services,
+		authHandler: authHandler,
 	}
 
-	userGroup := router.Group("/user")
+	userGroup := router.Group("/users")
 	{
 		userGroup.POST("/register", userHandler.register)
-		userGroup.POST("/login", userHandler.login)
-		userGroup.POST("/logout", userHandler.logout)
+		userGroup.GET("/",
+			userHandler.getAll)
+		userGroup.GET("/:id",
+			userHandler.getByID)
 	}
 
 	return userHandler
 }
 
-func (u *UserHandler) register(c *gin.Context) {
+// @Summary UserRegister
+// @Tags user
+// @Description registration
+// @Accept  json
+// @Produce json
+// @Param input body dto.RegisterUserDTO true "user information"
+// @Failure 400 {object} RestErrorBadRequest
+// @Failure 409 {object} RestErrorConflict
+// @Failure 500 {object} RestErrorInternalError
+// @Success 201 {string} string "message"
+// @Router /users/register [post]
+func (h *UserHandler) register(context *gin.Context) {
 	var registerDTO dto.RegisterUserDTO
-
-	if err := c.ShouldBindJSON(&registerDTO); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": "bad json format"})
+	err := context.ShouldBindJSON(&registerDTO)
+	if err != nil {
+		errorResponse(context, err)
 		return
 	}
 
-	_, err := u.userService.Register(c.Request.Context(), registerDTO.ToServiceRequest())
+	user, err := h.s.UserService.Register(
+		context.Request.Context(),
+		ports.UserServiceCreateRequest{
+			Name:     registerDTO.Name,
+			Email:    registerDTO.Email,
+			Phone:    registerDTO.Phone,
+			Password: registerDTO.Password,
+			Country:  registerDTO.Country,
+		},
+	)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": fmt.Errorf("can't create user: %v\n", err).Error()})
+		errorResponse(context, err)
+		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"msg": "user created"})
+	userDTO := dto.UserFromDomain(user)
+	createdResponse(context, userDTO)
 }
 
-func (u *UserHandler) login(c *gin.Context) {
-	var loginDTO dto.LoginUserDTO
-
-	if err := c.ShouldBindJSON(&loginDTO); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": "bad json format"})
-		return
-	}
-
-	tokenPair, err := u.authService.LogIn(c.Request.Context(), loginDTO.ToServiceRequest())
+// @Summary GetAllUsers
+// @Tags user
+// @Description get all users
+// @Accept  json
+// @Produce json
+// @Failure 500 {object} RestErrorInternalError
+// @Success 200 {object} []dto.UserDTO
+// @Router /users [get]
+func (h *UserHandler) getAll(context *gin.Context) {
+	users, err := h.s.UserService.GetAll(context.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": fmt.Errorf("can't login user: %v\n", err).Error()})
+		errorResponse(context, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.LoginUserResponseFromTokenPair(tokenPair))
+	userDTOs := make([]dto.UserDTO, len(users))
+	for i := range users {
+		userDTOs[i] = dto.UserFromDomain(users[i])
+	}
+
+	successResponse(context, userDTOs)
 }
 
-func (u *UserHandler) logout(c *gin.Context) {
-	var logoutDTO dto.LogoutUserDTO
-
-	if err := c.ShouldBindJSON(&logoutDTO); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": "bad json format"})
-		return
-	}
-
-	err := u.authService.LogOut(c.Request.Context(), logoutDTO.AccessToken)
+// @Summary GetUserByID
+// @Tags user
+// @Description get user id
+// @Accept  json
+// @Produce json
+// @Param   id   path    string  true  "user id"
+// @Failure 400 {object} RestErrorBadRequest
+// @Failure 404 {object} RestErrorNotFound
+// @Failure 500 {object} RestErrorInternalError
+// @Success 200 {object} dto.UserDTO
+// @Router /users/{id} [get]
+func (h *UserHandler) getByID(context *gin.Context) {
+	id, err := getIdFromPath(context, "id")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": fmt.Errorf("can't logout user: %v\n", err).Error()})
+		errorResponse(context, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, "user logged out")
+	user, err := h.s.UserService.GetById(context.Request.Context(), id)
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	userDTO := dto.UserFromDomain(user)
+	successResponse(context, userDTO)
 }

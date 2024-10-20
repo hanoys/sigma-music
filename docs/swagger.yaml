@@ -1,0 +1,1248 @@
+basePath: /api/v1
+definitions:
+  github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.AddForTrackDTO:
+    properties:
+      genres:
+        items:
+          type: string
+        type: array
+    type: object
+  github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.AlbumDTO:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      published:
+        type: boolean
+      release_date:
+        type: string
+    type: object
+  github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.CommentDTO:
+    properties:
+      id:
+        type: string
+      stars:
+        type: integer
+      text:
+        type: string
+      track_id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.CreateAlbumDTO:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    required:
+    - description
+    - name
+    type: object
+  github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.CreateTrackDTO:
+    properties:
+      genres:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.GenreDTO:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.LoginDTO:
+    properties:
+      name:
+        type: string
+      password:
+        type: string
+    required:
+    - name
+    - password
+    type: object
+  github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.LoginResponseDTO:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.MusicianDTO:
+    properties:
+      country:
+        type: string
+      description:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.PostCommentDTO:
+    properties:
+      stars:
+        type: integer
+      text:
+        type: string
+    type: object
+  github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.RefreshDTO:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.RegisterMusicianDTO:
+    properties:
+      country:
+        type: string
+      description:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    required:
+    - country
+    - description
+    - email
+    - name
+    - password
+    type: object
+  github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.RegisterUserDTO:
+    properties:
+      country:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+    required:
+    - country
+    - email
+    - name
+    - password
+    - phone
+    type: object
+  github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.TrackDTO:
+    properties:
+      album_id:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      url:
+        type: string
+    type: object
+  github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.UserDTO:
+    properties:
+      country:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+    type: object
+  internal_adapters_delivery_api.RestErrorBadRequest:
+    properties:
+      error:
+        example: bad request
+        type: string
+      status:
+        example: 400
+        type: integer
+      timestamp:
+        example: "2020-11-10T23:00:00+00:00"
+        type: string
+    type: object
+  internal_adapters_delivery_api.RestErrorConflict:
+    properties:
+      error:
+        example: conflict
+        type: string
+      status:
+        example: 409
+        type: integer
+      timestamp:
+        example: "2020-11-10T23:00:00+00:00"
+        type: string
+    type: object
+  internal_adapters_delivery_api.RestErrorForbidden:
+    properties:
+      error:
+        example: forbidden
+        type: string
+      status:
+        example: 403
+        type: integer
+      timestamp:
+        example: "2020-11-10T23:00:00+00:00"
+        type: string
+    type: object
+  internal_adapters_delivery_api.RestErrorInternalError:
+    properties:
+      error:
+        example: internal server error
+        type: string
+      status:
+        example: 500
+        type: integer
+      timestamp:
+        example: "2020-11-10T23:00:00+00:00"
+        type: string
+    type: object
+  internal_adapters_delivery_api.RestErrorNotFound:
+    properties:
+      error:
+        example: not found
+        type: string
+      status:
+        example: 404
+        type: integer
+      timestamp:
+        example: "2020-11-10T23:00:00+00:00"
+        type: string
+    type: object
+  internal_adapters_delivery_api.RestErrorUnauthorized:
+    properties:
+      error:
+        example: unauthorized
+        type: string
+      status:
+        example: 401
+        type: integer
+      timestamp:
+        example: "2020-11-10T23:00:00+00:00"
+        type: string
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:8080
+info:
+  contact: {}
+  description: This is a Sigma Music API.
+  termsOfService: http://swagger.io/terms/
+  title: Sigma Music API
+  version: "1.0"
+paths:
+  /albums:
+    get:
+      consumes:
+      - application/json
+      description: get all albums
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.AlbumDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      summary: GetAllAlbums
+      tags:
+      - album
+  /albums/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get album by id
+      parameters:
+      - description: album id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.AlbumDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorNotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      summary: GetAlbumByID
+      tags:
+      - album
+    patch:
+      consumes:
+      - application/json
+      description: publish album
+      parameters:
+      - description: album id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorUnauthorized'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorForbidden'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorNotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      security:
+      - ApiKeyAuth: []
+      summary: PublishAlbum
+      tags:
+      - album
+  /albums/{id}/tracks:
+    get:
+      consumes:
+      - application/json
+      description: get tracks by album id
+      parameters:
+      - description: album id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.TrackDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorNotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      summary: GetTracksByAlbumID
+      tags:
+      - track
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: login
+      parameters:
+      - description: credentials
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.LoginDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.LoginResponseDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorUnauthorized'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      summary: LogIn
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorUnauthorized'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      security:
+      - ApiKeyAuth: []
+      summary: Logout
+      tags:
+      - auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: refresh
+      parameters:
+      - description: refresh payload
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.RefreshDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.LoginResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorUnauthorized'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      security:
+      - ApiKeyAuth: []
+      summary: TokenRefresh
+      tags:
+      - auth
+  /genres:
+    get:
+      consumes:
+      - application/json
+      description: get all genres
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.GenreDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      summary: GetAllGenres
+      tags:
+      - genre
+  /genres/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get genre by id
+      parameters:
+      - description: genre id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.GenreDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorNotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      summary: GetGenreByID
+      tags:
+      - genre
+  /musicians:
+    get:
+      consumes:
+      - application/json
+      description: get all musicians
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.MusicianDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      summary: GetAllMusicians
+      tags:
+      - musician
+  /musicians/{id}/albums:
+    get:
+      consumes:
+      - application/json
+      description: get album by musician id
+      parameters:
+      - description: musician id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorNotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      summary: GetAlbumByMusicianID
+      tags:
+      - album
+  /musicians/{id}/tracks:
+    get:
+      consumes:
+      - application/json
+      description: get tracks by musician id
+      parameters:
+      - description: musician id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.TrackDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorNotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      summary: GetTracksByMusicianID
+      tags:
+      - track
+  /musicians/{musician_id}:
+    get:
+      consumes:
+      - application/json
+      description: get musician by id
+      parameters:
+      - description: musician id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.MusicianDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorNotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      summary: GetMusicianByID
+      tags:
+      - musician
+  /musicians/{musician_id}/albums:
+    post:
+      consumes:
+      - application/json
+      description: create album
+      parameters:
+      - description: musician id
+        in: path
+        name: musician_id
+        required: true
+        type: string
+      - description: create album info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.CreateAlbumDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.AlbumDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorUnauthorized'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorForbidden'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorNotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      security:
+      - ApiKeyAuth: []
+      summary: CreateAlbum
+      tags:
+      - album
+  /musicians/{musician_id}/albums/{album_id}/tracks:
+    post:
+      consumes:
+      - application/json
+      description: create track
+      parameters:
+      - description: musician id
+        in: path
+        name: musician_id
+        required: true
+        type: string
+      - description: album id
+        in: path
+        name: album_id
+        required: true
+        type: string
+      - description: create track info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.CreateTrackDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.TrackDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorUnauthorized'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorForbidden'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorNotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      security:
+      - ApiKeyAuth: []
+      summary: CreateTrack
+      tags:
+      - track
+  /musicians/{musician_id}/tracks/{track_id}:
+    delete:
+      consumes:
+      - application/json
+      description: get track by id
+      parameters:
+      - description: track id
+        in: path
+        name: track_id
+        required: true
+        type: string
+      - description: musician id
+        in: path
+        name: musician_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.TrackDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorUnauthorized'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorForbidden'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorNotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      security:
+      - ApiKeyAuth: []
+      summary: DeleteTrack
+      tags:
+      - track
+  /musicians/register:
+    post:
+      consumes:
+      - application/json
+      description: registration
+      parameters:
+      - description: musician information
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.RegisterMusicianDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorConflict'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      summary: MusicianRegister
+      tags:
+      - musician
+  /tracks:
+    get:
+      consumes:
+      - application/json
+      description: get all tracks
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.TrackDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      summary: GetAllTracks
+      tags:
+      - track
+  /tracks/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get track by id
+      parameters:
+      - description: track id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.TrackDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorNotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      summary: GetTrackByID
+      tags:
+      - track
+  /tracks/{id}/comments:
+    get:
+      consumes:
+      - application/json
+      description: get comments by track id
+      parameters:
+      - description: track id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.TrackDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorNotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      summary: GetByTrackID
+      tags:
+      - comment
+    post:
+      consumes:
+      - application/json
+      description: post comment
+      parameters:
+      - description: track id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: post comment info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.PostCommentDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.CommentDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorUnauthorized'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorNotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      security:
+      - ApiKeyAuth: []
+      summary: PostComment
+      tags:
+      - comment
+  /tracks/{track_id}/genres:
+    get:
+      consumes:
+      - application/json
+      description: get genres by track id
+      parameters:
+      - description: track id
+        in: path
+        name: track_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.GenreDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorNotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      summary: GetGenresByTrackID
+      tags:
+      - genre
+    patch:
+      consumes:
+      - application/json
+      description: set genres for track
+      parameters:
+      - description: add genres payload
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.AddForTrackDTO'
+      - description: track id
+        in: path
+        name: track_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorUnauthorized'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorForbidden'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorNotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      security:
+      - ApiKeyAuth: []
+      summary: SetGenresForTrack
+      tags:
+      - genre
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: get all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.UserDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      summary: GetAllUsers
+      tags:
+      - user
+  /users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get user id
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.UserDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorNotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      summary: GetUserByID
+      tags:
+      - user
+  /users/me/comments:
+    get:
+      consumes:
+      - application/json
+      description: get comments by user id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.TrackDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorNotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      summary: GetCommentByUserID
+      tags:
+      - comment
+  /users/me/favorites:
+    get:
+      consumes:
+      - application/json
+      description: get user favorites tracks
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.TrackDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorUnauthorized'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorForbidden'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorNotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      security:
+      - ApiKeyAuth: []
+      summary: GetFavorites
+      tags:
+      - track
+  /users/me/favorites/{id}:
+    put:
+      consumes:
+      - application/json
+      description: add track to user favorites
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorUnauthorized'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorForbidden'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorNotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      security:
+      - ApiKeyAuth: []
+      summary: AddToFavorites
+      tags:
+      - track
+  /users/register:
+    post:
+      consumes:
+      - application/json
+      description: registration
+      parameters:
+      - description: user information
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.RegisterUserDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorConflict'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      summary: UserRegister
+      tags:
+      - user
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

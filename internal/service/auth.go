@@ -162,7 +162,12 @@ func (a *AuthorizationService) VerifyToken(ctx context.Context, tokenString stri
 	if err != nil {
 		a.logger.Error("Failed to verify token for user", zap.Error(err),
 			zap.String("User ID", payload.UserID.String()), zap.String("User Role", stringRole))
-		return domain.Payload{}, err
+		if errors.Is(err, ports.ErrTokenProviderInvalidToken) ||
+			errors.Is(err, ports.ErrTokenProviderExpiredToken) ||
+			errors.Is(err, ports.ErrTokenProviderParsingToken) {
+			return domain.Payload{}, ports.ErrInvalidToken
+		}
+		return domain.Payload{}, ports.ErrInternalAuthRepo
 	}
 
 	a.logger.Info("Token successfully verified for user",

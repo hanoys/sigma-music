@@ -533,3 +533,135 @@
 {"level":"info","timestamp":"2024-09-17T15:18:54.325Z","msg":"User successfully registered","User ID":"d0e3b84c-cb10-42b2-9294-434a24ea7c5e"}
 {"level":"info","timestamp":"2024-09-17T15:18:56.816Z","msg":"User successfully authorized","User ID":"d0e3b84c-cb10-42b2-9294-434a24ea7c5e","User Role":"User"}
 {"level":"info","timestamp":"2024-09-17T15:18:56.817Z","msg":"Token successfully verified for user","User ID":"d0e3b84c-cb10-42b2-9294-434a24ea7c5e","User Role":"User"}
+{"level":"error","timestamp":"2024-10-15T13:01:17.024Z","msg":"Failed to create new album","error":"album repository internal error: ERROR: insert or update on table \"album_musician\" violates foreign key constraint \"album_musician_musician_id_fkey\" (SQLSTATE 23503)"}
+{"level":"error","timestamp":"2024-10-15T13:19:24.234Z","msg":"Failed to create new album","error":"album repository internal error: ERROR: insert or update on table \"album_musician\" violates foreign key constraint \"album_musician_musician_id_fkey\" (SQLSTATE 23503)"}
+{"level":"error","timestamp":"2024-10-15T13:19:37.782Z","msg":"Failed to get album by ID","error":"album with such id not found: sql: no rows in result set","Album ID":"de2b8d8c-a62e-4bc8-a454-38d3f88dc45f"}
+{"level":"info","timestamp":"2024-10-15T13:19:49.527Z","msg":"Successfully received musician albums","Musician ID":"de2b8d8c-a62e-4bc8-a454-38d3f88dc45f"}
+{"level":"error","timestamp":"2024-10-15T13:19:53.330Z","msg":"Failed to publish album","Album ID":"de2b8d8c-a62e-4bc8-a454-38d3f88dc45f"}
+{"level":"error","timestamp":"2024-10-15T13:49:59.283Z","msg":"Failed to create new album","error":"album repository internal error: ERROR: insert or update on table \"album_musician\" violates foreign key constraint \"album_musician_musician_id_fkey\" (SQLSTATE 23503)"}
+{"level":"error","timestamp":"2024-10-15T13:50:01.207Z","msg":"Failed to create new album","error":"album repository internal error: ERROR: insert or update on table \"album_musician\" violates foreign key constraint \"album_musician_musician_id_fkey\" (SQLSTATE 23503)"}
+{"level":"error","timestamp":"2024-10-15T13:50:13.492Z","msg":"Failed to get album by ID","error":"album with such id not found: sql: no rows in result set","Album ID":"de2b8d8c-a62e-4bc8-a454-38d3f88dc45f"}
+{"level":"error","timestamp":"2024-10-15T13:50:14.594Z","msg":"Failed to get album by ID","error":"album with such id not found: sql: no rows in result set","Album ID":"de2b8d8c-a62e-4bc8-a454-38d3f88dc45f"}
+{"level":"error","timestamp":"2024-10-15T13:50:15.571Z","msg":"Failed to get album by ID","error":"album with such id not found: sql: no rows in result set","Album ID":"de2b8d8c-a62e-4bc8-a454-38d3f88dc45f"}
+{"level":"error","timestamp":"2024-10-15T13:55:07.800Z","msg":"Failed to get album by ID","error":"album with such id not found: sql: no rows in result set","Album ID":"de2b8d8c-a62e-4bc8-a454-38d3f88dc45f"}
+{"level":"error","timestamp":"2024-10-15T13:55:14.669Z","msg":"Failed to create new album","error":"album repository internal error: ERROR: insert or update on table \"album_musician\" violates foreign key constraint \"album_musician_musician_id_fkey\" (SQLSTATE 23503)"}
+{"level":"error","timestamp":"2024-10-15T13:55:37.560Z","msg":"Failed to publish album","Album ID":"de2b8d8c-a62e-4bc8-a454-38d3f88dc45f"}
+{"level":"error","timestamp":"2024-10-15T13:55:43.088Z","msg":"Failed to get album by ID","error":"album with such id not found: sql: no rows in result set","Album ID":"de2b8d8c-a62e-4bc8-a454-38d3f88dc45f"}
+{"level":"error","timestamp":"2024-10-15T19:19:55.183Z","msg":"Failed to create new album","error":"album repository internal error: ERROR: insert or update on table \"album_musician\" violates foreign key constraint \"album_musician_musician_id_fkey\" (SQLSTATE 23503)"}
+{"level":"error","timestamp":"2024-10-16T18:30:39.171Z","msg":"Failed to authorize user","error":"authentication error: incorrect password","User Name":"Timur"}
+{"level":"error","timestamp":"2024-10-16T18:32:41.019Z","msg":"Failed to authorize user","error":"authentication error: incorrect password","User Name":"Timur"}
+{"level":"error","timestamp":"2024-10-16T18:32:47.371Z","msg":"Failed to authorize user","error":"authentication error: incorrect name","User Name":"Tiur"}
+{"level":"error","timestamp":"2024-10-16T18:39:28.216Z","msg":"Failed to register user","User Name":"Timur"}
+{"level":"info","timestamp":"2024-10-16T18:39:39.498Z","msg":"User successfully registered","User ID":"b2cfd20a-7956-427b-92dc-09dd02ec5544"}
+{"level":"info","timestamp":"2024-10-16T18:40:09.964Z","msg":"User successfully authorized","User ID":"b2cfd20a-7956-427b-92dc-09dd02ec5544","User Role":"User"}
+{"level":"info","timestamp":"2024-10-16T18:47:46.128Z","msg":"User successfully authorized","User ID":"b2cfd20a-7956-427b-92dc-09dd02ec5544","User Role":"User"}
+{"level":"error","timestamp":"2024-10-16T18:47:58.187Z","msg":"Failed to authorize user","error":"authentication error: incorrect name","User Name":"Ti"}
+{"level":"info","timestamp":"2024-10-16T18:50:44.410Z","msg":"User successfully authorized","User ID":"b2cfd20a-7956-427b-92dc-09dd02ec5544","User Role":"User"}
+{"level":"info","timestamp":"2024-10-16T18:51:32.959Z","msg":"Token successfully verified for user","User ID":"b2cfd20a-7956-427b-92dc-09dd02ec5544","User Role":"User"}
+{"level":"error","timestamp":"2024-10-16T18:51:32.966Z","msg":"Failed to create new album","error":"album repository internal error: ERROR: insert or update on table \"album_musician\" violates foreign key constraint \"album_musician_musician_id_fkey\" (SQLSTATE 23503)"}
+{"level":"info","timestamp":"2024-10-16T19:40:10.002Z","msg":"User successfully authorized","User ID":"b2cfd20a-7956-427b-92dc-09dd02ec5544","User Role":"User"}
+{"level":"info","timestamp":"2024-10-16T19:40:24.723Z","msg":"Token successfully verified for user","User ID":"b2cfd20a-7956-427b-92dc-09dd02ec5544","User Role":"User"}
+{"level":"error","timestamp":"2024-10-17T17:57:02.911Z","msg":"Failed to register user","User Name":"Tim"}
+{"level":"error","timestamp":"2024-10-17T18:06:56.248Z","msg":"Failed to register user","User Name":"Tim"}
+{"level":"info","timestamp":"2024-10-17T18:57:42.876Z","msg":"User successfully authorized","User ID":"b2cfd20a-7956-427b-92dc-09dd02ec5544","User Role":"User"}
+{"level":"info","timestamp":"2024-10-17T18:57:56.481Z","msg":"Token successfully verified for user","User ID":"b2cfd20a-7956-427b-92dc-09dd02ec5544","User Role":"User"}
+{"level":"error","timestamp":"2024-10-17T18:57:56.488Z","msg":"Failed to get album by ID","error":"album with such id not found: sql: no rows in result set","Album ID":"de2b8d8c-a62e-4bc8-a454-38d3f88dc45f"}
+{"level":"info","timestamp":"2024-10-17T19:48:56.860Z","msg":"User successfully authorized","User ID":"b2cfd20a-7956-427b-92dc-09dd02ec5544","User Role":"User"}
+{"level":"error","timestamp":"2024-10-18T12:19:14.471Z","msg":"Failed to authorize user","error":"authentication error: incorrect name","User Name":"Tim"}
+{"level":"info","timestamp":"2024-10-18T12:19:41.771Z","msg":"User successfully authorized","User ID":"b2cfd20a-7956-427b-92dc-09dd02ec5544","User Role":"User"}
+{"level":"info","timestamp":"2024-10-18T12:19:55.569Z","msg":"User successfully authorized","User ID":"b2cfd20a-7956-427b-92dc-09dd02ec5544","User Role":"User"}
+{"level":"info","timestamp":"2024-10-19T21:06:41.002Z","msg":"Musician successfully registered","Musician ID":"299016a5-35ff-409a-a3b9-a14af91cc763"}
+{"level":"info","timestamp":"2024-10-19T21:07:37.460Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T21:10:19.432Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T21:14:38.049Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T21:16:07.376Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T21:23:01.495Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T21:25:29.260Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T21:28:16.560Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T21:30:49.096Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T21:41:00.457Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T21:41:46.441Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T21:45:07.621Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T21:45:39.029Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T21:51:52.069Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T22:07:50.617Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T22:08:24.879Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T22:08:24.886Z","msg":"Album successfully created","Album ID":"541a7927-ae15-4a29-b498-007db1e4dda4","Album Name":"string"}
+{"level":"info","timestamp":"2024-10-19T22:08:48.660Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T22:08:48.663Z","msg":"Album successfully created","Album ID":"de0992e6-116a-4437-836a-d34be402a624","Album Name":"string"}
+{"level":"info","timestamp":"2024-10-19T22:09:02.283Z","msg":"Successfully received musician albums","Musician ID":"299016a5-35ff-409a-a3b9-a14af91cc763"}
+{"level":"info","timestamp":"2024-10-19T22:09:27.062Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T22:09:27.063Z","msg":"Musician successfully received by album ID","Album ID":"de0992e6-116a-4437-836a-d34be402a624"}
+{"level":"info","timestamp":"2024-10-19T22:09:27.068Z","msg":"Successfully published album","Album ID":"de0992e6-116a-4437-836a-d34be402a624"}
+{"level":"info","timestamp":"2024-10-19T22:09:45.071Z","msg":"Successfully received musician albums","Musician ID":"299016a5-35ff-409a-a3b9-a14af91cc763"}
+{"level":"info","timestamp":"2024-10-19T22:10:05.109Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T22:12:57.317Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T22:18:58.379Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T22:19:23.477Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T22:25:51.802Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T22:26:29.199Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T22:26:58.334Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T22:26:58.338Z","msg":"Musician successfully received by id","Musician ID":"299016a5-35ff-409a-a3b9-a14af91cc763"}
+{"level":"info","timestamp":"2024-10-19T22:27:14.209Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"error","timestamp":"2024-10-19T22:27:14.210Z","msg":"Failed to get musician by ID","error":"musician with such id not found: sql: no rows in result set","Musician ID":"299016a5-35ff-409a-a3b9-a14af92cc763"}
+{"level":"info","timestamp":"2024-10-19T22:28:49.500Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"error","timestamp":"2024-10-19T22:28:49.514Z","msg":"Failed to get musician by ID","error":"musician with such id not found: sql: no rows in result set","Musician ID":"299016a5-35ff-409a-a3b9-a14af92aa761"}
+{"level":"info","timestamp":"2024-10-19T22:29:19.342Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"error","timestamp":"2024-10-19T22:29:19.343Z","msg":"Failed to get musician by ID","error":"musician with such id not found: sql: no rows in result set","Musician ID":"299016a5-35ff-409a-a3b9-a14af92aa761"}
+{"level":"info","timestamp":"2024-10-19T22:34:00.109Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T22:34:44.888Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T22:34:44.893Z","msg":"Musician successfully received by id","Musician ID":"299016a5-35ff-409a-a3b9-a14af91cc763"}
+{"level":"info","timestamp":"2024-10-19T22:34:44.903Z","msg":"Album successfully created","Album ID":"0efa0709-16a2-440a-819f-7d796cc68f70","Album Name":"string"}
+{"level":"info","timestamp":"2024-10-19T22:35:01.641Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"error","timestamp":"2024-10-19T22:35:01.643Z","msg":"Failed to get musician by ID","error":"musician with such id not found: sql: no rows in result set","Musician ID":"299016a5-35ff-409a-a3b9-a14af91ca763"}
+{"level":"info","timestamp":"2024-10-19T22:37:02.287Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T22:37:33.818Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"error","timestamp":"2024-10-19T22:37:33.824Z","msg":"Failed to get musician by ID","error":"musician with such id not found: sql: no rows in result set","Musician ID":"299016a5-35ff-409a-a3b9-a14af91ca763"}
+{"level":"info","timestamp":"2024-10-19T22:40:11.780Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T22:40:47.226Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"error","timestamp":"2024-10-19T22:40:47.230Z","msg":"Failed to get musician by ID","error":"musician with such id not found: sql: no rows in result set","Musician ID":"299016a5-35ff-409a-a3b9-a14af91ac763"}
+{"level":"error","timestamp":"2024-10-19T23:07:53.339Z","msg":"Failed to register musician","Musician Name":"Musin"}
+{"level":"error","timestamp":"2024-10-19T23:22:22.682Z","msg":"Failed to register musician","Musician Name":"Musin"}
+{"level":"error","timestamp":"2024-10-19T23:25:44.031Z","msg":"Failed to register musician","Musician Name":"Musin"}
+{"level":"info","timestamp":"2024-10-19T23:28:00.787Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T23:28:44.959Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"error","timestamp":"2024-10-19T23:28:44.974Z","msg":"Failed to get musician by ID","error":"musician with such id not found: sql: no rows in result set","Musician ID":"299016a5-35ff-409a-a3b9-a14af91ca763"}
+{"level":"error","timestamp":"2024-10-19T23:30:04.405Z","msg":"Failed to register musician","Musician Name":"Musin"}
+{"level":"info","timestamp":"2024-10-19T23:30:27.598Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T23:30:55.463Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"error","timestamp":"2024-10-19T23:30:55.467Z","msg":"Failed to get musician by ID","error":"musician with such id not found: sql: no rows in result set","Musician ID":"299016a5-35ff-409a-a3b9-a14af91ac763"}
+{"level":"info","timestamp":"2024-10-19T23:32:27.142Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T23:33:56.363Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"error","timestamp":"2024-10-19T23:33:56.368Z","msg":"Failed to get musician by ID","error":"musician with such id not found: sql: no rows in result set","Musician ID":"299016a5-35ff-409a-a3b9-a14af91ac763"}
+{"level":"info","timestamp":"2024-10-19T23:34:07.388Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T23:34:07.389Z","msg":"Musician successfully received by id","Musician ID":"299016a5-35ff-409a-a3b9-a14af91cc763"}
+{"level":"info","timestamp":"2024-10-19T23:34:07.398Z","msg":"Album successfully created","Album ID":"83d37133-1c3b-4dba-ae6b-beeb3cb10aa6","Album Name":"string"}
+{"level":"info","timestamp":"2024-10-19T23:34:14.841Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T23:34:14.842Z","msg":"Musician successfully received by id","Musician ID":"299016a5-35ff-409a-a3b9-a14af91cc763"}
+{"level":"info","timestamp":"2024-10-19T23:41:22.312Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T23:42:06.491Z","msg":"Tracks successfully received by musician ID","Musician ID":"1add32df-d439-4fd1-9d4c-bef946b4a1fa"}
+{"level":"info","timestamp":"2024-10-19T23:42:13.594Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T23:42:46.616Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T23:44:43.472Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T23:46:19.128Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T23:46:58.322Z","msg":"Tracks successfully received by musician ID","Musician ID":"1add32df-d439-4fd1-9d4c-bef946b4a1fa"}
+{"level":"info","timestamp":"2024-10-19T23:47:04.998Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T23:51:15.417Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T23:52:26.559Z","msg":"Tracks successfully received by musician ID","Musician ID":"1add32df-d439-4fd1-9d4c-bef946b4a1fa"}
+{"level":"info","timestamp":"2024-10-19T23:52:43.652Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T23:54:04.712Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-19T23:54:28.127Z","msg":"Tracks successfully received by musician ID","Musician ID":"1add32df-d439-4fd1-9d4c-bef946b4a1fa"}
+{"level":"info","timestamp":"2024-10-19T23:54:41.130Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-20T00:04:39.124Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-20T00:05:05.973Z","msg":"Tracks successfully received by musician ID","Musician ID":"1add32df-d439-4fd1-9d4c-bef946b4a1fa"}
+{"level":"info","timestamp":"2024-10-20T00:05:44.861Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"error","timestamp":"2024-10-20T00:05:44.864Z","msg":"Failed to get track by ID","error":"internal track repository error: ERROR: syntax error at or near \".\" (SQLSTATE 42601)","Track ID":"41623ac1-b98d-4478-a10f-870a80c697b6"}
+{"level":"info","timestamp":"2024-10-20T00:09:55.545Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-20T00:10:27.859Z","msg":"Tracks successfully received by musician ID","Musician ID":"1add32df-d439-4fd1-9d4c-bef946b4a1fa"}
+{"level":"info","timestamp":"2024-10-20T00:10:38.461Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-20T00:10:38.464Z","msg":"Track successfully received by ID","Track ID":"41623ac1-b98d-4478-a10f-870a80c697b6"}
+{"level":"info","timestamp":"2024-10-20T00:10:38.465Z","msg":"Musician successfully received by album ID","Album ID":"b24fa8eb-9df6-406c-9b45-763d7b5a5078"}
+{"level":"info","timestamp":"2024-10-20T12:55:15.087Z","msg":"User successfully authorized","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-20T12:57:00.854Z","msg":"Successfully received musician albums","Musician ID":"299016a5-35ff-409a-a3b9-a14af91cc763"}
+{"level":"info","timestamp":"2024-10-20T12:57:18.905Z","msg":"Token successfully verified for user","User ID":"299016a5-35ff-409a-a3b9-a14af91cc763","User Role":"Musician"}
+{"level":"info","timestamp":"2024-10-20T12:57:18.908Z","msg":"Musician successfully received by album ID","Album ID":"de0992e6-116a-4437-836a-d34be402a624"}

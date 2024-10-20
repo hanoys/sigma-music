@@ -39,15 +39,15 @@ Sigma Music
 
 ## Use-Case диаграмма
 
-![Use-case](pics/use-cases.svg)
+![Use-case](docs/pics/use-cases.svg)
 
 ## ER диаграмма
 
-![ER](pics/er.svg)
+![ER](docs/pics/er.svg)
 
 ## Диаграмма базы данных
 
-![DB](pics/db.svg)
+![DB](docs/pics/db.svg)
 
 ## Сложные сценарии
 
@@ -105,9 +105,9 @@ Sigma Music
 
 ## BPMN-диаграмма
 
-![BPMN](pics/bpmn.png)
+![BPMN](docs/pics/bpmn.png)
 
 
 ## Экраны веб приложения
 
-![WEB](pics/web.svg)
+![WEB](docs/pics/web.svg)

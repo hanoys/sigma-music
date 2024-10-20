@@ -14,10 +14,11 @@ import (
 )
 
 const (
-	GenreGetByIDQuery     = "SELECT * FROM genres WHERE id = $1"
-	GenreGetAllQuery      = "SELECT * FROM genres"
-	genreAddForTrackQuery = "INSERT INTO track_genre (track_id, genre_id) VALUES ($1, $2)"
-	GenreGetByTrack       = "SELECT g.id, g.name FROM genres g JOIN public.track_genre tg on g.id = tg.genre_id WHERE tg.track_id = $1"
+	GenreGetByIDQuery        = "SELECT * FROM genres WHERE id = $1"
+	GenreGetAllQuery         = "SELECT * FROM genres"
+	genreDeleteForTrackQuery = "DELETE * FROM track_genre WHERE track_id=$1"
+	genreAddForTrackQuery    = "INSERT INTO track_genre (track_id, genre_id) VALUES ($1, $2)"
+	GenreGetByTrack          = "SELECT g.id, g.name FROM genres g JOIN public.track_genre tg on g.id = tg.genre_id WHERE tg.track_id = $1"
 )
 
 type PostgresGenreRepository struct {
@@ -58,6 +59,8 @@ func (gr *PostgresGenreRepository) GetByID(ctx context.Context, id uuid.UUID) (d
 
 func (gr *PostgresGenreRepository) AddForTrack(ctx context.Context, trackID uuid.UUID, genresID []uuid.UUID) error {
 	tx := gr.connection.MustBegin()
+    tx.MustExec(genreDeleteForTrackQuery, trackID)
+
 	for _, genreID := range genresID {
 		tx.MustExec(genreAddForTrackQuery, trackID, genreID)
 	}

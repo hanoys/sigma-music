@@ -1,18 +1,21 @@
 package dto
 
-import "github.com/hanoys/sigma-music/internal/domain"
+import (
+	"github.com/google/uuid"
+	"github.com/hanoys/sigma-music/internal/domain"
+)
 
 type AlbumDTO struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Published   bool   `json:"published"`
-	ReleaseDate string `json:"release_date"`
+	ID          uuid.UUID `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Published   bool      `json:"published"`
+	ReleaseDate string    `json:"release_date"`
 }
 
 func AlbumFromDomain(album domain.Album) AlbumDTO {
 	albumDTO := AlbumDTO{
-		ID:          album.ID.String(),
+		ID:          album.ID,
 		Name:        album.Name,
 		Description: album.Description,
 		Published:   album.Published,
@@ -28,6 +31,6 @@ func AlbumFromDomain(album domain.Album) AlbumDTO {
 }
 
 type CreateAlbumDTO struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	Name        string `json:"name" binding:"required"`
+	Description string `json:"description" binding:"required"`
 }

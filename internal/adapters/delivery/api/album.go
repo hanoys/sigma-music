@@ -1,166 +1,201 @@
 package api
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/hanoys/sigma-music/internal/adapters/delivery/api/dto"
-	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
-	"net/http"
+	"go.uber.org/zap"
 )
 
 type AlbumHandler struct {
-	router       *gin.RouterGroup
-	albumService ports.IAlbumService
+	router      *gin.RouterGroup
+	logger      *zap.Logger
+	s           *Services
+	authHandler *AuthHandler
 }
 
-func NewAlbumHandler(router *gin.RouterGroup, service ports.IAlbumService) *AlbumHandler {
+func NewAlbumHandler(router *gin.RouterGroup,
+	logger *zap.Logger,
+	services *Services,
+	authHandler *AuthHandler) *AlbumHandler {
 	albumHandler := &AlbumHandler{
-		router:       router,
-		albumService: service,
+		router:      router,
+		s:           services,
+		authHandler: authHandler,
 	}
-	router.Group("/album")
-	{
-		router.POST("/", albumHandler.createAlbum)
-		router.GET("/:id", albumHandler.getAlbum)
-		router.GET("/", albumHandler.getAllAlbums)
-		router.GET("/musician/:id", albumHandler.getAlbumsByMusician)
-		router.GET("/musician", albumHandler.getOwnAlbums)
-		router.POST("/publish/:id", albumHandler.publishAlbum)
-	}
+
+	router.PATCH("/albums/:album_id",
+		authHandler.verifyToken,
+		authHandler.verifyAlbumOwner,
+		albumHandler.publish)
+
+	router.GET("/albums/", albumHandler.getAll)
+	router.GET("/albums/:album_id", albumHandler.getByID)
+
+	router.GET("/musicians/:musician_id/albums",
+		albumHandler.getByMusicianID)
+	router.POST("/musicians/:musician_id/albums",
+		authHandler.verifyToken,
+		authHandler.verifyMusicianRole,
+		authHandler.verifyMusicianID,
+		albumHandler.create)
 
 	return albumHandler
 }
 
-func (h *AlbumHandler) createAlbum(c *gin.Context) {
+// @Summary CreateAlbum
+// @Tags album
+// @Security ApiKeyAuth
+// @Description create album
+// @Accept  json
+// @Produce json
+// @Param   musician_id   path    string  true  "musician id"
+// @Param input body dto.CreateAlbumDTO true "create album info"
+// @Failure 400 {object} RestErrorBadRequest
+// @Failure 401 {object} RestErrorUnauthorized
+// @Failure 403 {object} RestErrorForbidden
+// @Failure 404 {object} RestErrorNotFound
+// @Failure 500 {object} RestErrorInternalError
+// @Success 201 {object} dto.AlbumDTO
+// @Router /musicians/{musician_id}/albums [post]
+func (h *AlbumHandler) create(context *gin.Context) {
 	var createAlbumDTO dto.CreateAlbumDTO
-
-	if err := c.ShouldBindJSON(&createAlbumDTO); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": "bad json format"})
-		return
-	}
-
-	val, ok := c.Get("UserInfo")
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": "server error"})
-		return
-	}
-
-	payload, ok := val.(domain.Payload)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": "server error"})
-		return
-	}
-
-	if payload.Role != domain.MusicianRole {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": "you are not able to create album"})
-		return
-	}
-
-	album, err := h.albumService.Create(c.Request.Context(), ports.CreateAlbumServiceReq{
-		MusicianID:  payload.UserID,
-		Name:        createAlbumDTO.Name,
-		Description: createAlbumDTO.Description,
-	})
-
+	err := context.ShouldBindJSON(&createAlbumDTO)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": fmt.Errorf("can't create album: %v\n", err).Error()})
+		errorResponse(context, err)
+		return
 	}
 
-	c.JSON(http.StatusOK, dto.AlbumFromDomain(album))
+	id, err := getIdFromPath(context, "musician_id")
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	album, err := h.s.AlbumService.Create(context.Request.Context(),
+		ports.CreateAlbumServiceReq{
+			MusicianID:  id,
+			Name:        createAlbumDTO.Name,
+			Description: createAlbumDTO.Description,
+		})
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	albumDTO := dto.AlbumFromDomain(album)
+	createdResponse(context, albumDTO)
 }
 
-func (h *AlbumHandler) getAlbum(c *gin.Context) {
-	albumID := c.Param("id")
-
-	id, err := uuid.FromBytes([]byte(albumID))
+// @Summary GetAllAlbums
+// @Tags album
+// @Description get all albums
+// @Accept  json
+// @Produce json
+// @Failure 500 {object} RestErrorInternalError
+// @Success 200 {object} []dto.AlbumDTO
+// @Router /albums [get]
+func (h *AlbumHandler) getAll(context *gin.Context) {
+	albums, err := h.s.AlbumService.GetAll(context.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": fmt.Errorf("can't get album: %v\n", err).Error()})
+		errorResponse(context, err)
 		return
 	}
 
-	album, err := h.albumService.GetByID(c.Request.Context(), id)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": fmt.Errorf("can't create album: %v\n", err).Error()})
-		return
+	albumDTOs := make([]dto.AlbumDTO, len(albums))
+	for i := range albums {
+		albumDTOs[i] = dto.AlbumFromDomain(albums[i])
 	}
 
-	c.JSON(http.StatusOK, dto.AlbumFromDomain(album))
+	successResponse(context, albumDTOs)
 }
 
-func (h *AlbumHandler) getAllAlbums(c *gin.Context) {
+// @Summary GetAlbumByID
+// @Tags album
+// @Description get album by id
+// @Accept  json
+// @Produce json
+// @Param   id   path    string  true  "album id"
+// @Failure 400 {object} RestErrorBadRequest
+// @Failure 404 {object} RestErrorNotFound
+// @Failure 500 {object} RestErrorInternalError
+// @Success 200 {object} dto.AlbumDTO
+// @Router /albums/{id} [get]
+func (h *AlbumHandler) getByID(context *gin.Context) {
+	id, err := getIdFromPath(context, "album_id")
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
 
+	album, err := h.s.AlbumService.GetByID(context.Request.Context(), id)
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	albumDTO := dto.AlbumFromDomain(album)
+	successResponse(context, albumDTO)
 }
 
-func (h *AlbumHandler) getAlbumsByMusician(c *gin.Context) {
-	musicianID := c.Param("id")
-
-	id, err := uuid.FromBytes([]byte(musicianID))
+// @Summary PublishAlbum
+// @Tags album
+// @Security ApiKeyAuth
+// @Description publish album
+// @Accept  json
+// @Produce json
+// @Param id   path    string  true  "album id"
+// @Failure 400 {object} RestErrorBadRequest
+// @Failure 401 {object} RestErrorUnauthorized
+// @Failure 403 {object} RestErrorForbidden
+// @Failure 404 {object} RestErrorNotFound
+// @Failure 500 {object} RestErrorInternalError
+// @Success 200
+// @Router /albums/{id} [patch]
+func (h *AlbumHandler) publish(context *gin.Context) {
+	id, err := getIdFromPath(context, "album_id")
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": fmt.Errorf("can't get album: %v\n", err).Error()})
+		errorResponse(context, err)
 		return
 	}
 
-	albums, err := h.albumService.GetByMusicianID(c.Request.Context(), id)
+	err = h.s.AlbumService.Publish(context.Request.Context(), id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": fmt.Errorf("can't create album: %v\n", err).Error()})
+		errorResponse(context, err)
 		return
 	}
 
-	albumsDTO := make([]dto.AlbumDTO, len(albums))
-	for i, album := range albums {
-		albumsDTO[i] = dto.AlbumFromDomain(album)
-	}
-
-	c.JSON(http.StatusOK, albumsDTO)
+	successResponse(context, struct{}{})
 }
 
-func (h *AlbumHandler) getOwnAlbums(c *gin.Context) {
-	val, ok := c.Get("UserInfo")
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": "server error"})
-		return
-	}
-
-	payload, ok := val.(domain.Payload)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": "server error"})
-		return
-	}
-
-	if payload.Role != domain.MusicianRole {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": "you are not able to get own albums"})
-		return
-	}
-
-	albums, err := h.albumService.GetOwn(c.Request.Context(), payload.UserID)
+// @Summary GetAlbumByMusicianID
+// @Tags album
+// @Description get album by musician id
+// @Accept  json
+// @Produce json
+// @Param id   path    string  true  "musician id"
+// @Failure 400 {object} RestErrorBadRequest
+// @Failure 404 {object} RestErrorNotFound
+// @Failure 500 {object} RestErrorInternalError
+// @Success 200
+// @Router /musicians/{id}/albums [get]
+func (h *AlbumHandler) getByMusicianID(context *gin.Context) {
+	id, err := getIdFromPath(context, "musician_id")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": fmt.Errorf("can't create album: %v\n", err).Error()})
+		errorResponse(context, err)
 		return
 	}
 
-	albumsDTO := make([]dto.AlbumDTO, len(albums))
-	for i, album := range albums {
-		albumsDTO[i] = dto.AlbumFromDomain(album)
-	}
-
-	c.JSON(http.StatusOK, albumsDTO)
-}
-
-func (h *AlbumHandler) publishAlbum(c *gin.Context) {
-	musicianID := c.Param("id")
-
-	id, err := uuid.FromBytes([]byte(musicianID))
+	albums, err := h.s.AlbumService.GetByMusicianID(context.Request.Context(), id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": fmt.Errorf("can't publish album: %v\n", err).Error()})
+		errorResponse(context, err)
 		return
 	}
 
-	if err = h.albumService.Publish(c.Request.Context(), id); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": fmt.Errorf("can't publish album: %v\n", err).Error()})
-		return
+	albumDTOs := make([]dto.AlbumDTO, len(albums))
+	for i := range albums {
+		albumDTOs[i] = dto.AlbumFromDomain(albums[i])
 	}
 
-	c.JSON(http.StatusOK, gin.H{"msg": "album published"})
+	successResponse(context, albumDTOs)
 }
