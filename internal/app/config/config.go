@@ -126,13 +126,6 @@ const (
 	maxConnLifetime = 3 * time.Minute
 )
 
-type MongoConfig struct {
-	Database string
-	User     string
-	Password string
-	Url      string
-}
-
 func NewPostgresDB(cfg *PostgresConfig) (*sqlx.DB, error) {
 	connectionString := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s",
 		cfg.Host,
