@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eschool Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div id="content"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('/static/README.md')
+            .then(response => response.text())
+            .then(markdown => {
+                // Конвертируем Markdown в HTML с помощью marked.js
+                const htmlContent = marked.parse(markdown);
+                document.getElementById('content').innerHTML = htmlContent;
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки markdown файла:', error);
+            });
+    });
+</script>
+
+</body>
+</html>

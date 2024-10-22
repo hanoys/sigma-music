@@ -34,3 +34,4 @@ allure-results/
 allure-reports/
 
 .env.local
+/log

@@ -7,7 +7,7 @@ import "github.com/hanoys/sigma-music/internal/app/web"
 // @description     This is a Sigma Music API.
 // @termsOfService  http://swagger.io/terms/
 
-// @host      localhost:8080
+// @host      localhost:80
 // @BasePath  /api/v1
 
 // @securityDefinitions.apikey ApiKeyAuth

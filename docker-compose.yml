@@ -26,6 +26,22 @@ services:
     volumes:
       - ./.data/postgres:/var/lib/postgresql/data
 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: 'pgadmin4'
+    logging:
+      driver: none
+    restart: always
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: sigma@postgres.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    volumes:
+      - ./.data/pgadmin:/var/lib/pgadmin
+    networks:
+      - backend
+
   migrations:
     build:
       context: migrations
@@ -69,6 +85,23 @@ services:
       - ./log:/usr/src/app/log
       - ./config:/usr/src/app/config
       - ./data:/usr/src/app/data
+  proxy:
+    image: nginx
+    container_name: 'proxy'
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/static/dist:/static/dist
+      - ./docs:/static/docs
+      - ./README.md:/static/README.md
+      - ./nginx/static/index.html:/static/index.html
+      - ./nginx/static/md-renderer.html:/static/md-renderer.html
+      - ./log/nginx:/var/log/nginx
+    networks:
+      - backend
+    depends_on:
+      - app
 
 networks:
   backend:
