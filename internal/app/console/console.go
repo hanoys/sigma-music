@@ -105,7 +105,7 @@ func Run() {
 	statService := service.NewStatService(statRepo, genreService, musicianService, logger)
 	trackService := service.NewTrackService(trackRepo, trackStorage, genreService, logger)
 
-    cons := consd.NewConsole(consd.NewHandler(consd.HandlerParams{
+	cons := consd.NewConsole(consd.NewHandler(consd.HandlerParams{
 		AlbumService:    albumService,
 		AuthService:     authService,
 		CommentService:  commentService,

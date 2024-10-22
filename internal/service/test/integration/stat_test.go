@@ -10,7 +10,7 @@ import (
 )
 
 func (s *AllSuite) TestAdd(t provider.T) {
-    t.Parallel()
+	t.Parallel()
 	t.Title("stat add integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()
@@ -30,7 +30,7 @@ func (s *AllSuite) TestAdd(t provider.T) {
 }
 
 func (s *AllSuite) TestFormReport(t provider.T) {
-    t.Parallel()
+	t.Parallel()
 	t.Title("stat form report integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()

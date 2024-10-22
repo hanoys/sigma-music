@@ -59,7 +59,7 @@ func (gr *PostgresGenreRepository) GetByID(ctx context.Context, id uuid.UUID) (d
 
 func (gr *PostgresGenreRepository) AddForTrack(ctx context.Context, trackID uuid.UUID, genresID []uuid.UUID) error {
 	tx := gr.connection.MustBegin()
-    tx.MustExec(genreDeleteForTrackQuery, trackID)
+	tx.MustExec(genreDeleteForTrackQuery, trackID)
 
 	for _, genreID := range genresID {
 		tx.MustExec(genreAddForTrackQuery, trackID, genreID)

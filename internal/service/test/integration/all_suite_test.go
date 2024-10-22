@@ -54,5 +54,5 @@ func (s *AllSuite) AfterAll(t provider.T) {
 }
 
 func TestAllSuite(t *testing.T) {
-    suite.RunSuite(t, new(AllSuite))
+	suite.RunSuite(t, new(AllSuite))
 }

@@ -41,4 +41,3 @@ func (r *RegisterUserDTO) ToServiceRequest() ports.UserServiceCreateRequest {
 		Country:  r.Country,
 	}
 }
-

@@ -11,7 +11,7 @@ import (
 )
 
 func (s *AllSuite) TestAlbumCreate(t provider.T) {
-    t.Parallel()
+	t.Parallel()
 	t.Title("Album create integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()
@@ -31,7 +31,7 @@ func (s *AllSuite) TestAlbumCreate(t provider.T) {
 }
 
 func (s *AllSuite) TestAlbumGetAll(t provider.T) {
-    t.Parallel()
+	t.Parallel()
 	t.Title("Album get all integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()
@@ -46,7 +46,7 @@ func (s *AllSuite) TestAlbumGetAll(t provider.T) {
 }
 
 func (s *AllSuite) TestAlbumGetByID(t provider.T) {
-    t.Parallel()
+	t.Parallel()
 	t.Title("Album get by id integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()
@@ -61,7 +61,7 @@ func (s *AllSuite) TestAlbumGetByID(t provider.T) {
 }
 
 func (s *AllSuite) TestAlbumGetOwn(t provider.T) {
-    t.Parallel()
+	t.Parallel()
 	t.Title("Album get own integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()
@@ -76,7 +76,7 @@ func (s *AllSuite) TestAlbumGetOwn(t provider.T) {
 }
 
 func (s *AllSuite) TestAlbumGetByMusicianID(t provider.T) {
-    t.Parallel()
+	t.Parallel()
 	t.Title("Album get by musician id integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()
@@ -93,7 +93,7 @@ func (s *AllSuite) TestAlbumGetByMusicianID(t provider.T) {
 
 func (s *AllSuite) TestAlbumPublish(t provider.T) {
 	t.Title("Album publish integration test")
-    t.Parallel()
+	t.Parallel()
 	if isPreviousTestsFailed() {
 		t.Skip()
 	}

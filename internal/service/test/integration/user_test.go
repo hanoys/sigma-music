@@ -11,7 +11,7 @@ import (
 )
 
 func (s *AllSuite) TestCreateSuccess(t provider.T) {
-    t.Parallel()
+	t.Parallel()
 	t.Title("user create integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()
@@ -33,7 +33,7 @@ func (s *AllSuite) TestCreateSuccess(t provider.T) {
 }
 
 func (s *AllSuite) TestUserGetByIDSuccess(t provider.T) {
-    t.Parallel()
+	t.Parallel()
 	t.Title("user get by id integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()
@@ -50,7 +50,7 @@ func (s *AllSuite) TestUserGetByIDSuccess(t provider.T) {
 
 func (s *AllSuite) TestUserGetByNameSuccess(t provider.T) {
 	t.Title("user get by name integration test")
-    t.Parallel()
+	t.Parallel()
 	if isPreviousTestsFailed() {
 		t.Skip()
 	}
@@ -65,7 +65,7 @@ func (s *AllSuite) TestUserGetByNameSuccess(t provider.T) {
 }
 
 func (s *AllSuite) TestUserGetByEmailSuccess(t provider.T) {
-    t.Parallel()
+	t.Parallel()
 	t.Title("user get by email integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()
@@ -81,7 +81,7 @@ func (s *AllSuite) TestUserGetByEmailSuccess(t provider.T) {
 }
 
 func (s *AllSuite) TestGetByPhoneSuccess(t provider.T) {
-    t.Parallel()
+	t.Parallel()
 	t.Title("user get by phone integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()

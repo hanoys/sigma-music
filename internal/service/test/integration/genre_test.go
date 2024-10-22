@@ -10,7 +10,7 @@ import (
 )
 
 func (s *AllSuite) TestGenreGetAll(t provider.T) {
-    t.Parallel()
+	t.Parallel()
 	t.Title("genre get all integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()
@@ -25,7 +25,7 @@ func (s *AllSuite) TestGenreGetAll(t provider.T) {
 }
 
 func (s *AllSuite) TestGenreGetByID(t provider.T) {
-    t.Parallel()
+	t.Parallel()
 	t.Title("genre get by id integration test")
 	if isPreviousTestsFailed() {
 		t.Skip()

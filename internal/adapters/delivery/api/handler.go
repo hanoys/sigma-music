@@ -72,7 +72,7 @@ func (h *Handler) GetRouter() http.Handler {
 }
 
 func getIdFromPath(c *gin.Context, paramName string) (uuid.UUID, error) {
-    log.Println("DEBUG: c.Params: ", c.Params)
+	log.Println("DEBUG: c.Params: ", c.Params)
 	idString := c.Param(paramName)
 	if idString == "" {
 		return uuid.UUID{}, PathIDNotFoundError
