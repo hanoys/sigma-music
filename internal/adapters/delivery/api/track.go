@@ -1,6 +1,8 @@
 package api
 
 import (
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/hanoys/sigma-music/internal/adapters/delivery/api/dto"
@@ -18,7 +20,8 @@ type TrackHandler struct {
 func NewTrackHandler(router *gin.RouterGroup,
 	logger *zap.Logger,
 	services *Services,
-	authHandler *AuthHandler) *TrackHandler {
+	authHandler *AuthHandler,
+) *TrackHandler {
 	trackHandler := &TrackHandler{
 		router:      router,
 		logger:      logger,
@@ -45,12 +48,16 @@ func NewTrackHandler(router *gin.RouterGroup,
 		authHandler.verifyToken,
 		authHandler.verifyUserRole,
 		trackHandler.getFavorites)
-	router.PUT("/users/me/favorites/:track_id",
+	router.POST("/users/me/favorites/:track_id",
 		authHandler.verifyToken,
 		authHandler.verifyUserRole,
 		trackHandler.addToFavorites)
 	router.GET("/musicians/:musician_id/tracks",
 		trackHandler.getByMusicianID)
+	router.GET("/musicians/me/tracks",
+		authHandler.verifyToken,
+		authHandler.verifyMusicianRole,
+		trackHandler.getOwn)
 
 	return trackHandler
 }
@@ -102,7 +109,7 @@ func (h *TrackHandler) create(context *gin.Context) {
 		ports.CreateTrackReq{
 			AlbumID:   albumID,
 			Name:      createTrackDTO.Name,
-			TrackBLOB: nil,
+			TrackBLOB: strings.NewReader("fdf"),
 			GenresID:  genreIDs,
 		},
 	)
@@ -125,6 +132,36 @@ func (h *TrackHandler) create(context *gin.Context) {
 // @Router /tracks [get]
 func (h *TrackHandler) getAll(context *gin.Context) {
 	tracks, err := h.s.TrackService.GetAll(context.Request.Context())
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	trackDTOs := make([]dto.TrackDTO, len(tracks))
+	for i := range tracks {
+		trackDTOs[i] = dto.TrackFromDomain(tracks[i])
+	}
+
+	successResponse(context, trackDTOs)
+}
+
+// @Summary getOwn
+// @Tags track
+// @Security ApiKeyAuth
+// @Description get own tracks
+// @Accept  json
+// @Produce json
+// @Failure 500 {object} RestErrorInternalError
+// @Success 200 {object} []dto.TrackDTO
+// @Router /musicians/me/tracks [get]
+func (h *TrackHandler) getOwn(context *gin.Context) {
+	musicianID, err := getIdFromRequestContext(context)
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	tracks, err := h.s.TrackService.GetOwn(context.Request.Context(), musicianID)
 	if err != nil {
 		errorResponse(context, err)
 		return
@@ -228,7 +265,6 @@ func (h *TrackHandler) getByAlbumID(context *gin.Context) {
 	}
 
 	successResponse(context, trackDTOs)
-
 }
 
 // @Summary GetFavorites
@@ -271,13 +307,14 @@ func (h *TrackHandler) getFavorites(context *gin.Context) {
 // @Description add track to user favorites
 // @Accept  json
 // @Produce json
+// @Param   id   path    string  true  "track id"
 // @Failure 400 {object} RestErrorBadRequest
 // @Failure 401 {object} RestErrorUnauthorized
 // @Failure 403 {object} RestErrorForbidden
 // @Failure 404 {object} RestErrorNotFound
 // @Failure 500 {object} RestErrorInternalError
 // @Success 200 {string} string ""
-// @Router /users/me/favorites/{id} [put]
+// @Router /users/me/favorites/{id} [post]
 func (h *TrackHandler) addToFavorites(context *gin.Context) {
 	userID, err := getIdFromRequestContext(context)
 	if err != nil {

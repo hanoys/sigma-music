@@ -34,6 +34,9 @@ func NewMusicianHandler(router *gin.RouterGroup,
 			musicianHandler.getByID)
 	}
 
+    router.GET("/albums/:album_id/musicians", musicianHandler.getByAlbumID)
+    router.GET("/tracks/:track_id/musicians", musicianHandler.getByTrackID)
+
 	return musicianHandler
 }
 
@@ -125,3 +128,61 @@ func (h *MusicianHandler) getByID(context *gin.Context) {
 	musicianDTO := dto.MusicianFromDomain(musician)
 	successResponse(context, musicianDTO)
 }
+
+// @Summary GetByAlbumID
+// @Tags musician
+// @Description get musician by album id
+// @Accept  json
+// @Produce json
+// @Param   album_id   path    string  true  "album id"
+// @Failure 400 {object} RestErrorBadRequest
+// @Failure 404 {object} RestErrorNotFound
+// @Failure 500 {object} RestErrorInternalError
+// @Success 200 {object} dto.MusicianDTO
+// @Router /albums/{album_id}/musicians [get]
+func (h *MusicianHandler) getByAlbumID(context *gin.Context) {
+	id, err := getIdFromPath(context, "album_id")
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	musician, err := h.s.MusicianService.GetByAlbumID(context.Request.Context(), id)
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	musicianDTO := dto.MusicianFromDomain(musician)
+	successResponse(context, musicianDTO)
+}
+
+// @Summary GetByTrackID
+// @Tags musician
+// @Description get musician by track id
+// @Accept  json
+// @Produce json
+// @Param   track_id   path    string  true  "track id"
+// @Failure 400 {object} RestErrorBadRequest
+// @Failure 404 {object} RestErrorNotFound
+// @Failure 500 {object} RestErrorInternalError
+// @Success 200 {object} dto.MusicianDTO
+// @Router /tracks/{track_id}/musicians [get]
+func (h *MusicianHandler) getByTrackID(context *gin.Context) {
+	id, err := getIdFromPath(context, "track_id")
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	musician, err := h.s.MusicianService.GetByTrackID(context.Request.Context(), id)
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	musicianDTO := dto.MusicianFromDomain(musician)
+	successResponse(context, musicianDTO)
+}
+
+

@@ -17,7 +17,8 @@ type AlbumHandler struct {
 func NewAlbumHandler(router *gin.RouterGroup,
 	logger *zap.Logger,
 	services *Services,
-	authHandler *AuthHandler) *AlbumHandler {
+	authHandler *AuthHandler,
+) *AlbumHandler {
 	albumHandler := &AlbumHandler{
 		router:      router,
 		s:           services,
@@ -39,6 +40,10 @@ func NewAlbumHandler(router *gin.RouterGroup,
 		authHandler.verifyMusicianRole,
 		authHandler.verifyMusicianID,
 		albumHandler.create)
+	router.GET("/musicians/me/albums",
+		authHandler.verifyToken,
+		authHandler.verifyMusicianRole,
+		albumHandler.getOwn)
 
 	return albumHandler
 }
@@ -97,6 +102,38 @@ func (h *AlbumHandler) create(context *gin.Context) {
 // @Router /albums [get]
 func (h *AlbumHandler) getAll(context *gin.Context) {
 	albums, err := h.s.AlbumService.GetAll(context.Request.Context())
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	albumDTOs := make([]dto.AlbumDTO, len(albums))
+	for i := range albums {
+		albumDTOs[i] = dto.AlbumFromDomain(albums[i])
+	}
+
+	successResponse(context, albumDTOs)
+}
+
+// @Summary GetOwn
+// @Security ApiKeyAuth
+// @Tags album
+// @Description get own albums
+// @Accept  json
+// @Produce json
+// @Failure 400 {object} RestErrorBadRequest
+// @Failure 404 {object} RestErrorNotFound
+// @Failure 500 {object} RestErrorInternalError
+// @Success 200 {object} dto.AlbumDTO
+// @Router /musicians/me/albums [get]
+func (h *AlbumHandler) getOwn(context *gin.Context) {
+	musicianID, err := getIdFromRequestContext(context)
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	albums, err := h.s.AlbumService.GetOwn(context.Request.Context(), musicianID)
 	if err != nil {
 		errorResponse(context, err)
 		return

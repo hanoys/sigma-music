@@ -16,7 +16,7 @@ import (
 const (
 	GenreGetByIDQuery        = "SELECT * FROM genres WHERE id = $1"
 	GenreGetAllQuery         = "SELECT * FROM genres"
-	genreDeleteForTrackQuery = "DELETE * FROM track_genre WHERE track_id=$1"
+	genreDeleteForTrackQuery = "DELETE FROM track_genre WHERE track_id=$1"
 	genreAddForTrackQuery    = "INSERT INTO track_genre (track_id, genre_id) VALUES ($1, $2)"
 	GenreGetByTrack          = "SELECT g.id, g.name FROM genres g JOIN public.track_genre tg on g.id = tg.genre_id WHERE tg.track_id = $1"
 )

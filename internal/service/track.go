@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	"github.com/google/uuid"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
@@ -16,7 +17,8 @@ type TrackService struct {
 }
 
 func NewTrackService(repo ports.ITrackRepository, storage ports.ITrackObjectStorage,
-	genreService ports.IGenreService, logger *zap.Logger) *TrackService {
+	genreService ports.IGenreService, logger *zap.Logger,
+) *TrackService {
 	return &TrackService{
 		repository:   repo,
 		trackStorage: storage,
@@ -32,7 +34,6 @@ func (ts *TrackService) Create(ctx context.Context, trackInfo ports.CreateTrackR
 		TrackID:   trackID.String(),
 		TrackBLOB: trackInfo.TrackBLOB,
 	})
-
 	if err != nil {
 		ts.logger.Error("Failed to create track", zap.Error(err),
 			zap.String("Album ID", trackInfo.AlbumID.String()), zap.String("Track name", trackInfo.Name))
@@ -46,7 +47,6 @@ func (ts *TrackService) Create(ctx context.Context, trackInfo ports.CreateTrackR
 		Name:    trackInfo.Name,
 		URL:     url.String(),
 	})
-
 	if err != nil {
 		ts.logger.Error("Failed to create track", zap.Error(err),
 			zap.String("Track ID", track.ID.String()), zap.String("Album ID", trackInfo.AlbumID.String()),

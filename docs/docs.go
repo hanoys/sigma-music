@@ -48,6 +48,56 @@ const docTemplate = `{
                 }
             }
         },
+        "/albums/{album_id}/musicians": {
+            "get": {
+                "description": "get musician by album id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "musician"
+                ],
+                "summary": "GetByAlbumID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "album id",
+                        "name": "album_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.MusicianDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/internal_adapters_delivery_api.RestErrorBadRequest"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/internal_adapters_delivery_api.RestErrorNotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_adapters_delivery_api.RestErrorInternalError"
+                        }
+                    }
+                }
+            }
+        },
         "/albums/{id}": {
             "get": {
                 "description": "get album by id",
@@ -464,6 +514,89 @@ const docTemplate = `{
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.MusicianDTO"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_adapters_delivery_api.RestErrorInternalError"
+                        }
+                    }
+                }
+            }
+        },
+        "/musicians/me/albums": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get own albums",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "album"
+                ],
+                "summary": "GetOwn",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.AlbumDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/internal_adapters_delivery_api.RestErrorBadRequest"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/internal_adapters_delivery_api.RestErrorNotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_adapters_delivery_api.RestErrorInternalError"
+                        }
+                    }
+                }
+            }
+        },
+        "/musicians/me/tracks": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get own tracks",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "track"
+                ],
+                "summary": "getOwn",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.TrackDTO"
                             }
                         }
                     },
@@ -1238,6 +1371,56 @@ const docTemplate = `{
                 }
             }
         },
+        "/tracks/{track_id}/musicians": {
+            "get": {
+                "description": "get musician by track id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "musician"
+                ],
+                "summary": "GetByTrackID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "track id",
+                        "name": "track_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.MusicianDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/internal_adapters_delivery_api.RestErrorBadRequest"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/internal_adapters_delivery_api.RestErrorNotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_adapters_delivery_api.RestErrorInternalError"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "description": "get all users",
@@ -1272,6 +1455,11 @@ const docTemplate = `{
         },
         "/users/me/comments": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "get comments by user id",
                 "consumes": [
                     "application/json"
@@ -1282,7 +1470,7 @@ const docTemplate = `{
                 "tags": [
                     "comment"
                 ],
-                "summary": "GetCommentByUserID",
+                "summary": "GetUsersComments",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1376,7 +1564,7 @@ const docTemplate = `{
             }
         },
         "/users/me/favorites/{id}": {
-            "put": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -1393,6 +1581,15 @@ const docTemplate = `{
                     "track"
                 ],
                 "summary": "AddToFavorites",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "track id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",

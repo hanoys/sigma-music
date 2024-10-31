@@ -122,8 +122,9 @@ func (h *CommentHandler) getOnTrack(context *gin.Context) {
 	successResponse(context, commentDTOs)
 }
 
-// @Summary GetCommentByUserID
+// @Summary GetUsersComments
 // @Tags comment
+// @Security ApiKeyAuth
 // @Description get comments by user id
 // @Accept  json
 // @Produce json

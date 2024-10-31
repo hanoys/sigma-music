@@ -111,21 +111,20 @@ func (h *AuthHandler) login(context *gin.Context) {
 // @Success 200
 // @Router /auth/logout [post]
 func (h *AuthHandler) logout(context *gin.Context) {
-	var logoutDTO dto.LogoutDTO
-	err := context.ShouldBindJSON(&logoutDTO)
+	tokenString, err := h.extractAuthToken(context)
 	if err != nil {
+		//h.logger.Error("Failed to extart auth token", zap.Error(err))
 		errorResponse(context, err)
 		return
 	}
 
-	err = h.s.AuthService.LogOut(context.Request.Context(), logoutDTO.AccessToken)
+	err = h.s.AuthService.LogOut(context.Request.Context(), tokenString)
 	if err != nil {
 		errorResponse(context, err)
 		return
 	}
 
 	successResponse(context, struct{}{})
-
 }
 
 func (h *AuthHandler) verifyMusicianRole(context *gin.Context) {
@@ -240,9 +239,24 @@ func (h *AuthHandler) verifyTrackOwner(context *gin.Context) {
 		errorResponse(context, UnauthorizedError)
 	}
 
-	track, err := h.s.TrackService.GetByID(context.Request.Context(), trackID)
+	tracks, err := h.s.TrackService.GetOwn(context.Request.Context(), userID)
 	if err != nil {
 		errorResponse(context, err)
+		return
+	}
+
+	var track domain.Track
+	found := false
+	for _, trackEn := range tracks {
+		if trackEn.ID.String() == trackID.String() {
+			found = true
+			track = trackEn
+			break
+		}
+	}
+
+	if !found {
+		errorResponse(context, ports.ErrTrackIDNotFound)
 		return
 	}
 
@@ -261,14 +275,14 @@ func (h *AuthHandler) verifyTrackOwner(context *gin.Context) {
 func (h *AuthHandler) verifyToken(context *gin.Context) {
 	tokenString, err := h.extractAuthToken(context)
 	if err != nil {
-		h.logger.Error("Failed to extart auth token", zap.Error(err))
+		//h.logger.Error("Failed to extart auth token", zap.Error(err))
 		errorResponse(context, err)
 		return
 	}
 
 	payload, err := h.s.AuthService.VerifyToken(context.Request.Context(), tokenString)
 	if err != nil {
-		h.logger.Error("Failed to verify token", zap.Error(err))
+		//h.logger.Error("Failed to verify token", zap.Error(err))
 		errorResponse(context, err)
 		return
 	}
@@ -280,18 +294,18 @@ func (h *AuthHandler) verifyToken(context *gin.Context) {
 func (h *AuthHandler) extractAuthToken(context *gin.Context) (string, error) {
 	authHeader := context.GetHeader("Authorization")
 	if authHeader == "" {
-		h.logger.Error("No authorization header in request")
+		//h.logger.Error("No authorization header in request", zap.Error(UnauthorizedError))
 		return "", UnauthorizedError
 	}
 
 	headerParts := strings.Split(authHeader, " ")
 	if len(headerParts) != 2 || headerParts[0] != "Bearer" {
-		h.logger.Error("No {Bearer} string before the token")
+		//h.logger.Error("No {Bearer} string before the token", zap.Error(UnauthorizedError))
 		return "", UnauthorizedError
 	}
 
 	if len(headerParts[1]) == 0 {
-		h.logger.Error("No token after {Bearer} string")
+		//h.logger.Error("No token after {Bearer} string", zap.Error(UnauthorizedError))
 		return "", UnauthorizedError
 	}
 

@@ -127,8 +127,11 @@ func (tr *PostgresTrackRepository) AddToUserFavorites(ctx context.Context, track
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
-			if pgErr.Code == pgerrcode.UniqueViolation {
+			switch pgErr.Code {
+			case pgerrcode.UniqueViolation:
 				return util.WrapError(ports.ErrTrackDuplicate, err)
+			case pgerrcode.ForeignKeyViolation:
+				return util.WrapError(ports.ErrTrackIDNotFound, err)
 			}
 		}
 		return util.WrapError(ports.ErrInternalTrackRepo, err)

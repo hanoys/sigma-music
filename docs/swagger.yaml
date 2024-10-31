@@ -271,6 +271,39 @@ paths:
       summary: GetAllAlbums
       tags:
       - album
+  /albums/{album_id}/musicians:
+    get:
+      consumes:
+      - application/json
+      description: get musician by album id
+      parameters:
+      - description: album id
+        in: path
+        name: album_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.MusicianDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorNotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      summary: GetByAlbumID
+      tags:
+      - musician
   /albums/{id}:
     get:
       consumes:
@@ -799,6 +832,58 @@ paths:
       summary: DeleteTrack
       tags:
       - track
+  /musicians/me/albums:
+    get:
+      consumes:
+      - application/json
+      description: get own albums
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.AlbumDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorNotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      security:
+      - ApiKeyAuth: []
+      summary: GetOwn
+      tags:
+      - album
+  /musicians/me/tracks:
+    get:
+      consumes:
+      - application/json
+      description: get own tracks
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.TrackDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      security:
+      - ApiKeyAuth: []
+      summary: getOwn
+      tags:
+      - track
   /musicians/register:
     post:
       consumes:
@@ -1047,6 +1132,39 @@ paths:
       summary: SetGenresForTrack
       tags:
       - genre
+  /tracks/{track_id}/musicians:
+    get:
+      consumes:
+      - application/json
+      description: get musician by track id
+      parameters:
+      - description: track id
+        in: path
+        name: track_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.MusicianDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorBadRequest'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorNotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      summary: GetByTrackID
+      tags:
+      - musician
   /users:
     get:
       consumes:
@@ -1127,7 +1245,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
-      summary: GetCommentByUserID
+      security:
+      - ApiKeyAuth: []
+      summary: GetUsersComments
       tags:
       - comment
   /users/me/favorites:
@@ -1170,10 +1290,16 @@ paths:
       tags:
       - track
   /users/me/favorites/{id}:
-    put:
+    post:
       consumes:
       - application/json
       description: add track to user favorites
+      parameters:
+      - description: track id
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
       - application/json
       responses:
