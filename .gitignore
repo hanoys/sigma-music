@@ -23,6 +23,9 @@ go.work
 .data/*
 */.data/*
 
+log/*
+*/log/*
+
 *.DS_Store
 
 *.*.bkp
