@@ -16,7 +16,6 @@ import (
 	"github.com/hanoys/sigma-music/internal/adapters/hash"
 	"github.com/hanoys/sigma-music/internal/adapters/miniostorage"
 	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres"
-	gormRepo "github.com/hanoys/sigma-music/internal/adapters/repository/postgres/gorm"
 	"github.com/hanoys/sigma-music/internal/ports"
 	"github.com/hanoys/sigma-music/internal/service"
 	"github.com/jmoiron/sqlx"
@@ -27,10 +26,6 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/yaml.v3"
-	postgres_driver "gorm.io/driver/postgres"
-	"gorm.io/gorm"
-
-	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 type Config struct {
@@ -157,23 +152,6 @@ func NewPostgresDB(cfg *PostgresConfig) (*sqlx.DB, error) {
 	return db, nil
 }
 
-func NewGORMPostgresDB(cfg *PostgresConfig) (*gorm.DB, error) {
-	connectionString := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s",
-		cfg.Host,
-		cfg.Port,
-		cfg.User,
-		cfg.Database,
-		cfg.Password,
-	)
-	db, err := gorm.Open(postgres_driver.Open(connectionString), &gorm.Config{})
-	if err != nil {
-		fmt.Printf("failed to connect postgres db: %s", connectionString)
-		return nil, err
-	}
-
-	return db, nil
-}
-
 func NewRedisClient(cfg *RedisConfig) (*redis.Client, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr: cfg.Host + ":" + cfg.Port,
@@ -266,7 +244,6 @@ type Repositories struct {
 
 func Run() {
 	cfg, err := GetConfig(".env.local")
-
 	if err != nil {
 		log.Println("config error:", err)
 		return
@@ -289,20 +266,12 @@ func Run() {
 			Password: cfg.DB.Postgres.Password,
 		}
 		dbConn, err := NewPostgresDB(config)
-
 		if err != nil {
 			logger.Fatal("Error connecting postgres", zap.Error(err))
 			return
 		}
 
-		gormConnection, err := NewGORMPostgresDB(config)
-		if err != nil {
-			logger.Fatal("Error connecting postgres", zap.Error(err))
-			return
-		}
-
-		//repositories.User = postgres.NewPostgresUserRepository(dbConn)
-		repositories.User = gormRepo.NewPostgresUserRepository(gormConnection)
+		repositories.User = postgres.NewPostgresUserRepository(dbConn)
 		repositories.Musician = postgres.NewPostgresMusicianRepository(dbConn)
 		repositories.Album = postgres.NewPostgresAlbumRepository(dbConn)
 		repositories.Comment = postgres.NewPostgresCommentRepository(dbConn)
@@ -319,7 +288,6 @@ func Run() {
 		Host: cfg.Redis.Host,
 		Port: cfg.Redis.Port,
 	})
-
 	if err != nil {
 		logger.Fatal("Error connecting redis", zap.Error(err))
 		return
@@ -331,7 +299,6 @@ func Run() {
 		RootUser:     cfg.Minio.RootUser,
 		RootPassword: cfg.Minio.RootPassword,
 	})
-
 	if err != nil {
 		logger.Fatal("Error connecting minio", zap.Error(err))
 		return
