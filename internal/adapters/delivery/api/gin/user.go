@@ -1,4 +1,4 @@
-package api
+package gin
 
 import (
 	"github.com/gin-gonic/gin"
@@ -8,21 +8,19 @@ import (
 )
 
 type UserHandler struct {
-	router      *gin.RouterGroup
-	logger      *zap.Logger
-	s           *Services
-	authHandler *AuthHandler
+	router *gin.RouterGroup
+	logger *zap.Logger
+	s      *Services
 }
 
 func NewUserHandler(router *gin.RouterGroup,
 	logger *zap.Logger,
 	services *Services,
-	authHandler *AuthHandler) *UserHandler {
+) *UserHandler {
 	userHandler := &UserHandler{
-		router:      router,
-		logger:      logger,
-		s:           services,
-		authHandler: authHandler,
+		router: router,
+		logger: logger,
+		s:      services,
 	}
 
 	userGroup := router.Group("/users")

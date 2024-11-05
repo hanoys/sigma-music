@@ -1,13 +1,13 @@
 package web
 
 import (
+	"github.com/hanoys/sigma-music/internal/adapters/delivery/api/gin"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/hanoys/sigma-music/internal/adapters/auth"
 	"github.com/hanoys/sigma-music/internal/adapters/auth/adapters"
-	"github.com/hanoys/sigma-music/internal/adapters/delivery/api"
 	"github.com/hanoys/sigma-music/internal/adapters/hash"
 	"github.com/hanoys/sigma-music/internal/adapters/miniostorage"
 	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres"
@@ -105,8 +105,8 @@ func Run() {
 	genreService := service.NewGenreService(genreRepo, logger)
 	trackService := service.NewTrackService(trackRepo, trackStorage, genreService, logger)
 
-	handler := api.NewHandler(logger)
-	services := api.Services{
+	handler := gin.NewHandler(logger)
+	services := gin.Services{
 		AuthService:     authService,
 		AlbumService:    albumService,
 		MusicianService: musicianService,

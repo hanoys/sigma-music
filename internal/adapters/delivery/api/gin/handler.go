@@ -1,4 +1,4 @@
-package api
+package gin
 
 import (
 	"errors"
@@ -58,7 +58,7 @@ func (h *Handler) ConfigureHandlers() error {
 	v1Router := h.router.Group("/api/v1")
 	h.authHandler = NewAuthHandler(v1Router, h.logger, h.services)
 	h.albumHandler = NewAlbumHandler(v1Router, h.logger, h.services, h.authHandler)
-	h.userHandler = NewUserHandler(v1Router, h.logger, h.services, h.authHandler)
+	h.userHandler = NewUserHandler(v1Router, h.logger, h.services)
 	h.musicianHandler = NewMusicianHandler(v1Router, h.logger, h.services, h.authHandler)
 	h.genreHandler = NewGenreHandler(v1Router, h.logger, h.services, h.authHandler)
 	h.commentHandler = NewCommentHandler(v1Router, h.logger, h.services, h.authHandler)

@@ -106,6 +106,30 @@ services:
     depends_on:
       - app
 
+  prometheus:
+    image: prom/prometheus:v2.55.0
+    volumes:
+      - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+      - "./.data/prometheus:/prometheus"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+      - "--web.enable-lifecycle"
+    ports:
+      - "9090:9090"
+    networks:
+      - backend
+  grafana:
+    image: grafana/grafana:11.3.0
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./.data/grafana:/var/lib/grafana
+    networks:
+      - backend
+
 networks:
   backend:
     driver: bridge
