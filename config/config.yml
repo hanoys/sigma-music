@@ -9,6 +9,6 @@ db:
   postgres:
     user: sigma
     password: sigma
-    host: db
+    host: postgres
     port: 5432
     name: sigmamusic

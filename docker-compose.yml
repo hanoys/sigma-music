@@ -90,6 +90,8 @@ services:
         condition: service_healthy
     env_file:
       - .env.local
+    environment:
+      DB_HOST: "postgres"
     networks:
       - backend
   minio:
@@ -120,6 +122,8 @@ services:
         condition: service_started
     env_file:
       - .env.local
+    environment:
+      DB_HOST: "postgres"
     networks:
       - backend
     volumes:
@@ -220,6 +224,9 @@ services:
       - backend
     depends_on:
       - app
+      - app-mirror
+      - app-read1
+      - app-read2
 
 networks:
   backend:
