@@ -68,10 +68,31 @@ services:
       - .env.local
     networks:
       - backend
-  app:
+  app-echo:
     build: .
+    command: /usr/src/app/bin/echo
     ports:
-      - 8080:8080
+      - 8081:8080
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      minio:
+        condition: service_started
+    env_file:
+      - .env.local
+    networks:
+      - backend
+    volumes:
+      - ./log:/usr/src/app/log
+      - ./config:/usr/src/app/config
+      - ./data:/usr/src/app/data
+  app-gin:
+    build: .
+    command: /usr/src/app/bin/gin
+    ports:
+      - 8082:8080
     depends_on:
       db:
         condition: service_healthy
@@ -104,7 +125,8 @@ services:
     networks:
       - backend
     depends_on:
-      - app
+      - app-echo
+      - app-gin
 
   prometheus:
     image: prom/prometheus:v2.55.0

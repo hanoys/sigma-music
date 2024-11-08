@@ -9,12 +9,22 @@ import (
 	"go.uber.org/zap"
 )
 
+type Services struct {
+	AuthService     ports.IAuthorizationService
+	AlbumService    ports.IAlbumService
+	MusicianService ports.IMusicianService
+	UserService     ports.IUserService
+	TrackService    ports.ITrackService
+	CommentService  ports.ICommentService
+	GenreService    ports.IGenreService
+}
+
 type UserHandler struct {
 	logger *zap.Logger
 	s      *Services
 }
 
-func NewUserHandler(e *echo.Group, logger *zap.Logger, services *Services) *UserHandler {
+func NewUserHandler(e *echo.Echo, logger *zap.Logger, services *Services) *UserHandler {
 	userHandler := &UserHandler{
 		logger: logger,
 		s:      services,

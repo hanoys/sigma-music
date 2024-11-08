@@ -11,9 +11,37 @@ import (
 	"github.com/hanoys/sigma-music/internal/app/config"
 	"github.com/hanoys/sigma-music/internal/service"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 )
+
+var (
+	// Counter for total HTTP requests
+	requestCount = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "echo_http_requests_total",
+			Help: "Total number of HTTP requests",
+		},
+		[]string{"method"},
+	)
+
+	requestDuration = prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Name:    "echo_http_request_duration_seconds",
+			Help:    "Duration of HTTP requests in seconds",
+			Buckets: prometheus.DefBuckets,
+		},
+		[]string{"method"},
+	)
+)
+
+func init() {
+    // Register metrics with Prometheus
+    prometheus.MustRegister(requestCount, requestDuration)
+}
+
 
 func Run() {
 	cfg, err := config.GetConfig(".env.local")
@@ -44,6 +72,21 @@ func Run() {
 	hashProvider := hash.NewHashPasswordProvider()
 	userService := service.NewUserService(userRepo, hashProvider, logger)
 	router := echo.New()
+	router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			start := time.Now()
+			err := next(c) // Call the next handler
+			duration := time.Since(start).Seconds()
+
+			// Increment the request counter
+			requestCount.WithLabelValues(c.Request().Method).Inc()
+
+			// Record the request duration
+			requestDuration.WithLabelValues(c.Request().Method).Observe(duration)
+
+			return err
+		}
+	})
 	services := &echoapi.Services{
 		AuthService:     nil,
 		AlbumService:    nil,
@@ -53,18 +96,18 @@ func Run() {
 		CommentService:  nil,
 		GenreService:    nil,
 	}
-	apiRouter := router.Group("api/v1")
+	router.Use(middleware.Logger())
 	_ = echoapi.NewUserHandler(
-		apiRouter,
+		router,
 		logger,
 		services,
 	)
 
-	apiRouter.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
+	router.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
 
 	server := http.Server{
 		Handler:      router,
-		Addr:         ":8082",
+		Addr:         ":8080",
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 	}

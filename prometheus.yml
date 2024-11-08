@@ -1,5 +1,11 @@
+global:
+  scrape_interval: 5s
+
 scrape_configs:
-  - job_name: 'app'
+  - job_name: 'app-echo'
     static_configs:
-      - targets: ['app:8080']
+      - targets: ['app-echo:8080']
+  - job_name: 'app-gin'
+    static_configs:
+      - targets: ['app-gin:8080']
 

@@ -9,8 +9,8 @@ RUN go mod download && go mod verify
 
 COPY .. .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o ./bin/app ./cmd/web/main.go
-CMD ["./bin/app"]
+RUN CGO_ENABLED=0 GOOS=linux go build -o ./bin/echo ./cmd/benchmark_echo/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o ./bin/gin ./cmd/benchmark_gin/main.go
 
 #FROM scratch
 #

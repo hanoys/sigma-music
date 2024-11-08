@@ -11,9 +11,55 @@ import (
 	"github.com/hanoys/sigma-music/internal/adapters/repository/postgres"
 	"github.com/hanoys/sigma-music/internal/app/config"
 	"github.com/hanoys/sigma-music/internal/service"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 )
+
+var (
+        // Counter for total HTTP requests
+    requestCount = prometheus.NewCounterVec(
+        prometheus.CounterOpts{
+            Name: "gin_http_requests_total",
+            Help: "Total number of HTTP requests",
+        },
+        []string{"method"},
+    )
+
+     requestDuration = prometheus.NewHistogramVec(
+        prometheus.HistogramOpts{
+            Name:    "gin_http_request_duration_seconds",
+            Help:    "Duration of HTTP requests in seconds",
+            Buckets: prometheus.DefBuckets,
+        },
+        []string{"method"},
+    )
+)
+
+func init() {
+    // Register metrics with Prometheus
+    prometheus.MustRegister(requestCount, requestDuration)
+}
+
+// Middleware to collect metrics
+func prometheusMiddleware() gin.HandlerFunc {
+    return func(c *gin.Context) {
+        // Start time for request duration
+        startTime := time.Now()
+        
+        // Process request
+        c.Next()
+
+        // Calculate metrics
+        // path := c.FullPath()
+        method := c.Request.Method
+        duration := time.Since(startTime).Seconds()
+
+        // Update Prometheus metrics
+        requestCount.WithLabelValues(method).Inc()
+        requestDuration.WithLabelValues(method).Observe(duration)
+    }
+}
 
 func Run() {
 	cfg, err := config.GetConfig(".env.local")
@@ -43,7 +89,8 @@ func Run() {
 	userRepo := postgres.NewPostgresUserRepository(dbConn)
 	hashProvider := hash.NewHashPasswordProvider()
 	userService := service.NewUserService(userRepo, hashProvider, logger)
-	router := gin.New()
+	router := gin.Default()
+	router.Use(prometheusMiddleware())
 	services := &ginapi.Services{
 		AuthService:     nil,
 		AlbumService:    nil,
@@ -53,7 +100,7 @@ func Run() {
 		CommentService:  nil,
 		GenreService:    nil,
 	}
-	apiRouter := router.Group("api/v1")
+	apiRouter := router.Group("")
 	_ = ginapi.NewUserHandler(
 		apiRouter,
 		logger,
@@ -64,7 +111,7 @@ func Run() {
 
 	server := http.Server{
 		Handler:      router,
-		Addr:         ":8081",
+		Addr:         ":8080",
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 	}
