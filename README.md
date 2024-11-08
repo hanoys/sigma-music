@@ -111,3 +111,92 @@ Sigma Music
 ## Экраны веб приложения
 
 ![WEB](docs/pics/web.svg)
+
+## Нагрузочное тестирование
+
+Запуск тестирования с Apache Benchmark
+
+### Запуск с двумя дополнительными инстансами
+
+```
+ab -k -n 1000 -c 10 -l 'http://localhost/api/v1/users/'
+
+
+Server Software:        nginx
+Server Hostname:        localhost
+Server Port:            80
+
+Document Path:          /api/v1/users/
+Document Length:        Variable
+
+Concurrency Level:      10
+Time taken for tests:   1.173 seconds
+Complete requests:      1000
+Failed requests:        0
+Keep-Alive requests:    0
+Total transferred:      158521000 bytes
+HTML transferred:       158343000 bytes
+Requests per second:    852.54 [#/sec] (mean)
+Time per request:       11.730 [ms] (mean)
+Time per request:       1.173 [ms] (mean, across all concurrent requests)
+Transfer rate:          131977.51 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.3      0       5
+Processing:     3   11   4.9     10      50
+Waiting:        2    9   4.6      8      45
+Total:          4   11   4.9     10      51
+
+Percentage of the requests served within a certain time (ms)
+  50%     10
+  66%     12
+  75%     13
+  80%     14
+  90%     17
+  95%     20
+  98%     23
+  99%     29
+ 100%     51 (longest request)
+ ```
+
+### Запуск одного инстанса
+
+```
+Server Software:        nginx
+Server Hostname:        localhost
+Server Port:            80
+
+Document Path:          /api/v1/users/
+Document Length:        Variable
+
+Concurrency Level:      10
+Time taken for tests:   1.285 seconds
+Complete requests:      1000
+Failed requests:        0
+Keep-Alive requests:    0
+Total transferred:      158521000 bytes
+HTML transferred:       158343000 bytes
+Requests per second:    778.19 [#/sec] (mean)
+Time per request:       12.850 [ms] (mean)
+Time per request:       1.285 [ms] (mean, across all concurrent requests)
+Transfer rate:          120468.33 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:     3   13   4.9     11      34
+Waiting:        2   11   4.8      9      33
+Total:          3   13   4.9     12      34
+
+Percentage of the requests served within a certain time (ms)
+  50%     12
+  66%     15
+  75%     16
+  80%     17
+  90%     19
+  95%     21
+  98%     23
+  99%     25
+ 100%     34 (longest request)
+ ```

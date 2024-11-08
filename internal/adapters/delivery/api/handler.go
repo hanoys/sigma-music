@@ -38,7 +38,7 @@ type Handler struct {
 }
 
 func NewHandler(logger *zap.Logger) *Handler {
-	router := gin.New()
+	router := gin.Default()
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")

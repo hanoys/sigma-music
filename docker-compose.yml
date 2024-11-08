@@ -190,8 +190,6 @@ services:
       - ./data:/usr/src/app/data
     env_file:
       - .env.local
-    environment:
-      DB_HOST: "postgres-slave"
     depends_on:
       postgres-slave:
         condition: service_healthy
