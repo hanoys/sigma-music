@@ -58,8 +58,58 @@ func NewTrackHandler(router *gin.RouterGroup,
 		authHandler.verifyToken,
 		authHandler.verifyMusicianRole,
 		trackHandler.getOwn)
+	router.PUT("/tracks/:track_id/image",
+		authHandler.verifyToken,
+		authHandler.verifyMusicianRole,
+		trackHandler.uploadImage)
 
 	return trackHandler
+}
+
+// @Summary UploadImage
+// @Tags track
+// @Security ApiKeyAuth
+// @Description upload track image
+// @Accept  mpfd
+// @Produce json
+// @Param   track_id   path    string  true  "track id"
+// @Param image formData file true "upload file"
+// @Failure 500 {object} RestErrorInternalError
+// @Success 201 {object} dto.TrackDTO
+// @Router /tracks/{track_id}/image [put]
+func (h *TrackHandler) uploadImage(context *gin.Context) {
+	musician_id, err := getIdFromRequestContext(context)
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	id, err := getIdFromPath(context, "track_id")
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	fileheader, err := context.FormFile("image")
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	file, err := fileheader.Open()
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	track, err := h.s.TrackService.UploadImage(context.Request.Context(), file, id, musician_id)
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	trackDTO := dto.TrackFromDomain(track)
+	successResponse(context, trackDTO)
 }
 
 // @Summary CreateTrack

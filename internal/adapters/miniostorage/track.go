@@ -2,11 +2,13 @@ package miniostorage
 
 import (
 	"context"
+	"io"
+	"net/url"
+	"path/filepath"
+
 	"github.com/google/uuid"
 	"github.com/hanoys/sigma-music/internal/ports"
 	"github.com/minio/minio-go/v7"
-	"net/url"
-	"path/filepath"
 )
 
 type TrackStorage struct {
@@ -28,6 +30,21 @@ func (ts *TrackStorage) PutTrack(ctx context.Context, req ports.PutTrackReq) (ur
 		Scheme: "http",
 		Host:   ts.client.EndpointURL().Host,
 		Path:   filepath.Join(ts.bucketName, req.TrackID),
+	}
+
+	return fileURL, nil
+}
+
+func (ts *TrackStorage) UploadImage(ctx context.Context, image io.Reader, id string) (url.URL, error) {
+	_, err := ts.client.PutObject(ctx, ts.bucketName, id, image, -1, minio.PutObjectOptions{})
+	if err != nil {
+		return url.URL{}, err
+	}
+
+	fileURL := url.URL{
+		Scheme: "http",
+		Host:   ts.client.EndpointURL().Host,
+		Path:   filepath.Join(ts.bucketName, id) + "_image" + ".png",
 	}
 
 	return fileURL, nil

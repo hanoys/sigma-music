@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"io"
+
 	"github.com/google/uuid"
 	"github.com/guregu/null/v5"
 	"github.com/hanoys/sigma-music/internal/domain"
@@ -10,13 +12,43 @@ import (
 )
 
 type AlbumService struct {
-	repository ports.IAlbumRepository
-	logger     *zap.Logger
+	repository   ports.IAlbumRepository
+	imageStorage ports.IAlbumImageStorage
+	logger       *zap.Logger
 }
 
-func NewAlbumService(repo ports.IAlbumRepository, logger *zap.Logger) *AlbumService {
-	return &AlbumService{repository: repo,
-		logger: logger}
+func NewAlbumService(repo ports.IAlbumRepository, imageStorage ports.IAlbumImageStorage, logger *zap.Logger) *AlbumService {
+	return &AlbumService{
+		repository:   repo,
+		imageStorage: imageStorage,
+		logger:       logger,
+	}
+}
+
+func (as *AlbumService) UploadImage(ctx context.Context, image io.Reader, id uuid.UUID, musician_id uuid.UUID) (domain.Album, error) {
+	url, err := as.imageStorage.UploadImage(ctx, image, id.String())
+	if err != nil {
+		return domain.Album{}, err
+	}
+
+	albums, err := as.repository.GetOwn(ctx, musician_id)
+	if err != nil {
+		return domain.Album{}, err
+	}
+
+	for _, album := range albums {
+		if album.ID == id {
+			album.ImageURL = null.StringFrom(url.String())
+			album, err = as.repository.Update(ctx, album)
+			if err != nil {
+				return domain.Album{}, err
+			}
+
+			return album, nil
+		}
+	}
+
+	return domain.Album{}, ports.ErrAlbumIDNotFound
 }
 
 func (as *AlbumService) Create(ctx context.Context, albumInfo ports.CreateAlbumServiceReq) (domain.Album, error) {
@@ -26,6 +58,7 @@ func (as *AlbumService) Create(ctx context.Context, albumInfo ports.CreateAlbumS
 		Description: albumInfo.Description,
 		Published:   false,
 		ReleaseDate: null.Time{},
+		ImageURL:    null.String{},
 	}
 
 	album, err := as.repository.Create(ctx, createAlbum, albumInfo.MusicianID)

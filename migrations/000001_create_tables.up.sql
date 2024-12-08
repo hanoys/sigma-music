@@ -30,7 +30,8 @@ CREATE TABLE IF NOT EXISTS albums (
     name VARCHAR(255) NOT NULL,
     description VARCHAR(1024),
     published BOOLEAN NOT NULL,
-    release_date TIMESTAMP
+    release_date TIMESTAMP,
+    image_url VARCHAR(1024)
 );
 
 CREATE TABLE IF NOT EXISTS album_musician (

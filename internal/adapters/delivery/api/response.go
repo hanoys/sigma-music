@@ -4,9 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
-	"reflect"
 	"runtime/debug"
 	"strings"
 	"time"
@@ -26,15 +24,16 @@ const (
 )
 
 var (
-	BadRequestError     = errors.New("bad request")
-	NotFoundError       = errors.New("not Found")
-	UnauthorizedError   = errors.New("unauthorized")
-	ForbiddenError      = errors.New("forbidden")
-	InternalServerError = errors.New("internal server error")
-	PathIDNotFoundError = errors.New("id not found in query path")
-	InvalidPathIDError  = errors.New("query path id is invalid")
-	ParseGenreIDError   = errors.New("cannot parse genre id")
-	ParseAlbumIDError   = errors.New("cannot parse album id")
+	BadRequestError         = errors.New("bad request")
+	NotFoundError           = errors.New("not Found")
+	UnauthorizedError       = errors.New("unauthorized")
+	ForbiddenError          = errors.New("forbidden")
+	InternalServerError     = errors.New("internal server error")
+	PathIDNotFoundError     = errors.New("id not found in query path")
+	InvalidPathIDError      = errors.New("query path id is invalid")
+	ParseGenreIDError       = errors.New("cannot parse genre id")
+	ParseAlbumIDError       = errors.New("cannot parse album id")
+	UnexpectedFileExtension = errors.New("unexpecte file extension")
 )
 
 var errorStatusMap = map[error]int{
@@ -185,28 +184,20 @@ func ParseError(err error) RestErr {
 	case errors.As(err, &validationErrors):
 		return NewRestError(http.StatusBadRequest, getValidationMessage(validationErrors[0]))
 	default:
-		log.Println("HERE 1")
-		log.Println("ERROR: ", err)
-		log.Println("ERROR TYPE: ", reflect.TypeOf(err))
 		for errType, errResponseCode := range errorStatusMap {
 			if errors.Is(err, errType) {
 				return NewRestError(errResponseCode, errType.Error())
 			}
 		}
 
-		log.Println("HERE 3")
 		if restErr, ok := err.(*RestError); ok {
-			log.Println("HERE 4")
 			return restErr
 		}
-		log.Println("HERE 5")
 		return NewRestError(http.StatusInternalServerError, ErrInternalServerError)
 	}
 }
 
 func errorResponse(context *gin.Context, err error) {
-	log.Println("Error: ", err)
-	log.Println("Stack trace:")
 	debug.PrintStack()
 	restErr := ParseError(err)
 	context.AbortWithStatusJSON(restErr.Status(), restErr)

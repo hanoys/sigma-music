@@ -16,7 +16,6 @@ import (
 
 func Run() {
 	cfg, err := config.GetConfig(".env.local")
-
 	if err != nil {
 		log.Println("config error:", err)
 		return
@@ -38,7 +37,6 @@ func Run() {
 			User:     cfg.DB.Postgres.User,
 			Password: cfg.DB.Postgres.Password,
 		})
-
 		if err != nil {
 			logger.Fatal("Error connecting postgres", zap.Error(err))
 			return
@@ -61,19 +59,17 @@ func Run() {
 		Host: cfg.Redis.Host,
 		Port: cfg.Redis.Port,
 	})
-
 	if err != nil {
 		logger.Fatal("Error connecting redis", zap.Error(err))
 		return
 	}
 
 	minioClient, err := config.NewMinioClient(&config.MinioConfig{
-		Endpoint:     cfg.Minio.Endpoint,
-		BucketName:   cfg.Minio.BucketName,
-		RootUser:     cfg.Minio.RootUser,
-		RootPassword: cfg.Minio.RootPassword,
+		Endpoint:        cfg.Minio.Endpoint,
+		TrackBucketName: cfg.Minio.TrackBucketName,
+		RootUser:        cfg.Minio.RootUser,
+		RootPassword:    cfg.Minio.RootPassword,
 	})
-
 	if err != nil {
 		logger.Fatal("Error connecting minio", zap.Error(err))
 		return
@@ -94,12 +90,13 @@ func Run() {
 		SecretKey:           cfg.JWT.SecretKey,
 	})
 	hashProvider := hash.NewHashPasswordProvider()
-	trackStorage := miniostorage.NewTrackStorage(minioClient, cfg.Minio.BucketName)
+	trackStorage := miniostorage.NewTrackStorage(minioClient, cfg.Minio.TrackBucketName)
+	albumStorage := miniostorage.NewAlbumImageStorage(minioClient, cfg.Minio.AlbumImageBucketName)
 
 	authService := service.NewAuthorizationService(userRepo, musicianRepo, tokenProvider, hashProvider, logger)
 	userService := service.NewUserService(userRepo, hashProvider, logger)
 	musicianService := service.NewMusicianService(musicianRepo, hashProvider, logger)
-	albumService := service.NewAlbumService(albumRepo, logger)
+	albumService := service.NewAlbumService(albumRepo, albumStorage, logger)
 	commentService := service.NewCommentService(commentRepo, logger)
 	genreService := service.NewGenreService(genreRepo, logger)
 	statService := service.NewStatService(statRepo, genreService, musicianService, logger)

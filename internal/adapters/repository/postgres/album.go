@@ -19,8 +19,8 @@ import (
 
 const (
 	AlbumGetAllQuery          = "SELECT * FROM albums WHERE published = TRUE"
-	AlbumGetByMusicianIDQuery = "SELECT a.id, a.name, a.description, a.published, a.release_date FROM album_musician JOIN public.albums a on a.id = album_musician.album_id WHERE musician_id = $1 AND published = TRUE"
-	AlbumGetOwnQuery          = "SELECT a.id, a.name, a.description, a.published, a.release_date FROM album_musician JOIN public.albums a on a.id = album_musician.album_id WHERE musician_id = $1"
+	AlbumGetByMusicianIDQuery = "SELECT a.id, a.name, a.description, a.published, a.release_date, a.image_url FROM album_musician JOIN public.albums a on a.id = album_musician.album_id WHERE musician_id = $1 AND published = TRUE"
+	AlbumGetOwnQuery          = "SELECT a.id, a.name, a.description, a.published, a.release_date, a.image_url FROM album_musician JOIN public.albums a on a.id = album_musician.album_id WHERE musician_id = $1"
 	AlbumGetByIDQuery         = "SELECT * FROM albums WHERE id = $1 AND published = TRUE"
 	AlbumGetByIDInternalQuery = "SELECT * FROM albums WHERE id = $1"
 	AlbumInsertQuery          = "INSERT INTO album_musician(musician_id, album_id) VALUES ($1, $2)"
@@ -66,6 +66,26 @@ func (ar *PostgresAlbumRepository) Create(ctx context.Context, album domain.Albu
 	}
 
 	return createdUser.ToDomain(), nil
+}
+
+func (ar *PostgresAlbumRepository) Update(ctx context.Context, album domain.Album) (domain.Album, error) {
+	pgAlbum := entity2.NewPgAlbum(album)
+	queryString := entity2.UpdateQueryString(pgAlbum, "albums")
+	_, err := ar.connection.NamedExecContext(ctx, queryString, pgAlbum)
+	if err != nil {
+		return domain.Album{}, util.WrapError(ports.ErrAlbumUpdate, err)
+	}
+
+	var updatedAlbum entity2.PgAlbum
+	err = ar.connection.GetContext(ctx, &updatedAlbum, AlbumGetByIDInternalQuery, pgAlbum.ID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.Album{}, util.WrapError(ports.ErrAlbumIDNotFound, err)
+		}
+		return domain.Album{}, util.WrapError(ports.ErrInternalAlbumRepo, err)
+	}
+
+	return updatedAlbum.ToDomain(), nil
 }
 
 func (ar *PostgresAlbumRepository) GetAll(ctx context.Context) ([]domain.Album, error) {

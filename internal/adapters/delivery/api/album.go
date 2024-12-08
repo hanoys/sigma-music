@@ -45,7 +45,58 @@ func NewAlbumHandler(router *gin.RouterGroup,
 		authHandler.verifyMusicianRole,
 		albumHandler.getOwn)
 
+	router.PUT("/albums/:album_id/image",
+		authHandler.verifyToken,
+		authHandler.verifyMusicianRole,
+		albumHandler.uploadImage)
+
 	return albumHandler
+}
+
+// @Summary UploadImage
+// @Tags album
+// @Security ApiKeyAuth
+// @Description upload album image
+// @Accept  mpfd
+// @Produce json
+// @Param   album_id   path    string  true  "album id"
+// @Param image formData file true "upload file"
+// @Failure 500 {object} RestErrorInternalError
+// @Success 201 {object} dto.AlbumDTO
+// @Router /albums/{album_id}/image [put]
+func (h *AlbumHandler) uploadImage(context *gin.Context) {
+	musician_id, err := getIdFromRequestContext(context)
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	id, err := getIdFromPath(context, "album_id")
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	fileheader, err := context.FormFile("image")
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	file, err := fileheader.Open()
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	album, err := h.s.AlbumService.UploadImage(context.Request.Context(), file, id, musician_id)
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	albumDTO := dto.AlbumFromDomain(album)
+	successResponse(context, albumDTO)
 }
 
 // @Summary CreateAlbum

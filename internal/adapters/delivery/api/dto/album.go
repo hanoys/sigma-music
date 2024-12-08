@@ -11,6 +11,7 @@ type AlbumDTO struct {
 	Description string    `json:"description"`
 	Published   bool      `json:"published"`
 	ReleaseDate string    `json:"release_date"`
+	ImageURL    string    `json:"image_url"`
 }
 
 func AlbumFromDomain(album domain.Album) AlbumDTO {
@@ -19,6 +20,7 @@ func AlbumFromDomain(album domain.Album) AlbumDTO {
 		Name:        album.Name,
 		Description: album.Description,
 		Published:   album.Published,
+		ImageURL:    album.ImageURL.ValueOrZero(),
 	}
 
 	if album.ReleaseDate.IsZero() {

@@ -2,8 +2,10 @@ package service
 
 import (
 	"context"
+	"io"
 
 	"github.com/google/uuid"
+	"github.com/guregu/null/v5"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
 	"go.uber.org/zap"
@@ -25,6 +27,32 @@ func NewTrackService(repo ports.ITrackRepository, storage ports.ITrackObjectStor
 		genreService: genreService,
 		logger:       logger,
 	}
+}
+
+func (ts *TrackService) UploadImage(ctx context.Context, image io.Reader, id uuid.UUID, musician_id uuid.UUID) (domain.Track, error) {
+	url, err := ts.trackStorage.UploadImage(ctx, image, id.String())
+	if err != nil {
+		return domain.Track{}, err
+	}
+
+	tracks, err := ts.repository.GetOwn(ctx, musician_id)
+	if err != nil {
+		return domain.Track{}, err
+	}
+
+	for _, track := range tracks {
+		if track.ID == id {
+			track.ImageURL = null.StringFrom(url.String())
+			track, err = ts.repository.Update(ctx, track)
+			if err != nil {
+				return domain.Track{}, err
+			}
+
+			return track, nil
+		}
+	}
+
+	return domain.Track{}, ports.ErrTrackIDNotFound
 }
 
 func (ts *TrackService) Create(ctx context.Context, trackInfo ports.CreateTrackReq) (domain.Track, error) {

@@ -131,78 +131,78 @@ services:
       - ./config:/usr/src/app/config
       - ./data:/usr/src/app/data
 
-  app-read1:
-    container_name: 'app-read1'
-    build: .
-    volumes:
-      - ./log:/usr/src/app/log
-      - ./config:/usr/src/app/config
-      - ./data:/usr/src/app/data
-    env_file:
-      - .env.local
-    environment:
-      DB_HOST: "postgres-slave"
-    depends_on:
-      postgres-slave:
-        condition: service_healthy
-      app:
-        condition: service_started
-      redis:
-        condition: service_started
-      minio:
-        condition: service_started
-    ports:
-      - "8081:8080"
-    networks:
-      - backend
-
-  app-read2:
-    container_name: 'app-read2'
-    build: .
-    volumes:
-      - ./log:/usr/src/app/log
-      - ./config:/usr/src/app/config
-      - ./data:/usr/src/app/data
-    env_file:
-      - .env.local
-    environment:
-      DB_HOST: "postgres-slave"
-    depends_on:
-      postgres-slave:
-        condition: service_healthy
-      app:
-        condition: service_started
-      redis:
-        condition: service_started
-      minio:
-        condition: service_started
-    ports:
-      - "8082:8080"
-    networks:
-      - backend
-
-  app-mirror:
-    container_name: 'app-mirror'
-    build: .
-    volumes:
-      - ./log:/usr/src/app/log
-      - ./config:/usr/src/app/config
-      - ./data:/usr/src/app/data
-    env_file:
-      - .env.local
-    depends_on:
-      postgres-slave:
-        condition: service_healthy
-      app:
-        condition: service_started
-      redis:
-        condition: service_started
-      minio:
-        condition: service_started
-    ports:
-      - "8083:8080"
-    networks:
-      - backend
+      #  app-read1:
+      #    container_name: 'app-read1'
+      #    build: .
+      #    volumes:
+      #      - ./log:/usr/src/app/log
+      #      - ./config:/usr/src/app/config
+      #      - ./data:/usr/src/app/data
+      #    env_file:
+      #      - .env.local
+      #    environment:
+      #      DB_HOST: "postgres-slave"
+      #    depends_on:
+      #      postgres-slave:
+      #        condition: service_healthy
+      #      app:
+      #        condition: service_started
+      #      redis:
+      #        condition: service_started
+      #      minio:
+      #        condition: service_started
+      #    ports:
+      #      - "8081:8080"
+      #    networks:
+      #      - backend
+      #
+      #  app-read2:
+      #    container_name: 'app-read2'
+      #    build: .
+      #    volumes:
+      #      - ./log:/usr/src/app/log
+      #      - ./config:/usr/src/app/config
+      #      - ./data:/usr/src/app/data
+      #    env_file:
+      #      - .env.local
+      #    environment:
+      #      DB_HOST: "postgres-slave"
+      #    depends_on:
+      #      postgres-slave:
+      #        condition: service_healthy
+      #      app:
+      #        condition: service_started
+      #      redis:
+      #        condition: service_started
+      #      minio:
+      #        condition: service_started
+      #    ports:
+      #      - "8082:8080"
+      #    networks:
+      #      - backend
+      #
+      #  app-mirror:
+      #    container_name: 'app-mirror'
+      #    build: .
+      #    volumes:
+      #      - ./log:/usr/src/app/log
+      #      - ./config:/usr/src/app/config
+      #      - ./data:/usr/src/app/data
+      #    env_file:
+      #      - .env.local
+      #    depends_on:
+      #      postgres-slave:
+      #        condition: service_healthy
+      #      app:
+      #        condition: service_started
+      #      redis:
+      #        condition: service_started
+      #      minio:
+      #        condition: service_started
+      #    ports:
+      #      - "8083:8080"
+      #    networks:
+      #      - backend
 
 
   proxy:
@@ -222,9 +222,9 @@ services:
       - backend
     depends_on:
       - app
-      - app-mirror
-      - app-read1
-      - app-read2
+      #      - app-mirror
+      #      - app-read1
+      #      - app-read2
 
 networks:
   backend:

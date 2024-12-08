@@ -11,4 +11,5 @@ type Album struct {
 	Description string
 	Published   bool
 	ReleaseDate null.Time
+	ImageURL    null.String
 }

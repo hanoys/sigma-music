@@ -7,11 +7,12 @@ import (
 )
 
 type PgAlbum struct {
-	ID          uuid.UUID `db:"id"`
-	Name        string    `db:"name"`
-	Description string    `db:"description"`
-	Published   bool      `db:"published"`
-	ReleaseDate null.Time `db:"release_date"`
+	ID          uuid.UUID   `db:"id"`
+	Name        string      `db:"name"`
+	Description string      `db:"description"`
+	Published   bool        `db:"published"`
+	ReleaseDate null.Time   `db:"release_date"`
+	ImageURL    null.String `db:"image_url"`
 }
 
 func (a *PgAlbum) ToDomain() domain.Album {
@@ -21,6 +22,7 @@ func (a *PgAlbum) ToDomain() domain.Album {
 		Description: a.Description,
 		Published:   a.Published,
 		ReleaseDate: a.ReleaseDate,
+		ImageURL:    a.ImageURL,
 	}
 }
 
@@ -31,5 +33,6 @@ func NewPgAlbum(album domain.Album) PgAlbum {
 		Description: album.Description,
 		Published:   album.Published,
 		ReleaseDate: album.ReleaseDate,
+		ImageURL:    album.ImageURL,
 	}
 }

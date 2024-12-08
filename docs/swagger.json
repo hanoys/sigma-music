@@ -42,6 +42,56 @@
                 }
             }
         },
+        "/albums/{album_id}/image": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "upload album image",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "album"
+                ],
+                "summary": "UploadImage",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "album id",
+                        "name": "album_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "upload file",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.AlbumDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_adapters_delivery_api.RestErrorInternalError"
+                        }
+                    }
+                }
+            }
+        },
         "/albums/{album_id}/musicians": {
             "get": {
                 "description": "get musician by album id",
@@ -1365,6 +1415,56 @@
                 }
             }
         },
+        "/tracks/{track_id}/image": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "upload track image",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "track"
+                ],
+                "summary": "UploadImage",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "track id",
+                        "name": "track_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "upload file",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.TrackDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_adapters_delivery_api.RestErrorInternalError"
+                        }
+                    }
+                }
+            }
+        },
         "/tracks/{track_id}/musicians": {
             "get": {
                 "description": "get musician by track id",
@@ -1746,6 +1846,9 @@
                     "type": "string"
                 },
                 "id": {
+                    "type": "string"
+                },
+                "image_url": {
                     "type": "string"
                 },
                 "name": {

@@ -32,6 +32,38 @@ paths:
       summary: GetAllAlbums
       tags:
         - album
+  "/albums/{album_id}/image":
+    put:
+      description: upload album image
+      parameters:
+        - description: album id
+          in: path
+          name: album_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/putAlbums_albumId_image"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/github_com_hanoys_sigma-music_internal_adapters_del\
+                  ivery_api_dto.AlbumDTO"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/internal_adapters_delivery_api.RestErrorInternalErr\
+                  or"
+      security:
+        - ApiKeyAuth: []
+      summary: UploadImage
+      tags:
+        - album
   "/albums/{album_id}/musicians":
     get:
       description: get musician by album id
@@ -1072,6 +1104,38 @@ paths:
       summary: SetGenresForTrack
       tags:
         - genre
+  "/tracks/{track_id}/image":
+    put:
+      description: upload track image
+      parameters:
+        - description: track id
+          in: path
+          name: track_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/putAlbums_albumId_image"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/github_com_hanoys_sigma-music_internal_adapters_del\
+                  ivery_api_dto.TrackDTO"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/internal_adapters_delivery_api.RestErrorInternalErr\
+                  or"
+      security:
+        - ApiKeyAuth: []
+      summary: UploadImage
+      tags:
+        - track
   "/tracks/{track_id}/musicians":
     get:
       description: get musician by track id
@@ -1359,6 +1423,20 @@ paths:
 servers:
   - url: //localhost:80/api/v1
 components:
+  requestBodies:
+    putAlbums_albumId_image:
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              image:
+                description: upload file
+                type: string
+                format: binary
+            required:
+              - image
+      required: true
   securitySchemes:
     ApiKeyAuth:
       in: header
@@ -1377,6 +1455,8 @@ components:
         description:
           type: string
         id:
+          type: string
+        image_url:
           type: string
         name:
           type: string

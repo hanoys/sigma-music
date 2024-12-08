@@ -34,8 +34,8 @@ func NewMusicianHandler(router *gin.RouterGroup,
 			musicianHandler.getByID)
 	}
 
-    router.GET("/albums/:album_id/musicians", musicianHandler.getByAlbumID)
-    router.GET("/tracks/:track_id/musicians", musicianHandler.getByTrackID)
+	router.GET("/albums/:album_id/musicians", musicianHandler.getByAlbumID)
+	router.GET("/tracks/:track_id/musicians", musicianHandler.getByTrackID)
 
 	return musicianHandler
 }
@@ -184,5 +184,3 @@ func (h *MusicianHandler) getByTrackID(context *gin.Context) {
 	musicianDTO := dto.MusicianFromDomain(musician)
 	successResponse(context, musicianDTO)
 }
-
-
