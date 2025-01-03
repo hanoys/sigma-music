@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	"github.com/google/uuid"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
@@ -16,7 +17,8 @@ type CommentService struct {
 func NewCommentService(repo ports.ICommentRepository, logger *zap.Logger) *CommentService {
 	return &CommentService{
 		repository: repo,
-		logger:     logger}
+		logger:     logger,
+	}
 }
 
 func (cs *CommentService) Post(ctx context.Context, comment ports.PostCommentServiceReq) (domain.Comment, error) {
@@ -26,6 +28,20 @@ func (cs *CommentService) Post(ctx context.Context, comment ports.PostCommentSer
 		TrackID: comment.TrackID,
 		Stars:   comment.Stars,
 		Text:    comment.Text,
+	}
+
+	comments, err := cs.GetUserComments(ctx, comment.UserID)
+    if err != nil {
+        return domain.Comment{}, err
+    }
+
+	for _, postedComment := range comments {
+		if postedComment.UserID == comment.UserID && postedComment.TrackID == comment.TrackID {
+			_, err = cs.repository.Delete(ctx, comment.UserID, postedComment.TrackID)
+            if err != nil {
+                return domain.Comment{}, err
+            }
+		}
 	}
 
 	comm, err := cs.repository.Create(ctx, postComment)
@@ -40,6 +56,11 @@ func (cs *CommentService) Post(ctx context.Context, comment ports.PostCommentSer
 		zap.String("User ID", postComment.UserID.String()), zap.String("Track ID", postComment.TrackID.String()))
 
 	return comm, nil
+}
+
+func (cs *CommentService) Delete(ctx context.Context, userID uuid.UUID, trackID uuid.UUID) (domain.Comment, error) {
+	comment, err := cs.repository.Delete(ctx, userID, trackID)
+	return comment, err
 }
 
 func (cs *CommentService) GetCommentsOnTrack(ctx context.Context, trackID uuid.UUID) ([]domain.Comment, error) {

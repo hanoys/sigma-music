@@ -818,6 +818,38 @@ paths:
       summary: CreateTrack
       tags:
       - track
+  /musicians/{musician_id}/image:
+    put:
+      consumes:
+      - multipart/form-data
+      description: upload musician avatar
+      parameters:
+      - description: musician id
+        in: path
+        name: musician_id
+        required: true
+        type: string
+      - description: upload file
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.MusicianDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
+      security:
+      - ApiKeyAuth: []
+      summary: UploadImage
+      tags:
+      - musician
   /musicians/{musician_id}/tracks/{track_id}:
     delete:
       consumes:
@@ -1166,38 +1198,6 @@ paths:
       summary: SetGenresForTrack
       tags:
       - genre
-  /tracks/{track_id}/image:
-    put:
-      consumes:
-      - multipart/form-data
-      description: upload track image
-      parameters:
-      - description: track id
-        in: path
-        name: track_id
-        required: true
-        type: string
-      - description: upload file
-        in: formData
-        name: image
-        required: true
-        type: file
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.TrackDTO'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/internal_adapters_delivery_api.RestErrorInternalError'
-      security:
-      - ApiKeyAuth: []
-      summary: UploadImage
-      tags:
-      - track
   /tracks/{track_id}/musicians:
     get:
       consumes:

@@ -2,24 +2,30 @@ package service
 
 import (
 	"context"
+	"io"
+
 	"github.com/google/uuid"
+	"github.com/guregu/null/v5"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
 	"go.uber.org/zap"
 )
 
 type MusicianService struct {
-	repository ports.IMusicianRepository
-	hash       ports.IHashPasswordProvider
-	logger     *zap.Logger
+	repository   ports.IMusicianRepository
+	imageStorage ports.IMusicianImageStorage
+	hash         ports.IHashPasswordProvider
+	logger       *zap.Logger
 }
 
-func NewMusicianService(repo ports.IMusicianRepository, hash ports.IHashPasswordProvider,
-	logger *zap.Logger) *MusicianService {
+func NewMusicianService(repo ports.IMusicianRepository, imageStorage ports.IMusicianImageStorage, hash ports.IHashPasswordProvider,
+	logger *zap.Logger,
+) *MusicianService {
 	return &MusicianService{
-		repository: repo,
-		hash:       hash,
-		logger:     logger,
+		repository:   repo,
+		imageStorage: imageStorage,
+		hash:         hash,
+		logger:       logger,
 	}
 }
 
@@ -57,6 +63,26 @@ func (ms *MusicianService) Register(ctx context.Context, musician ports.Musician
 	ms.logger.Info("Musician successfully registered", zap.String("Musician ID", createMusician.ID.String()))
 
 	return mus, nil
+}
+
+func (ms *MusicianService) UploadImage(ctx context.Context, image io.Reader, id uuid.UUID) (domain.Musician, error) {
+	url, err := ms.imageStorage.UploadImage(ctx, image, id.String())
+	if err != nil {
+		return domain.Musician{}, err
+	}
+
+	musician, err := ms.repository.GetByID(ctx, id)
+	if err != nil {
+		return domain.Musician{}, err
+	}
+
+	musician.ImageURL = null.StringFrom(url.String())
+	updatedMusician, err := ms.repository.Update(ctx, musician)
+	if err != nil {
+		return domain.Musician{}, err
+	}
+
+	return updatedMusician, nil
 }
 
 func (ms *MusicianService) GetAll(ctx context.Context) ([]domain.Musician, error) {

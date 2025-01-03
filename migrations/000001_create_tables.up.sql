@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS musicians (
     password VARCHAR(255) NOT NULL,
     salt VARCHAR(255) NOT NULL,
     country VARCHAR(255) NOT NULL,
-    description VARCHAR(1024) NOT NULL
+    description VARCHAR(1024) NOT NULL,
+    image_url VARCHAR(1024) 
 );
 
 CREATE TABLE IF NOT EXISTS albums (
@@ -44,7 +45,8 @@ CREATE TABLE IF NOT EXISTS tracks (
     id UUID PRIMARY KEY,
     album_id UUID REFERENCES albums ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
-    url VARCHAR(2048) NOT NULL
+    url VARCHAR(2048) NOT NULL,
+    image_url VARCHAR(1024)
 );
 
 CREATE TABLE IF NOT EXISTS genres (

@@ -16,14 +16,15 @@ import (
 )
 
 const (
-	TrackGetAllQuery          = "SELECT t.id, t.album_id, t.name, t.url, t.image_url FROM tracks t JOIN albums a ON t.album_id = a.id WHERE a.published = TRUE"
+	TrackGetAllQuery          = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN albums a ON t.album_id = a.id WHERE a.published = TRUE"
 	TrackDeleteQuery          = "DELETE FROM tracks WHERE id = $1"
-	TrackGetByIDQuery         = "SELECT t.id, t.album_id, t.name, t.url, t.image_url FROM tracks t JOIN albums a ON t.album_id = a.id WHERE t.id = $1 AND a.published = TRUE"
-	TrackGetByIDInternalQuery = "SELECT id, album_id, name, url, image_url FROM tracks WHERE id = $1"
-	TrackGetUserFavorites     = "SELECT t.id, t.album_id, t.name, t.url, t.image_url FROM tracks t JOIN favorite f on t.id = f.track_id WHERE f.user_id = $1"
-	TrackGetByAlbumID         = "SELECT t.id, t.album_id, t.name, t.url, t.image_url FROM tracks t JOIN albums a ON t.album_id = a.id WHERE a.published = TRUE AND a.id = $1"
-	TrackGetByMusicianID      = "SELECT t.id, t.album_id, t.name, t.url, t.image_url FROM tracks t JOIN albums a ON t.album_id = a.id JOIN album_musician am on a.id = am.album_id JOIN musicians m on am.musician_id = m.id WHERE published = TRUE and m.id = $1"
-	TrackGetOwn               = "SELECT t.id, t.album_id, t.name, t.url, t.image_url FROM tracks t JOIN albums a ON t.album_id = a.id JOIN album_musician am on a.id = am.album_id JOIN musicians m on am.musician_id = m.id WHERE m.id = $1"
+	TrackDeleteFavoriteQuery  = "DELETE FROM favorite WHERE user_id = $1 and track_id = $2"
+	TrackGetByIDQuery         = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN albums a ON t.album_id = a.id WHERE t.id = $1 AND a.published = TRUE"
+	TrackGetByIDInternalQuery = "SELECT id, album_id, name, url FROM tracks WHERE id = $1"
+	TrackGetUserFavorites     = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN favorite f on t.id = f.track_id WHERE f.user_id = $1"
+	TrackGetByAlbumID         = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN albums a ON t.album_id = a.id WHERE a.published = TRUE AND a.id = $1"
+	TrackGetByMusicianID      = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN albums a ON t.album_id = a.id JOIN album_musician am on a.id = am.album_id JOIN musicians m on am.musician_id = m.id WHERE published = TRUE and m.id = $1"
+	TrackGetOwn               = "SELECT t.id, t.album_id, t.name, t.url FROM tracks t JOIN albums a ON t.album_id = a.id JOIN album_musician am on a.id = am.album_id JOIN musicians m on am.musician_id = m.id WHERE m.id = $1"
 	TrackInsertFavorite       = "INSERT INTO favorite(user_id, track_id) VALUES ($1, $2)"
 )
 
@@ -122,6 +123,24 @@ func (tr *PostgresTrackRepository) Delete(ctx context.Context, trackID uuid.UUID
 	_, err = tr.connection.ExecContext(ctx, TrackDeleteQuery, trackID)
 	if err != nil {
 		return domain.Track{}, util.WrapError(ports.ErrTrackDelete, err)
+	}
+
+	return deletedTrack.ToDomain(), nil
+}
+
+func (tr *PostgresTrackRepository) DeleteFavorite(ctx context.Context, trackID uuid.UUID, userID uuid.UUID) (domain.Track, error) {
+	var deletedTrack entity2.PgTrack
+	err := tr.connection.GetContext(ctx, &deletedTrack, TrackGetByIDInternalQuery, trackID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.Track{}, util.WrapError(ports.ErrTrackIDNotFound, err)
+		}
+		return domain.Track{}, util.WrapError(ports.ErrInternalTrackRepo, err)
+	}
+
+	_, err = tr.connection.ExecContext(ctx, TrackDeleteFavoriteQuery, userID, trackID)
+	if err != nil {
+		return domain.Track{}, util.WrapError(ports.ErrTrackDeleteFavorite, err)
 	}
 
 	return deletedTrack.ToDomain(), nil

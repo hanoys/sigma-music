@@ -683,6 +683,38 @@ paths:
       summary: CreateTrack
       tags:
         - track
+  "/musicians/{musician_id}/image":
+    put:
+      description: upload musician avatar
+      parameters:
+        - description: musician id
+          in: path
+          name: musician_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/putAlbums_albumId_image"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/github_com_hanoys_sigma-music_internal_adapters_del\
+                  ivery_api_dto.MusicianDTO"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/internal_adapters_delivery_api.RestErrorInternalErr\
+                  or"
+      security:
+        - ApiKeyAuth: []
+      summary: UploadImage
+      tags:
+        - musician
   "/musicians/{musician_id}/tracks/{track_id}":
     delete:
       description: get track by id
@@ -1104,38 +1136,6 @@ paths:
       summary: SetGenresForTrack
       tags:
         - genre
-  "/tracks/{track_id}/image":
-    put:
-      description: upload track image
-      parameters:
-        - description: track id
-          in: path
-          name: track_id
-          required: true
-          schema:
-            type: string
-      requestBody:
-        $ref: "#/components/requestBodies/putAlbums_albumId_image"
-      responses:
-        "201":
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/github_com_hanoys_sigma-music_internal_adapters_del\
-                  ivery_api_dto.TrackDTO"
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/internal_adapters_delivery_api.RestErrorInternalErr\
-                  or"
-      security:
-        - ApiKeyAuth: []
-      summary: UploadImage
-      tags:
-        - track
   "/tracks/{track_id}/musicians":
     get:
       description: get musician by track id

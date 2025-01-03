@@ -1,6 +1,9 @@
 package domain
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+	"github.com/guregu/null/v5"
+)
 
 type Musician struct {
 	ID          uuid.UUID
@@ -10,4 +13,5 @@ type Musician struct {
 	Salt        string
 	Country     string
 	Description string
+	ImageURL    null.String
 }

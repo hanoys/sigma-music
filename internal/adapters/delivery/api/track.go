@@ -52,57 +52,48 @@ func NewTrackHandler(router *gin.RouterGroup,
 		authHandler.verifyToken,
 		authHandler.verifyUserRole,
 		trackHandler.addToFavorites)
+	router.DELETE("/users/me/favorites/:track_id",
+		authHandler.verifyToken,
+		authHandler.verifyUserRole,
+		trackHandler.deleteFromFavorites)
 	router.GET("/musicians/:musician_id/tracks",
 		trackHandler.getByMusicianID)
 	router.GET("/musicians/me/tracks",
 		authHandler.verifyToken,
 		authHandler.verifyMusicianRole,
 		trackHandler.getOwn)
-	router.PUT("/tracks/:track_id/image",
-		authHandler.verifyToken,
-		authHandler.verifyMusicianRole,
-		trackHandler.uploadImage)
 
 	return trackHandler
 }
 
-// @Summary UploadImage
+// @Summary DeleteFavorite
 // @Tags track
+// @Description delete favorite track
 // @Security ApiKeyAuth
-// @Description upload track image
-// @Accept  mpfd
+// @Accept  json
 // @Produce json
 // @Param   track_id   path    string  true  "track id"
-// @Param image formData file true "upload file"
+// @Failure 400 {object} RestErrorBadRequest
+// @Failure 401 {object} RestErrorUnauthorized
+// @Failure 403 {object} RestErrorForbidden
+// @Failure 404 {object} RestErrorNotFound
 // @Failure 500 {object} RestErrorInternalError
-// @Success 201 {object} dto.TrackDTO
-// @Router /tracks/{track_id}/image [put]
-func (h *TrackHandler) uploadImage(context *gin.Context) {
-	musician_id, err := getIdFromRequestContext(context)
+// @Success 200 {object} dto.TrackDTO
+// @Router /users/me/favorites/{track_id} [delete]
+func (h *TrackHandler) deleteFromFavorites(context *gin.Context) {
+	userID, err := getIdFromRequestContext(context)
 	if err != nil {
 		errorResponse(context, err)
 		return
 	}
 
-	id, err := getIdFromPath(context, "track_id")
+	trackID, err := getIdFromPath(context, "track_id")
 	if err != nil {
 		errorResponse(context, err)
 		return
 	}
 
-	fileheader, err := context.FormFile("image")
-	if err != nil {
-		errorResponse(context, err)
-		return
-	}
-
-	file, err := fileheader.Open()
-	if err != nil {
-		errorResponse(context, err)
-		return
-	}
-
-	track, err := h.s.TrackService.UploadImage(context.Request.Context(), file, id, musician_id)
+	track, err := h.s.TrackService.DeleteFavorite(context.Request.Context(), trackID, userID)
 	if err != nil {
 		errorResponse(context, err)
 		return

@@ -45,11 +45,12 @@ type Config struct {
 	}
 
 	Minio struct {
-		Endpoint             string `config:"MINIO_ENDPOINT"`
-		TrackBucketName      string `config:"TRACK_MINIO_BUCKET_NAME"`
-		AlbumImageBucketName string `config:"ALBUM_IMAGE_MINIO_BUCKET_NAME"`
-		RootUser             string `config:"MINIO_ROOT_USER"`
-		RootPassword         string `config:"MINIO_ROOT_PASSWORD"`
+		Endpoint                string `config:"MINIO_ENDPOINT"`
+		TrackBucketName         string `config:"TRACK_MINIO_BUCKET_NAME"`
+		AlbumImageBucketName    string `config:"ALBUM_IMAGE_MINIO_BUCKET_NAME"`
+		MusicianImageBucketName string `config:"MUSICIAN_IMAGE_MINIO_BUCKET_NAME"`
+		RootUser                string `config:"MINIO_ROOT_USER"`
+		RootPassword            string `config:"MINIO_ROOT_PASSWORD"`
 	}
 
 	Logger struct {
@@ -102,11 +103,12 @@ type RedisConfig struct {
 }
 
 type MinioConfig struct {
-	Endpoint             string
-	TrackBucketName      string
-	AlbumImageBucketName string
-	RootUser             string
-	RootPassword         string
+	Endpoint                string
+	TrackBucketName         string
+	AlbumImageBucketName    string
+	MusicianImageBucketName string
+	RootUser                string
+	RootPassword            string
 }
 
 type LoggerConfig struct {
@@ -193,8 +195,18 @@ func NewMinioClient(cfg *MinioConfig) (*minio.Client, error) {
 	}
 
 	ctx := context.Background()
-	minioCreateBucket(ctx, minioClient, cfg.TrackBucketName)
-	minioCreateBucket(ctx, minioClient, cfg.AlbumImageBucketName)
+	err = minioCreateBucket(ctx, minioClient, cfg.TrackBucketName)
+	if err != nil {
+		return nil, err
+	}
+	err = minioCreateBucket(ctx, minioClient, cfg.AlbumImageBucketName)
+	if err != nil {
+		return nil, err
+	}
+	err = minioCreateBucket(ctx, minioClient, cfg.MusicianImageBucketName)
+	if err != nil {
+		return nil, err
+	}
 	return minioClient, nil
 }
 

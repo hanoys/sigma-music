@@ -2,10 +2,9 @@ package service
 
 import (
 	"context"
-	"io"
+	"log"
 
 	"github.com/google/uuid"
-	"github.com/guregu/null/v5"
 	"github.com/hanoys/sigma-music/internal/domain"
 	"github.com/hanoys/sigma-music/internal/ports"
 	"go.uber.org/zap"
@@ -27,32 +26,6 @@ func NewTrackService(repo ports.ITrackRepository, storage ports.ITrackObjectStor
 		genreService: genreService,
 		logger:       logger,
 	}
-}
-
-func (ts *TrackService) UploadImage(ctx context.Context, image io.Reader, id uuid.UUID, musician_id uuid.UUID) (domain.Track, error) {
-	url, err := ts.trackStorage.UploadImage(ctx, image, id.String())
-	if err != nil {
-		return domain.Track{}, err
-	}
-
-	tracks, err := ts.repository.GetOwn(ctx, musician_id)
-	if err != nil {
-		return domain.Track{}, err
-	}
-
-	for _, track := range tracks {
-		if track.ID == id {
-			track.ImageURL = null.StringFrom(url.String())
-			track, err = ts.repository.Update(ctx, track)
-			if err != nil {
-				return domain.Track{}, err
-			}
-
-			return track, nil
-		}
-	}
-
-	return domain.Track{}, ports.ErrTrackIDNotFound
 }
 
 func (ts *TrackService) Create(ctx context.Context, trackInfo ports.CreateTrackReq) (domain.Track, error) {
@@ -95,6 +68,8 @@ func (ts *TrackService) Create(ctx context.Context, trackInfo ports.CreateTrackR
 	ts.logger.Info("Track successfully created",
 		zap.String("Track ID", track.ID.String()), zap.String("Album ID", trackInfo.AlbumID.String()),
 		zap.String("Track name", trackInfo.Name), zap.String("Track URL", track.URL))
+
+	log.Println("TRACK DEBUG: created track: ", track.ID.String())
 
 	return track, nil
 }
@@ -139,6 +114,15 @@ func (ts *TrackService) Delete(ctx context.Context, trackID uuid.UUID) (domain.T
 	ts.logger.Info("Track successfully delted", zap.String("Track ID", trackID.String()))
 
 	return trackInfo, nil
+}
+
+func (ts *TrackService) DeleteFavorite(ctx context.Context, trackID uuid.UUID, userID uuid.UUID) (domain.Track, error) {
+	track, err := ts.repository.DeleteFavorite(ctx, trackID, userID)
+	if err != nil {
+		return domain.Track{}, nil
+	}
+
+	return track, nil
 }
 
 func (ts *TrackService) GetUserFavorites(ctx context.Context, userID uuid.UUID) ([]domain.Track, error) {

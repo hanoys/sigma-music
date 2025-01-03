@@ -1,6 +1,8 @@
 package api
 
 import (
+	"log"
+
 	"github.com/gin-gonic/gin"
 	"github.com/hanoys/sigma-music/internal/adapters/delivery/api/dto"
 	"github.com/hanoys/sigma-music/internal/ports"
@@ -17,7 +19,8 @@ type CommentHandler struct {
 func NewCommentHandler(router *gin.RouterGroup,
 	logger *zap.Logger,
 	services *Services,
-	authHandler *AuthHandler) *CommentHandler {
+	authHandler *AuthHandler,
+) *CommentHandler {
 	commentHandler := &CommentHandler{
 		router:      router,
 		logger:      logger,
@@ -34,8 +37,50 @@ func NewCommentHandler(router *gin.RouterGroup,
 	router.GET("/users/me/comments",
 		authHandler.verifyToken,
 		commentHandler.getUsers)
+	router.DELETE("/users/me/comments/:track_id",
+		authHandler.verifyToken,
+		authHandler.verifyUserRole,
+		commentHandler.delete)
 
 	return commentHandler
+}
+
+// @Summary DeleteComment
+// @Tags comment
+// @Description delete comment on track
+// @Security ApiKeyAuth
+// @Accept  json
+// @Produce json
+// @Param   track_id   path    string  true  "track id"
+// @Failure 400 {object} RestErrorBadRequest
+// @Failure 401 {object} RestErrorUnauthorized
+// @Failure 403 {object} RestErrorForbidden
+// @Failure 404 {object} RestErrorNotFound
+// @Failure 500 {object} RestErrorInternalError
+// @Success 200 {object} dto.CommentDTO
+// @Router /users/me/comments/{track_id} [delete]
+
+func (h *CommentHandler) delete(context *gin.Context) {
+	userID, err := getIdFromRequestContext(context)
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	trackID, err := getIdFromPath(context, "track_id")
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	comment, err := h.s.CommentService.Delete(context.Request.Context(), userID, trackID)
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	commentDTO := dto.CommentFromDomain(comment)
+	successResponse(context, commentDTO)
 }
 
 // @Summary PostComment
@@ -82,6 +127,7 @@ func (h *CommentHandler) post(context *gin.Context) {
 		},
 	)
 	if err != nil {
+        log.Println("COMMENT ERROR: ", err)
 		errorResponse(context, err)
 		return
 	}

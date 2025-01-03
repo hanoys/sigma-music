@@ -1020,6 +1020,56 @@ const docTemplate = `{
                 }
             }
         },
+        "/musicians/{musician_id}/image": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "upload musician avatar",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "musician"
+                ],
+                "summary": "UploadImage",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "musician id",
+                        "name": "musician_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "upload file",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.MusicianDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_adapters_delivery_api.RestErrorInternalError"
+                        }
+                    }
+                }
+            }
+        },
         "/musicians/{musician_id}/tracks/{track_id}": {
             "delete": {
                 "security": [
@@ -1410,56 +1460,6 @@ const docTemplate = `{
                         "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/internal_adapters_delivery_api.RestErrorNotFound"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/internal_adapters_delivery_api.RestErrorInternalError"
-                        }
-                    }
-                }
-            }
-        },
-        "/tracks/{track_id}/image": {
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "upload track image",
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "track"
-                ],
-                "summary": "UploadImage",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "track id",
-                        "name": "track_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "file",
-                        "description": "upload file",
-                        "name": "image",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_hanoys_sigma-music_internal_adapters_delivery_api_dto.TrackDTO"
                         }
                     },
                     "500": {

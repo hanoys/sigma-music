@@ -67,11 +67,12 @@ func Run() {
 	}
 
 	minioClient, err := config.NewMinioClient(&config.MinioConfig{
-		Endpoint:             cfg.Minio.Endpoint,
-		TrackBucketName:      cfg.Minio.TrackBucketName,
-		AlbumImageBucketName: cfg.Minio.AlbumImageBucketName,
-		RootUser:             cfg.Minio.RootUser,
-		RootPassword:         cfg.Minio.RootPassword,
+		Endpoint:                cfg.Minio.Endpoint,
+		TrackBucketName:         cfg.Minio.TrackBucketName,
+		AlbumImageBucketName:    cfg.Minio.AlbumImageBucketName,
+		MusicianImageBucketName: cfg.Minio.MusicianImageBucketName,
+		RootUser:                cfg.Minio.RootUser,
+		RootPassword:            cfg.Minio.RootPassword,
 	})
 	if err != nil {
 		logger.Fatal("Error connecting minio", zap.Error(err))
@@ -94,10 +95,11 @@ func Run() {
 	hashProvider := hash.NewHashPasswordProvider()
 	trackStorage := miniostorage.NewTrackStorage(minioClient, cfg.Minio.TrackBucketName)
 	albumImageStorage := miniostorage.NewAlbumImageStorage(minioClient, cfg.Minio.AlbumImageBucketName)
+	musicianImageStorage := miniostorage.NewMusicianImageStorage(minioClient, cfg.Minio.MusicianImageBucketName)
 
 	authService := service.NewAuthorizationService(userRepo, musicianRepo, tokenProvider, hashProvider, logger)
 	userService := service.NewUserService(userRepo, hashProvider, logger)
-	musicianService := service.NewMusicianService(musicianRepo, hashProvider, logger)
+	musicianService := service.NewMusicianService(musicianRepo, musicianImageStorage, hashProvider, logger)
 	albumService := service.NewAlbumService(albumRepo, albumImageStorage, logger)
 	commentService := service.NewCommentService(commentRepo, logger)
 	genreService := service.NewGenreService(genreRepo, logger)

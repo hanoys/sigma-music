@@ -1,6 +1,8 @@
 package api
 
 import (
+	"log"
+
 	"github.com/gin-gonic/gin"
 	"github.com/hanoys/sigma-music/internal/adapters/delivery/api/dto"
 	"github.com/hanoys/sigma-music/internal/ports"
@@ -17,7 +19,8 @@ type MusicianHandler struct {
 func NewMusicianHandler(router *gin.RouterGroup,
 	logger *zap.Logger,
 	services *Services,
-	authHandler *AuthHandler) *MusicianHandler {
+	authHandler *AuthHandler,
+) *MusicianHandler {
 	musicianHandler := &MusicianHandler{
 		router:      router,
 		logger:      logger,
@@ -37,7 +40,53 @@ func NewMusicianHandler(router *gin.RouterGroup,
 	router.GET("/albums/:album_id/musicians", musicianHandler.getByAlbumID)
 	router.GET("/tracks/:track_id/musicians", musicianHandler.getByTrackID)
 
+	router.PUT("/musicians/:musician_id/image",
+		authHandler.verifyToken,
+		authHandler.verifyMusicianRole,
+		musicianHandler.uploadImage)
+
 	return musicianHandler
+}
+
+// @Summary UploadImage
+// @Tags musician
+// @Security ApiKeyAuth
+// @Description upload musician avatar
+// @Accept  mpfd
+// @Produce json
+// @Param   musician_id   path    string  true  "musician id"
+// @Param image formData file true "upload file"
+// @Failure 500 {object} RestErrorInternalError
+// @Success 201 {object} dto.MusicianDTO
+// @Router /musicians/{musician_id}/image [put]
+func (h *MusicianHandler) uploadImage(context *gin.Context) {
+	musician_id, err := getIdFromRequestContext(context)
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	fileheader, err := context.FormFile("image")
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	file, err := fileheader.Open()
+	if err != nil {
+		errorResponse(context, err)
+		return
+	}
+
+	musician, err := h.s.MusicianService.UploadImage(context.Request.Context(), file, musician_id)
+	if err != nil {
+        log.Println("MUS ERR: ", err)
+		errorResponse(context, err)
+		return
+	}
+
+	musicianDTO := dto.MusicianFromDomain(musician)
+	successResponse(context, musicianDTO)
 }
 
 // @Summary MusicianRegister

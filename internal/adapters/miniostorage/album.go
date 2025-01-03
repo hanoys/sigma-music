@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/url"
 	"path/filepath"
+	"strings"
 
 	"github.com/minio/minio-go/v7"
 )
@@ -19,15 +20,16 @@ func NewAlbumImageStorage(client *minio.Client, bucketName string) *AlbumImageSt
 }
 
 func (a *AlbumImageStorage) UploadImage(ctx context.Context, image io.Reader, id string) (url.URL, error) {
-	_, err := a.client.PutObject(ctx, a.bucketName, id, image, -1, minio.PutObjectOptions{})
+	object_name := id + "_image.jpg"
+	_, err := a.client.PutObject(ctx, a.bucketName, object_name, image, -1, minio.PutObjectOptions{})
 	if err != nil {
 		return url.URL{}, err
 	}
 
 	fileURL := url.URL{
 		Scheme: "http",
-		Host:   a.client.EndpointURL().Host,
-		Path:   filepath.Join(a.bucketName, id) + ".png",
+		Host:   strings.Replace(a.client.EndpointURL().Host, "minio", "localhost", 1),
+		Path:   filepath.Join(a.bucketName, object_name),
 	}
 
 	return fileURL, nil

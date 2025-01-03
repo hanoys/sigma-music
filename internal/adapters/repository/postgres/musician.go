@@ -20,8 +20,8 @@ const (
 	MusicianGetByIDQuery      = "SELECT * FROM musicians WHERE id = $1"
 	MusicianGetByNameQuery    = "SELECT * FROM musicians WHERE name = $1"
 	MusicianGetByEmailQuery   = "SELECT * FROM musicians WHERE email = $1"
-	MusicianGetByAlbumIDQuery = "SELECT m.id, m.name, m.email, m.salt, m.password, m.country, m.description FROM musicians m JOIN public.album_musician am on m.id = am.musician_id WHERE album_id = $1"
-	MusicianGetByTrackIDQuery = "SELECT m.id, m.name, m.email, m.salt, m.password, m.country, m.description FROM musicians m JOIN public.album_musician am on m.id = am.musician_id JOIN public.tracks t ON am.album_id = t.album_id WHERE t.id = $1"
+	MusicianGetByAlbumIDQuery = "SELECT m.id, m.name, m.email, m.salt, m.password, m.country, m.description, m.image_url FROM musicians m JOIN public.album_musician am on m.id = am.musician_id WHERE album_id = $1"
+	MusicianGetByTrackIDQuery = "SELECT m.id, m.name, m.email, m.salt, m.password, m.country, m.description, m.image_url FROM musicians m JOIN public.album_musician am on m.id = am.musician_id JOIN public.tracks t ON am.album_id = t.album_id WHERE t.id = $1"
 )
 
 type PostgresMusicianRepository struct {
@@ -56,6 +56,26 @@ func (mr *PostgresMusicianRepository) Create(ctx context.Context, musician domai
 	}
 
 	return createdMusician.ToDomain(), nil
+}
+
+func (mr *PostgresMusicianRepository) Update(ctx context.Context, musician domain.Musician) (domain.Musician, error) {
+	pgMusician := entity2.NewPgMusician(musician)
+	queryString := entity2.UpdateQueryString(pgMusician, "musicians")
+	_, err := mr.connection.NamedExecContext(ctx, queryString, pgMusician)
+	if err != nil {
+		return domain.Musician{}, util.WrapError(ports.ErrMusicianUpdate, err)
+	}
+
+	var updatedMusician entity2.PgMusician
+	err = mr.connection.GetContext(ctx, &updatedMusician, MusicianGetByIDQuery, pgMusician.ID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.Musician{}, util.WrapError(ports.ErrMusicianIDNotFound, err)
+		}
+		return domain.Musician{}, util.WrapError(ports.ErrInternalMusicianRepo, err)
+	}
+
+	return updatedMusician.ToDomain(), nil
 }
 
 func (mr *PostgresMusicianRepository) GetAll(ctx context.Context) ([]domain.Musician, error) {

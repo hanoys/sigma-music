@@ -11,6 +11,7 @@ type MusicianDTO struct {
 	Email       string    `json:"email"`
 	Country     string    `json:"country"`
 	Description string    `json:"description"`
+	ImageURL    string    `json:"image_url"`
 }
 
 func MusicianFromDomain(musician domain.Musician) MusicianDTO {
@@ -20,6 +21,7 @@ func MusicianFromDomain(musician domain.Musician) MusicianDTO {
 		Email:       musician.Email,
 		Country:     musician.Country,
 		Description: musician.Description,
+		ImageURL:    musician.ImageURL.ValueOrZero(),
 	}
 }
 
